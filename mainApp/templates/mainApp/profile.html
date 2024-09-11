@@ -1,0 +1,419 @@
+{% extends 'mainApp/main.html' %} {% load static %}
+<!--  -->
+{% block css %}
+<link
+  rel="stylesheet"
+  href="{% static 'css/profile.css' %}"
+  type="text/css"
+  media="screen"
+/>
+
+<link
+  rel="stylesheet"
+  href="{% static 'css/saerto_styles.css' %}"
+  type="text/css"
+  media="screen"
+/>
+{% endblock css %}
+<!-- Page Content -->
+
+{% block content %}
+
+<nav class="top-nav">
+  <a href="{% url 'home' %}" class="nav-link">🏠 Home</a>
+  <a href="#" class="nav-link">👤 Profile</a>
+  <a
+    href="#notifications"
+    class="nav-link"
+    data-bs-toggle="modal"
+    data-bs-target="#staticBackdrop2"
+    data-title="Notifications"
+    >🔔 Notifications</a
+  >
+  <a href="{% url 'logout' %}" class="nav-link">🚪 Logout</a>
+</nav>
+
+<!-- Profile Header -->
+<header id="profile-header" style="margin-top: 4.1rem">
+  <div class="profile-cover">
+    <img src="images/No Image.svg" alt="Cover Photo" />
+  </div>
+
+  <div class="profile-info container">
+    <img
+      src="/static/media/{{request.user.avatar}}"
+      alt="User Avatar"
+      class="profile-avatar"
+    />
+    <div class="profile-details">
+      <h2>Username</h2>
+      <p>@username_handle</p>
+      <p class="bio">
+        This is the user's bio, describing their interests and activities.
+      </p>
+      <button class="edit-profile-btn d-none">Edit Profile</button>
+
+      <div class="profile-buttons">
+        <button>Add Friend</button>
+        <button class="friend" data-name="Friend 1">Message</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="bottom-nav">
+  <a href="{% url 'home' %}" class="nav-link">🏠</a>
+  <a href="#" class="nav-link">👤</a>
+  <a
+    href="#notifications"
+    class="nav-link"
+    data-bs-toggle="modal"
+    data-bs-target="#staticBackdrop2"
+    data-title="Notifications"
+    >🔔</a
+  >
+  <a href="{% url 'logout' %}" class="nav-link">🚪</a>
+</nav>
+
+<!-- Tab Navigation -->
+<div class="container tab-navigation">
+  <ul class="nav nav-tabs" id="profile-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link active"
+        id="profile-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#profile"
+        type="button"
+        role="tab"
+        aria-controls="profile"
+        aria-selected="true"
+      >
+        Profile
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="friends-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#friends"
+        type="button"
+        role="tab"
+        aria-controls="friends"
+        aria-selected="false"
+      >
+        Friends
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="media-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#media"
+        type="button"
+        role="tab"
+        aria-controls="media"
+        aria-selected="false"
+      >
+        Media
+      </button>
+    </li>
+  </ul>
+</div>
+
+<!-- Tab Content -->
+<div
+  class="tab-content container"
+  id="profile-tab-content"
+  style="margin-bottom: 3rem"
+>
+  <!-- Profile Tab (Main Page Content) -->
+  <div
+    class="tab-pane fade show active"
+    id="profile"
+    role="tabpanel"
+    aria-labelledby="profile-tab"
+  >
+    <div id="profile-page" class="container">
+      <!-- Main Profile Content -->
+      <div id="profile-content">
+        <!-- Left Column: About Section & Images -->
+        <aside id="profile-sidebar">
+          <div class="fixed-container">
+            <!-- About Section -->
+            <section id="profile-about">
+              <h4>About</h4>
+              <ul>
+                <li>
+                  Location:
+                  <button
+                    class="btn btn-warning add-location-btn"
+                    style="font-size: 0.9rem"
+                  >
+                    Add Location
+                  </button>
+
+                  <div class="input-and-add-button-location d-none">
+                    <input type="text" name="location" id="location" />
+
+                    <button class="btn btn-success" style="font-size: 0.8rem">
+                      Add
+                    </button>
+                  </div>
+                </li>
+                <li>
+                  Works at:
+                  <button
+                    class="btn btn-warning add-job-btn"
+                    style="font-size: 0.9rem"
+                  >
+                    Add Job
+                  </button>
+
+                  <div class="input-and-add-button-job d-none">
+                    <input type="text" name="job" id="job" />
+
+                    <button class="btn btn-success" style="font-size: 0.8rem">
+                      Add
+                    </button>
+                  </div>
+                </li>
+                <li>Joined: January 2020</li>
+              </ul>
+            </section>
+
+            <!-- User Images Section -->
+            <section id="profile-images" class="mb-3 media-images">
+              <h4>Images</h4>
+              <div class="photo-grid">
+                <img
+                  src="/static/media/{{request.user.avatar}}"
+                  alt="Photo 1"
+                />
+                <img
+                  src="/static/media/{{request.user.avatar}}"
+                  alt="Photo 2"
+                />
+                <img
+                  src="/static/media/{{request.user.avatar}}"
+                  alt="Photo 3"
+                />
+                <!-- More photos can go here -->
+              </div>
+            </section>
+          </div>
+        </aside>
+
+        <!-- Right Column: User Posts -->
+        <main id="profile-posts" class="posts-area-mainpage-profilepage">
+          <!-- Shared Post -->
+          <article class="post shared-post feed-posts">
+            <div class="post-header">
+              <img src="default-boy-avatar.jpg" alt="User Avatar" />
+              <div class="post-user-info">
+                <h4>Username</h4>
+                <!-- Sharer's name -->
+                <p>Shared 2 hours ago</p>
+                <!-- Time of sharing -->
+              </div>
+            </div>
+            <div class="post-content">
+              <p>Look at this amazing post I found!</p>
+              <!-- Sharer's message -->
+              <!-- Original Post -->
+              <div class="original-post">
+                <div class="post-header">
+                  <img
+                    src="default-boy-avatar.jpg"
+                    alt="Original User Avatar"
+                  />
+                  <div class="post-user-info">
+                    <h4>Original Username</h4>
+                    <!-- Original Poster's name -->
+                    <p>Posted 5 hours ago</p>
+                    <!-- Time of original post -->
+                  </div>
+                </div>
+                <div class="post-content">
+                  <div class="post-description">
+                    <p>This is the original post content!</p>
+                  </div>
+                  <div class="media">
+                    <img src="img1 (1).svg" alt="Original Post Image" />
+                  </div>
+                </div>
+                <div class="post-actions">
+                  <div class="like-section">
+                    <button>👍 Like</button>
+                    <span class="like-count">15 Likes</span>
+                    <!-- Number of likes -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <!-- Post with Text -->
+          <article class="post feed-posts">
+            <div class="post-header">
+              <img src="default-boy-avatar.jpg" alt="User Avatar" />
+              <div class="post-user-info">
+                <h4>Username</h4>
+                <p>Posted 2 hours ago</p>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>This is a sample text post.</p>
+            </div>
+            <div class="post-actions">
+              <div class="like-section">
+                <button>👍 Like</button>
+                <span class="like-count">15 Likes</span>
+                <!-- Number of likes -->
+              </div>
+            </div>
+            <!-- Hidden Comment Section -->
+            <details>
+              <summary>View Comments</summary>
+              <div class="comments">
+                <!-- Comment -->
+                <div class="comment">
+                  <p><strong>Friend:</strong> Nice post!</p>
+                </div>
+                <!-- Add a Comment -->
+                <div class="add-comment">
+                  <input type="text" placeholder="Write a comment..." />
+                  <button>Post</button>
+                </div>
+              </div>
+            </details>
+          </article>
+          <!-- More user posts -->
+        </main>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Friends Tab -->
+<div
+  class="tab-pane fade container mt-3"
+  id="friends"
+  role="tabpanel"
+  aria-labelledby="friends-tab"
+  style="margin-bottom: 5rem"
+>
+  <h3>Friend List</h3>
+
+  <div id="search-friends-desktop" class="mb-3">
+    <input
+      type="text"
+      id="search-input__nav-desktop"
+      placeholder="Find Friends"
+      style="font-size: 0.9rem"
+    />
+    <button>🔍</button>
+  </div>
+
+  <ul class="friend-list">
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 1</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 2</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 3</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 1</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 2</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 3</p>
+    </li>
+
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 1</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 2</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 3</p>
+    </li>
+
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 1</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 2</p>
+    </li>
+    <li>
+      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+      <p>Friend 3</p>
+    </li>
+  </ul>
+</div>
+
+<!-- Media Tab -->
+<div
+  class="tab-pane fade container mt-3 media-images"
+  id="media"
+  role="tabpanel"
+  aria-labelledby="media-tab"
+  style="margin-bottom: 5rem"
+>
+  <h3>Media</h3>
+
+  <div
+    class="photo-grid tab-photo-grid"
+    style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"
+  >
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 1" />
+    <video controls>
+      <source src="chat.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 3" />
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 4" />
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 1" />
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 2" />
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 3" />
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 4" />
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 1" />
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 2" />
+    <img src="/static/media/{{request.user.avatar}}" alt="Photo 3" />
+    <video controls>
+      <source src="chat.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <!-- More photos can go here -->
+  </div>
+</div>
+
+<!-- Chat Window -->
+{% include 'mainApp/components/chat_window.html' %}
+
+<!-- Modal for notifications -->
+{% include 'mainApp/components/notifications_modal.html' %}
+
+<!--  -->
+{% block scripts %}
+
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock scripts %} {% endblock content %}

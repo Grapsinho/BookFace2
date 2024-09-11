@@ -1,0 +1,826 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;amp;display=swap");
+
+h3 {
+  font-size: 1.1rem !important;
+}
+
+h1 {
+  font-size: 1.2rem !important;
+}
+
+p {
+  margin-bottom: 0 !important;
+}
+
+.container-for-everything {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr; /* Friend list, main content, nav */
+
+  min-height: 100vh;
+}
+
+nav,
+aside {
+  background-color: #ffffff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.fixed-nav-container {
+  position: fixed;
+  background-color: #ffffff;
+
+  padding-inline: 0.5rem;
+}
+
+/* Navigation Sidebar */
+#user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#user-info img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+#search-friends-desktop,
+#search-friends-mobile,
+#search-friends {
+  display: flex;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+#search-friends-desktop input,
+#search-friends-mobile input,
+#search-friends input {
+  width: 80%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+#search-friends-desktop button,
+#search-friends-mobile button,
+#search-friends button {
+  background-color: #1877f2;
+  color: #ffffff;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 5px;
+}
+
+nav ul {
+  list-style: none;
+  width: 100%;
+}
+
+nav ul li {
+  margin: 15px 0;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  padding: 10px 20px;
+  display: block;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+
+nav ul li a:hover {
+  background-color: #f0f2f5;
+}
+
+/* Main Content */
+#main-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+#create-post {
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+#create-post .open-post-create-thing {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  cursor: pointer;
+  color: #8d8d8d;
+}
+
+/* Right Sidebar */
+aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+aside section {
+  background-color: #f0f2f5;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+aside section h4 {
+  margin-bottom: 10px;
+}
+
+aside ul {
+  list-style: none;
+}
+
+aside ul li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+aside ul li img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+aside ul li p {
+  flex-grow: 1;
+}
+
+aside ul li button {
+  background-color: #1877f2;
+  color: #ffffff;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+aside ul li button:hover {
+  background-color: #165ecf;
+}
+
+/* Scrollable Friend Suggestions */
+.sxvafirend {
+  position: fixed;
+  padding: 0 0.5rem;
+}
+
+#friend-list ul {
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+/* Chat Window */
+#chat-window {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
+  width: 300px;
+  background-color: white;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+  height: 100%;
+}
+
+.chat-hidden {
+  transform: translateY(100%);
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #1877f2;
+  color: white;
+  border-radius: 10px 10px 0 0;
+}
+
+.chat-header h4 {
+  margin: 0;
+}
+
+.chat-header button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.chat-body {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f9f9f9;
+  font-size: 0.8rem;
+}
+
+.message {
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+.received {
+  background-color: #e4e6eb;
+  align-self: flex-start;
+}
+
+.sent {
+  background-color: #1877f2;
+  color: white;
+  align-self: flex-end;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  background-color: #f0f2f5;
+  border-radius: 0 0 10px 10px;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.chat-input button {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.chat-input button:hover {
+  background-color: #165ecf;
+}
+
+.gamochndeba_roca_mobile {
+  display: none;
+}
+
+/* Media Queries for Mobile */
+@media (max-width: 768px) {
+  .sxvafirend {
+    z-index: 10 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    padding: 0;
+    height: 100% !important;
+  }
+
+  aside {
+    display: none;
+  }
+
+  #chat-window {
+    z-index: 1000;
+  }
+
+  #friend-list {
+    height: 100%;
+  }
+
+  #main-content {
+    padding: 10px;
+  }
+  .post-header img {
+    width: 40px;
+    height: 40px;
+  }
+  .post-user-info h4 {
+    font-size: 14px;
+  }
+
+  .container-for-everything {
+    grid-template-columns: 1fr; /* Friend list, main content, nav */
+  }
+
+  /* Mobile navigation bar at the bottom with icons */
+  .fixed-nav-container {
+    bottom: 0 !important;
+    width: 100% !important;
+    background-color: #fff !important;
+    padding: 10px 0 !important;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1) !important;
+    border-top: 1px solid #ddd !important;
+    z-index: 100 !important;
+  }
+
+  #mobile-nav .nav_ul {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  #mobile-nav .no_margin_bottom {
+    margin-bottom: 0 !important;
+  }
+
+  #search-friends-desktop,
+  #search-friends-mobile,
+  #search-friends {
+    justify-content: end;
+    width: 80%;
+  }
+
+  #search-friends-desktop input,
+  #search-friends-mobile input,
+  #search-friends input {
+    width: 100%;
+  }
+
+  #mobile-nav .mobile_nav_and_search {
+    display: flex !important;
+    justify-content: space-evenly;
+    width: 100%;
+    align-items: center;
+  }
+
+  #mobile-nav .eseni_washale__nav {
+    display: none !important;
+  }
+
+  #mobile-nav .nav_ul {
+    margin: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  #mobile-nav .nav_ul li {
+    font-size: 1.5rem;
+    margin: 0 !important;
+  }
+
+  .gamochndeba_roca_mobile {
+    display: block !important;
+  }
+
+  #mobile-nav .text-fornav-icons {
+    display: none;
+  }
+
+  #mobile-nav a {
+    text-align: center;
+    flex-grow: 1;
+  }
+
+  #mobile-nav a i {
+    font-size: 24px;
+    color: #333;
+  }
+
+  #mobile-nav a:hover i {
+    color: #1877f2;
+  }
+
+  #mobile-nav ul li a {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 368px) {
+  #chat-window {
+    width: 90%;
+    right: 10px;
+  }
+}
+
+@media (max-width: 300px) {
+  .chat-input input {
+    padding: 5px !important;
+    width: 80%;
+  }
+
+  .chat-input button {
+    padding: 5px !important;
+    width: 20%;
+  }
+}
+
+/* create-post styles */
+
+.post-create-post {
+  display: none;
+
+  box-shadow: -1px 0px 5px 500px rgb(194 194 194 / 70%);
+
+  position: fixed;
+  left: 50%;
+  transform: translate(-50%, 0);
+
+  z-index: 1000;
+
+  margin-top: 1rem;
+
+  background-color: #f9f9f9;
+}
+
+.post-create-post .wrapper {
+  height: 30rem;
+  transition: height 0.2s ease;
+
+  overflow-y: scroll;
+}
+
+.post-create-post .wrapper.wrapper-active {
+  height: 20rem;
+}
+
+.post-create-post .create-post2 {
+  border-radius: 5px;
+}
+
+.post-create-post .header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 1.5rem;
+  padding-block: 1rem;
+}
+
+.post-create-post .header::before,
+.post-create-post h1,
+.post-create-post .cross-icon {
+  content: "";
+  flex-basis: 100%;
+}
+
+.post-create-post .header::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: -0.25rem;
+  left: 0;
+  background-color: rgb(193, 190, 190);
+}
+
+.post-create-post h1 {
+  text-align: center;
+}
+
+.post-create-post .post-header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.post-create-post .profile-pic {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-color: green;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: auto 80%;
+  border-radius: 50%;
+}
+
+.post-create-post .full-name {
+  margin-bottom: 0.3rem;
+}
+
+.post-create-post .fa-sort-down {
+  margin-bottom: 0.5rem;
+}
+
+.post-create-post .post-content {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.post-create-post textarea {
+  font-family: "Inter", sans-serif;
+  font-size: 1.25rem;
+  width: 100%;
+  border: none;
+  resize: none;
+  outline: none;
+  line-height: 1.25;
+}
+
+.post-create-post .add-to-your-post {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 7rem;
+  border: 1px solid rgb(193, 190, 190);
+  padding: 1.25rem 1rem;
+  border-radius: 5px;
+}
+
+.post-create-post .add-to-post-text {
+  font-weight: bold;
+}
+
+.post-create-post .add-to-post-icons {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.post-create-post .add-to-post-icons div {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+
+  margin-top: 0.5rem;
+}
+
+.post-create-post .photo-video {
+  background-image: url(https://static.xx.fbcdn.net/rsrc.php/v3/yC/r/a6OjkIIE-R0.png);
+}
+
+.post-create-post .post-btn {
+  outline: none;
+  border: none;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0.75rem 0;
+  margin-top: 1rem;
+  font-family: "Inter", sans-serif;
+  background-color: #1b74e4;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.post-create-post .post-btn:hover {
+  background-color: rgba(27, 116, 228, 0.85);
+}
+
+.post-create-post .post-btn:disabled,
+.post-create-post .post-btn[disabled] {
+  cursor: not-allowed;
+  background-color: #e4e6eb;
+  color: #bdc1c5;
+}
+
+.post-create-post .cross-icon-mark {
+  width: min-content;
+  margin: 0 0 0 80%;
+  background: #d4d4d4ba;
+  padding: 5px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 560px) {
+  .post-create-post .create-post2 {
+    width: 100% !important;
+  }
+
+  .post-create-post {
+    width: 90% !important;
+  }
+}
+
+@media screen and (max-width: 370px) {
+  .post-create-post .add-to-your-post {
+    gap: 1rem;
+  }
+}
+
+.post-create-post .add-to-your-post {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.post-create-post .add-to-post-icons {
+  position: relative;
+}
+
+.post-create-post #media {
+  display: none; /* Hide the default file input */
+}
+
+.post-create-post label {
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.post-create-post .photo-video {
+  width: 100px; /* Adjust size as needed */
+  height: 100px; /* Adjust size as needed */
+  background-color: #f0f0f0; /* Placeholder color */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-create-post #preview {
+  max-width: 100px;
+  margin-top: 10px;
+  border: 1px solid;
+  background-color: black;
+}
+
+.post-create-post #remove-preview {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #f44336; /* Red background for remove button */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.post-create-post #remove-preview:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
+
+.results-box {
+  display: none;
+  position: absolute;
+  top: 50px;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.results-box ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.results-box li {
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.results-box li:hover {
+  background-color: #f9f9f9;
+}
+
+.results-box li:last-child {
+  border-bottom: none;
+}
+
+/* Smooth scrollbar for the results box */
+.results-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.results-box::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 8px;
+}
+
+#search-friends-desktop,
+#search-friends-mobile,
+#search-friends {
+  position: relative;
+}
+
+/* Like section styling */
+.feed-posts .like-section {
+  display: flex;
+  align-items: center;
+}
+
+.feed-posts .like-section button {
+  margin-right: 10px;
+}
+
+.feed-posts .like-count {
+  font-size: 14px;
+  color: #555;
+  font-weight: bold;
+}
+
+.feed-posts .post-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.feed-posts .post-actions button {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.feed-posts .post-actions button:hover {
+  background-color: #165dbe;
+}
+
+/* Adjust margin for post-actions */
+.feed-posts .post-actions .share-btn {
+  margin-left: 10px;
+}
+
+/* Styles for shared post */
+#news-feed .shared-post {
+  background-color: #f5f6f7;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+/* Inner original post in shared post */
+#news-feed .shared-post .original-post {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+#news-feed .shared-post .original-post .post-header {
+  display: flex;
+  align-items: center;
+}
+
+#news-feed .shared-post .original-post .post-header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+#news-feed .shared-post .original-post .post-content {
+  margin-top: 10px;
+}
+
+#news-feed .shared-post .original-post .media img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+/* Styles for sharer’s info */
+#news-feed .shared-post .post-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+#news-feed .shared-post .post-user-info h4 {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+#news-feed .shared-post .post-user-info p {
+  font-size: 12px;
+  color: #888;
+}
+
+#news-feed .shared-post .post-content p {
+  font-size: 14px;
+  margin-bottom: 10px;
+}

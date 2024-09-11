@@ -1,0 +1,65 @@
+<!-- Share Modal (Bootstrap) -->
+<div
+  class="modal fade"
+  id="shareModal"
+  tabindex="-1"
+  aria-labelledby="shareModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="shareModalLabel">Share Post</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Share Message Input -->
+        <textarea
+          id="share-message"
+          class="form-control mb-3"
+          rows="4"
+          placeholder="Add a message to your shared post..."
+        ></textarea>
+
+        <!-- Preview of the Post being Shared -->
+        <div id="post-preview" class="border p-3 rounded">
+          <div class="post">
+            <div class="post-header d-flex align-items-center">
+              <img
+                src="static/media/{{request.user.avatar}}"
+                alt="User Avatar"
+                class="rounded-circle me-2"
+                style="width: 40px; height: 40px"
+              />
+              <div class="post-user-info">
+                <h6 class="mb-0">Post User</h6>
+                <small>2 hours ago</small>
+              </div>
+            </div>
+            <div class="post-content mt-3">
+              <p>This is an example post that you are about to share!</p>
+              <img
+                src="img1 (1).svg"
+                alt="Shared Image"
+                class="img-fluid rounded"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="confirm-share">
+          Share Now
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

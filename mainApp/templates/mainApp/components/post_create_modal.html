@@ -1,0 +1,67 @@
+<!-- this is for creating posts never mind this -->
+<div class="post-create-post">
+  <div class="wrapper">
+    <section class="create-post2" style="width: 500px">
+      <div class="header">
+        <h1>Create post</h1>
+        <div class="cross-icon">
+          <div class="cross-icon-mark">✖</div>
+        </div>
+      </div>
+      <div class="post-header">
+        <div class="profile-pic">
+          <img
+            src="static/media/{{request.user.avatar}}"
+            alt=""
+            style="width: 3.5rem; height: 3.5rem"
+          />
+        </div>
+        <div class="user-info">
+          <div class="full-name">GeeksforGeeks</div>
+        </div>
+      </div>
+      <div class="post-content">
+        <textarea
+          name="post-desc"
+          id="post-desc"
+          cols="30"
+          rows="5"
+          placeholder="What's on you mind?"
+          style="background-color: #f9f9f9"
+        ></textarea>
+        <div class="add-to-your-post">
+          <span class="add-to-post-text">Add to your post</span>
+          <div class="add-to-post-icons">
+            <input
+              type="file"
+              name="media"
+              id="media"
+              accept="image/*,video/*"
+            />
+            <label for="media">
+              <div class="photo-video"></div>
+              <img
+                id="image-preview"
+                src=""
+                alt="Image preview"
+                style="display: none; width: 100px"
+              />
+              <video
+                id="video-preview"
+                controls
+                style="display: none; max-width: 100%; max-height: 100px"
+              ></video>
+              <button
+                id="remove-preview"
+                style="display: none; margin-bottom: 0.4rem"
+              >
+                Remove
+              </button>
+            </label>
+          </div>
+        </div>
+        <button class="post-btn" disabled>Post</button>
+      </div>
+    </section>
+  </div>
+</div>

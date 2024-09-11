@@ -1,0 +1,46 @@
+<!-- Shared Post -->
+<article class="post shared-post feed-posts">
+  <div class="post-header">
+    <img src="static/media/{{request.user.avatar}}" alt="User Avatar" />
+    <div class="post-user-info">
+      <h4>Username</h4>
+      <!-- Sharer's name -->
+      <p>Shared 2 hours ago</p>
+      <!-- Time of sharing -->
+    </div>
+  </div>
+  <div class="post-content">
+    <p>Look at this amazing post I found!</p>
+    <!-- Sharer's message -->
+    <!-- Original Post -->
+    <div class="original-post">
+      <div class="post-header">
+        <img
+          src="static/media/{{request.user.avatar}}"
+          alt="Original User Avatar"
+        />
+        <div class="post-user-info">
+          <h4>Original Username</h4>
+          <!-- Original Poster's name -->
+          <p>Posted 5 hours ago</p>
+          <!-- Time of original post -->
+        </div>
+      </div>
+      <div class="post-content">
+        <div class="post-description">
+          <p>This is the original post content!</p>
+        </div>
+        <div class="media">
+          <img src="img1 (1).svg" alt="Original Post Image" />
+        </div>
+      </div>
+      <div class="post-actions">
+        <div class="like-section">
+          <button>👍 Like</button>
+          <span class="like-count">15 Likes</span>
+          <!-- Number of likes -->
+        </div>
+      </div>
+    </div>
+  </div>
+</article>

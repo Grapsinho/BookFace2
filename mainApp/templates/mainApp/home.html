@@ -1,0 +1,70 @@
+{% extends 'mainApp/main.html' %} {% load static %}
+<!--  -->
+{% block css %}
+<link
+  rel="stylesheet"
+  href="{% static 'css/home1.css' %}"
+  type="text/css"
+  media="screen"
+/>
+
+<link
+  rel="stylesheet"
+  href="{% static 'css/saerto_styles.css' %}"
+  type="text/css"
+  media="screen"
+/>
+{% endblock css %}
+<!-- Page Content -->
+
+{% block content %}
+
+<div class="container-for-everything">
+  {% include 'mainApp/components/nav.html' %}
+
+  <!-- Main Content Area -->
+  <div id="main-content" class="posts-area-mainpage-profilepage">
+    <!-- Post Creation -->
+    <section id="create-post">
+      <div class="open-post-create-thing">What's on your mind?</div>
+    </section>
+
+    <!-- News Feed -->
+    <section id="news-feed">
+      <!-- shared post -->
+      {% include 'mainApp/components/shared-post.html' %}
+
+      <!-- text post -->
+      {% include 'mainApp/components/text-post.html' %}
+
+      <!-- photo post -->
+      {% include 'mainApp/components/photo-post.html' %}
+
+      <!-- video post -->
+      {% include 'mainApp/components/video-post.html' %}
+
+      <!-- Additional posts can be added similarly -->
+    </section>
+  </div>
+
+  <!-- Right Sidebar for Friends List -->
+  {% include 'mainApp/components/aside_friend_list.html' %}
+
+  <!-- this is for creating posts never mind this -->
+  {% include 'mainApp/components/post_create_modal.html' %}
+</div>
+
+<!-- Chat Window -->
+{% include 'mainApp/components/chat_window.html' %}
+
+<!-- Modal for notifications -->
+{% include 'mainApp/components/notifications_modal.html' %}
+
+<!-- Share Modal (Bootstrap) -->
+{% include 'mainApp/components/share_modal.html' %}
+
+<!--  -->
+{% block scripts %}
+
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock scripts %} {% endblock content %}

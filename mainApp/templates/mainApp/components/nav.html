@@ -1,0 +1,72 @@
+<!-- Navigation Sidebar -->
+<nav id="mobile-nav">
+  <div class="mobile_nav_and_search" style="display: none">
+    <div id="user-info" class="no_margin_bottom">
+      <img
+        src="static/media/{{request.user.avatar}}"
+        alt="User Avatar"
+        style="width: 50px; height: 50px"
+      />
+    </div>
+    <!-- Search for Friends (Mobile) -->
+    <div id="search-friends-mobile" class="no_margin_bottom">
+      <input
+        type="text"
+        id="search-input__nav-mobile"
+        placeholder="Find Friends"
+        style="font-size: 0.9rem"
+      />
+      <button>🔍</button>
+
+      <div class="results-box">
+        <ul class="results-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="fixed-nav-container">
+    <div id="user-info" class="eseni_washale__nav">
+      <img src="static/media/{{request.user.avatar}}" alt="User Avatar" />
+      <h3>Username</h3>
+    </div>
+    <!-- Search for Friends (Desktop) -->
+    <div id="search-friends-desktop" class="eseni_washale__nav">
+      <input
+        type="text"
+        id="search-input__nav-desktop"
+        placeholder="Find Friends"
+        style="font-size: 0.9rem"
+      />
+      <button>🔍</button>
+
+      <div class="results-box">
+        <ul class="results-list"></ul>
+      </div>
+    </div>
+    <ul class="nav_ul" style="padding-left: 0">
+      <li class="gavaqro_megobrebi">
+        <a href="#">🏠 <span class="text-fornav-icons">Home</span></a>
+      </li>
+      <li>
+        <a href="{% url 'profile' %}"
+          >👤 <span class="text-fornav-icons">Profile</span></a
+        >
+      </li>
+      <li class="gamochndeba_roca_mobile">
+        <a href="#">👥</a>
+      </li>
+      <li
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop2"
+        data-title="Notifications"
+      >
+        <a href="#">🔔 <span class="text-fornav-icons">Notifications</span></a>
+      </li>
+      <li>
+        <a href="{% url 'logout' %}"
+          >🚪 <span class="text-fornav-icons">Logout</span></a
+        >
+      </li>
+    </ul>
+  </div>
+</nav>

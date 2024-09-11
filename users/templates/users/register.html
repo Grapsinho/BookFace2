@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration</title>
+
+    <!-- bootstrap link -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- bootstrap icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- favicon -->
+    <link
+      rel="shortcut icon"
+      href="{% static 'media/logo/BookFace-logo.svg' %}"
+      type="image/x-icon"
+    />
+
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .form-container {
+        max-width: 500px;
+        margin: 50px auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .account-question {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .account-question a {
+        text-decoration: none;
+      }
+
+      .input-group .form-control {
+        border-right: 0;
+      }
+      .input-group-text {
+        background-color: #cbd1d8;
+        border-left: 0;
+        cursor: pointer;
+      }
+
+      .password-toggle {
+        position: relative;
+      }
+      .password-toggle .bi {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container">
+        <h2 class="text-center">Register</h2>
+        <form id="registrationForm" novalidate>
+          {% csrf_token %}
+          <!-- first name last name -->
+          <div class="d-flex gap-2">
+            <div class="mb-3 w-100">
+              <label for="firstName" class="form-label">First Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="firstName"
+                name="first_name"
+                required
+              />
+              <div class="invalid-feedback">Please enter your first name.</div>
+            </div>
+            <div class="mb-3 w-100">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="lastName"
+                name="last_name"
+                required
+              />
+              <div class="invalid-feedback">Please enter your last name.</div>
+            </div>
+          </div>
+
+          <!-- email -->
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input
+              type="email"
+              class="form-control"
+              name="email"
+              id="email"
+              required
+            />
+            <div class="invalid-feedback">Please enter a valid email.</div>
+          </div>
+
+          <!-- gender -->
+          <div class="mb-3">
+            <label for="gender" class="form-label">Gender</label>
+            <select class="form-select" name="gender" id="gender" required>
+              <option value="">Select your gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            <div class="invalid-feedback">Please select your gender.</div>
+          </div>
+
+          <!-- birth date -->
+          <div class="mb-3">
+            <label for="birthDate" class="form-label">Date of Birth</label>
+            <div class="row">
+              <div class="col">
+                <select
+                  class="form-select"
+                  name="birth_day"
+                  id="birthDay"
+                  required
+                >
+                  <option value="">Day</option>
+                  <!-- Days 1-31 -->
+                </select>
+                <div class="invalid-feedback">
+                  Please select your birth day.
+                </div>
+              </div>
+              <div class="col">
+                <select
+                  class="form-select"
+                  name="birth_month"
+                  id="birthMonth"
+                  required
+                >
+                  <option value="">Month</option>
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+                <div class="invalid-feedback">
+                  Please select your birth month.
+                </div>
+              </div>
+              <div class="col">
+                <select
+                  class="form-select"
+                  name="birth_year"
+                  id="birthYear"
+                  required
+                >
+                  <!-- Years 1920-2024 -->
+                  <option value="">Year</option>
+                </select>
+                <div class="invalid-feedback">
+                  Please select your birth year.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- passwords -->
+          <div class="d-flex gap-2">
+            <div class="mb-3 w-100">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  minlength="8"
+                  required
+                />
+                <span class="input-group-text" id="togglePassword">
+                  <i class="bi bi-eye-slash"></i>
+                </span>
+
+                <div class="invalid-feedback">
+                  Password must be at least 8 characters long.
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 w-100">
+              <label for="confirmPassword" class="form-label"
+                >Confirm Password</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                required
+              />
+              <div class="invalid-feedback">Passwords do not match.</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Register</button>
+
+          <div class="account-question">
+            <p>
+              Already have an account?
+              <a href="{% url 'login' %}" class="btn btn-link">Login</a>
+            </p>
+          </div>
+
+          <p id="error-message"></p>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/registration.js' %}"></script>
+  </body>
+</html>

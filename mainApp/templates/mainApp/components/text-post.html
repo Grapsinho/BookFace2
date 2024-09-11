@@ -1,0 +1,64 @@
+<!-- Post with Text -->
+<article class="post feed-posts">
+  <div class="post-header">
+    <img src="static/media/{{request.user.avatar}}" alt="User Avatar" />
+    <div class="post-user-info">
+      <h4>Username</h4>
+      <p>Posted 2 hours ago</p>
+    </div>
+  </div>
+  <div class="post-content">
+    <p>This is a sample text post.</p>
+  </div>
+  <div class="post-actions">
+    <div class="like-section">
+      <button>👍 Like</button>
+      <span class="like-count">15 Likes</span>
+      <!-- Number of likes -->
+    </div>
+    <button
+      class="share-btn"
+      class="share-btn"
+      data-bs-toggle="modal"
+      data-bs-target="#shareModal"
+      data-title="Share"
+    >
+      ↪️ Share
+    </button>
+  </div>
+  <!-- Hidden Comment Section -->
+  <details>
+    <summary>View Comments</summary>
+    <div class="comments">
+      <!-- Comment -->
+      <div class="comment">
+        <p><strong>Friend:</strong> Nice post!</p>
+      </div>
+
+      <div class="comment">
+        <p><strong>Friend:</strong> Nice post!</p>
+      </div>
+
+      <div class="comment">
+        <p><strong>Friend:</strong> Nice post!</p>
+      </div>
+
+      <div class="comment">
+        <p><strong>Friend:</strong> Nice post!</p>
+      </div>
+
+      <div class="comment">
+        <p><strong>Friend:</strong> Nice post!</p>
+      </div>
+
+      <div class="comment">
+        <p><strong>Friend:</strong> Nice post!</p>
+      </div>
+      <!-- Add a Comment -->
+      <div class="add-comment">
+        <input type="text" placeholder="Write a comment..." />
+        <button>Post</button>
+      </div>
+    </div>
+  </details>
+</article>

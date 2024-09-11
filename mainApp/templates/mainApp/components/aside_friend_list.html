@@ -1,0 +1,31 @@
+<!-- Right Sidebar for Friends List -->
+<aside class="magariaside">
+  <!-- Friend Suggestions -->
+  <div class="sxvafirend">
+    <section id="friend-list">
+      <div>
+        <h4>Friend List</h4>
+
+        <div id="search-friends">
+          <input
+            type="text"
+            placeholder="Search Friends"
+            style="width: 100% !important; font-size: 0.9rem"
+          />
+        </div>
+      </div>
+
+      <ul style="padding-left: 0">
+        <li class="friend" style="cursor: pointer">
+          <img src="static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+          <p class="friend_name" data-name="Friend 1">Friend 1</p>
+        </li>
+        <li class="friend" style="cursor: pointer">
+          <img src="static/media/{{request.user.avatar}}" alt="Friend Avatar" />
+          <p class="friend_name" data-name="Friend 2">Friend 2</p>
+        </li>
+        <!-- More friends -->
+      </ul>
+    </section>
+  </div>
+</aside>
