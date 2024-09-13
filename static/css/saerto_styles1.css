@@ -13,6 +13,10 @@ body {
   color: #333;
 }
 
+img {
+  object-fit: cover;
+}
+
 img,
 video {
   border-radius: 5px;

@@ -48,7 +48,7 @@
         <a href="#">🏠 <span class="text-fornav-icons">Home</span></a>
       </li>
       <li>
-        <a href="{% url 'profile' %}"
+        <a href="{% url 'profile' request.user.email %}"
           >👤 <span class="text-fornav-icons">Profile</span></a
         >
       </li>

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 
 #Django Core Imports:
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -33,6 +34,7 @@ def sanitize_input(user_input):
     cleaned_input = bleach.clean(user_input, tags=['p', 'strong', 'em'], attributes={'*': ['class']})
     return cleaned_input
 
+############################ es yvelaferi aqedan ############################################
 def registration(request):
     return render(request, 'users/register.html')
 
@@ -83,7 +85,6 @@ class UserProfileView(APIView):
         except AuthenticationRedirectException as e:
             return Response({"detail": str(e)}, status=401)
 
-
 class LoginView(APIView):
     """
     View for user login and JWT token generation.
@@ -108,11 +109,18 @@ class LoginView(APIView):
             # When the user logs in, create tokens
             tokens = create_jwt_for_user(user)
             
-            # Create the response object with JSON data
-            response_data = {
-                "message": "User login successful",
-                "user": email
-            }
+            if user.setup_profile:
+                # Create response with JWT tokens in cookies
+                response_data = {
+                    "message": "User login successful",
+                }
+            else:
+                # Create response with JWT tokens in cookies
+                response_data = {
+                    "message": "User login successful",
+                    "redirect_url": reverse('profile_setup')  # URL for redirection after login
+                }
+
             response = Response(response_data, status=status.HTTP_200_OK)
 
             # Set the JWT tokens as HTTP-only cookies
@@ -203,3 +211,5 @@ class RefreshAccessTokenView(APIView):
 
         except Exception as e:
             return Response({"message": "An error occurred: " + str(e)}, status=400)
+
+####################### aqamde aris registracia logini an parolis shecvlistvis ############################

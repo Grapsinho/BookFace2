@@ -76,7 +76,11 @@ function sanitizeInput(userInput) {
             if (data.message == "Email or password is invalid") {
               document.querySelector("#messages").textContent = data.message;
             } else {
-              window.location.href = "/"; // Redirect to secure area
+              if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+              } else {
+                window.location.href = "/";
+              }
             }
           },
           error: function (error) {

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+{% load filters %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Set up Profile</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+
+    <style>
+      /* Global styles for body and container */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 600px;
+        background-color: #fff;
+        padding: 20px;
+        margin: 50px auto;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      /* Custom styles for form */
+      form {
+        width: 100%;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      .form-control {
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        font-size: 14px;
+        width: 100%;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+
+      textarea.form-control {
+        resize: vertical;
+      }
+      /* Custom styles for file input */
+      .form-control-file {
+        display: block;
+        padding: 6px;
+        border: 1px dashed #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+      }
+
+      .form-control-file:focus {
+        border-color: #007bff;
+      }
+
+      .invalid-feedback {
+        color: #e74c3c;
+        font-size: 12px;
+      }
+
+      button[type="submit"] {
+        background-color: #007bff;
+        border: none;
+        padding: 10px 20px;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      button[type="submit"]:focus {
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+
+      /* Responsive styles */
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+          margin: 20px auto;
+        }
+
+        h2 {
+          font-size: 20px;
+        }
+
+        .form-group label {
+          font-size: 14px;
+        }
+
+        button[type="submit"] {
+          font-size: 14px;
+          padding: 8px 15px;
+        }
+      }
+
+      /* Profile Header */
+      #profile-header {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        margin: 20px 0;
+        padding-bottom: 20px;
+      }
+
+      .profile-cover {
+        width: 100%;
+        height: 200px;
+        background-color: #555;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: rgb(131, 131, 131);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .profile-cover img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 10px 10px 0 0;
+        bottom: -90px;
+        position: absolute;
+      }
+
+      .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin-right: 20px;
+        border: 3px solid #fff;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        object-fit: cover;
+      }
+
+      .profile-info2 {
+        width: 120px;
+        height: 120px;
+        background-color: #555;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="my-4">Set up Optional Profile Features</h2>
+
+      <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="needs-validation"
+        novalidate
+      >
+        {% csrf_token %}
+        <!-- Step 1: Image Uploads -->
+        <div id="step1" class="setup-step">
+          <header id="profile-header">
+            <div class="profile-cover">
+              <img
+                id="background-image-preview"
+                style="display: none; object-fit: cover"
+                alt="Background Image Preview"
+              />
+              <span class="cover-text">Your Cover Image Will Go Here</span>
+            </div>
+
+            <div class="profile-info" style="padding: 10px">
+              <img
+                id="profile-image-preview"
+                class="profile-avatar"
+                alt="Profile Image Preview"
+                style="display: none"
+              />
+              <div class="profile-info2"></div>
+            </div>
+          </header>
+
+          <div class="form-group">
+            <label for="avatar">Profile Picture</label>
+            <input
+              type="file"
+              class="form-control-file every_input"
+              id="avatar"
+              name="avatar"
+              onchange="previewImage('avatar', 'profile-image-preview', '.profile-info2')"
+            />
+            {% if form.avatar.errors %}
+            <div class="invalid-feedback">{{ form.avatar.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="background_image">Background Image</label>
+            <input
+              type="file"
+              class="form-control-file every_input"
+              id="background_image"
+              name="background_image"
+              onchange="previewImage('background_image', 'background-image-preview', '.cover-text')"
+            />
+            {% if form.background_image.errors %}
+            <div class="invalid-feedback">
+              {{ form.background_image.errors.0 }}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="buttons">
+            <button id="next-step" type="button" class="btn btn-primary">
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Profile Details -->
+        <div id="step2" class="setup-step" style="display: none">
+          <!-- Bio Field -->
+          <div class="form-group">
+            <label for="id_bio">Bio</label>
+            {{ form.bio }}
+            <div class="invalid-feedback">Please provide a short bio.</div>
+          </div>
+
+          <div class="d-flex" style="gap: 1rem">
+            <!-- Job Field -->
+            <div class="form-group">
+              <label for="id_job">Job</label>
+              {{ form.job }}
+              <div class="invalid-feedback">Please enter your current job.</div>
+            </div>
+
+            <!-- Location Field -->
+            <div class="form-group">
+              <label for="id_location">Location</label>
+              {{ form.location }}
+              <div class="invalid-feedback">Please enter your location.</div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary save-btn"
+            style="pointer-events: none"
+          >
+            Save
+          </button>
+
+          <div class="d-flex align-items-center mt-2" style="gap: 1rem">
+            <button id="back-step" type="button" class="btn btn-secondary">
+              Back
+            </button>
+            <button id="skip-setup" type="button" class="btn btn-secondary">
+              Skip
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Custom Bootstrap validation
+      (function () {
+        "use strict";
+        window.addEventListener(
+          "load",
+          function () {
+            var forms = document.getElementsByClassName("needs-validation");
+            var validation = Array.prototype.filter.call(
+              forms,
+              function (form) {
+                form.addEventListener(
+                  "submit",
+                  function (event) {
+                    if (form.checkValidity() === false) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    form.classList.add("was-validated");
+                  },
+                  false
+                );
+              }
+            );
+          },
+          false
+        );
+      })();
+
+      const every_input = document.querySelectorAll(".every_input");
+
+      every_input.forEach((element) => {
+        element.addEventListener("input", () => {
+          const input = element.value;
+
+          if (input) {
+            document.querySelector(".save-btn").style.pointerEvents = "all";
+          } else {
+            document.querySelector(".save-btn").style.pointerEvents = "none";
+          }
+        });
+      });
+
+      function previewImage(inputId, previewId, delete_after) {
+        const file = document.getElementById(inputId).files[0];
+        const imagePreview = document.getElementById(previewId);
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = "block"; // Show the image preview
+
+            document.querySelector(delete_after).classList.add("d-none");
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreview.src = "";
+          imagePreview.style.display = "none"; // Hide the image preview if no file is selected
+        }
+      }
+
+      document
+        .getElementById("next-step")
+        .addEventListener("click", function () {
+          document.getElementById("step1").style.display = "none";
+          document.getElementById("step2").style.display = "block";
+        });
+
+      document
+        .getElementById("back-step")
+        .addEventListener("click", function () {
+          document.getElementById("step2").style.display = "none";
+          document.getElementById("step1").style.display = "block";
+        });
+
+      document
+        .getElementById("skip-setup")
+        .addEventListener("click", function () {
+          window.location.href = "/";
+        });
+    </script>
+  </body>
+</html>

@@ -13,6 +13,9 @@ urlpatterns = [
     # mainApp urls
     path('', include('mainApp.urls')),
 
+    # profile setup urls
+    path('', include('user_profile.urls')),
+
     #for development
     path("__debug__/", include(debug_toolbar.urls)),
 ]

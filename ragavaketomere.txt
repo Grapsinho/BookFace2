@@ -1,16 +1,22 @@
 
-eseigi profile morcha dizaini gvaq
-
-mokled exla viwyeb mushaobas databeisze ra
-
-avawyob modelebs
-
-eseigi profile sheidzleba calke modeli shevuqmna saertod
-
-profile, post, megobrebi, shetyobineba, mesijebi, komentarebi
+post, megobrebi, shetyobineba, mesijebi, komentarebi
 
 karoche rac sachiroa profilestvis jer magas vizav anu uralod ro iuzeris profile movawyo ra postebi da ragac ara
 background foto da ase shemdeg
+
+
+
+
+
+
+DONE login&register password change
+DONE setup profile
+
+NEXT davamtavreb set covers da backs
+
+
+
+
 
 
 <!-- <script>

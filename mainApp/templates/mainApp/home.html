@@ -3,14 +3,14 @@
 {% block css %}
 <link
   rel="stylesheet"
-  href="{% static 'css/home1.css' %}"
+  href="{% static 'css/home.css' %}"
   type="text/css"
   media="screen"
 />
 
 <link
   rel="stylesheet"
-  href="{% static 'css/saerto_styles.css' %}"
+  href="{% static 'css/saerto_styles1.css' %}"
   type="text/css"
   media="screen"
 />
@@ -62,9 +62,11 @@
 
 <!-- Share Modal (Bootstrap) -->
 {% include 'mainApp/components/share_modal.html' %}
+<!--  -->
+{% endblock content %}
 
 <!--  -->
 {% block scripts %}
 
 <script src="{% static 'js/home.js' %}"></script>
-{% endblock scripts %} {% endblock content %}
+{% endblock scripts %}

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     # local apps
     'users.apps.UsersConfig',
     'mainApp.apps.MainappConfig',
+    'user_profile.apps.UserProfileConfig',
 
     #api
     'rest_framework',

@@ -1,16 +1,16 @@
-{% extends 'mainApp/main.html' %} {% load static %}
+{% extends 'mainApp/main.html' %} {% load static %} {% load custom_filters %}
 <!--  -->
 {% block css %}
 <link
   rel="stylesheet"
-  href="{% static 'css/profile.css' %}"
+  href="{% static 'css/profile1.css' %}"
   type="text/css"
   media="screen"
 />
 
 <link
   rel="stylesheet"
-  href="{% static 'css/saerto_styles.css' %}"
+  href="{% static 'css/saerto_styles1.css' %}"
   type="text/css"
   media="screen"
 />
@@ -21,7 +21,7 @@
 
 <nav class="top-nav">
   <a href="{% url 'home' %}" class="nav-link">🏠 Home</a>
-  <a href="#" class="nav-link">👤 Profile</a>
+  <a href="{% url 'profile' request.user %}" class="nav-link">👤 Profile</a>
   <a
     href="#notifications"
     class="nav-link"
@@ -35,35 +35,80 @@
 
 <!-- Profile Header -->
 <header id="profile-header" style="margin-top: 4.1rem">
-  <div class="profile-cover">
-    <img src="images/No Image.svg" alt="Cover Photo" />
+  <div class="profile-cover" style="position: relative; overflow: hidden">
+    <img
+      src="/static/media/{{user.background_image}}"
+      alt="Cover Photo"
+      style="bottom: -90px; position: absolute; height: 400px"
+    />
   </div>
 
   <div class="profile-info container">
     <img
-      src="/static/media/{{request.user.avatar}}"
+      src="/static/media/{{user.avatar}}"
       alt="User Avatar"
       class="profile-avatar"
+      style="object-fit: cover"
     />
     <div class="profile-details">
-      <h2>Username</h2>
-      <p>@username_handle</p>
+      <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+      <p>@{{ user.first_name }}</p>
       <p class="bio">
-        This is the user's bio, describing their interests and activities.
+        Bio: <span class="bio-txt">{{ user.bio }}</span>
+
+        {% if user == request.user %}
+        <span
+          class="update_profile_info__bio"
+          style="
+            background-color: rgb(83, 83, 83);
+            cursor: pointer;
+            padding: 3px;
+          "
+          >✏️</span
+        >
       </p>
-      <button class="edit-profile-btn d-none">Edit Profile</button>
+      <div class="input-and-add-button-bio d-none">
+        <input
+          type="text"
+          name="bio"
+          id="bio"
+          class="bio-input"
+          placeholder="Update Bio"
+        />
+
+        <button
+          class="btn btn-success add-bio-submit"
+          style="font-size: 0.8rem"
+        >
+          Add
+        </button>
+      </div>
+      {% else %}
+      <!--  -->
+      {% endif %} {% if request.user == user %}
+
+      <button
+        class="edit-profile-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#editProfileModal"
+        data-title="Edit Profile"
+      >
+        Edit Profile
+      </button>
+      {% else %}
 
       <div class="profile-buttons">
         <button>Add Friend</button>
         <button class="friend" data-name="Friend 1">Message</button>
       </div>
+      {% endif %}
     </div>
   </div>
 </header>
 
 <nav class="bottom-nav">
   <a href="{% url 'home' %}" class="nav-link">🏠</a>
-  <a href="#" class="nav-link">👤</a>
+  <a href="{% url 'profile' request.user %}" class="nav-link">👤</a>
   <a
     href="#notifications"
     class="nav-link"
@@ -147,7 +192,44 @@
               <h4>About</h4>
               <ul>
                 <li>
-                  Location:
+                  Location: {% if user.location %}
+                  <!--  -->
+                  <span class="location-txt">{{ user.location }}</span>
+
+                  <!--  -->
+                  {% if request.user == user %}
+                  <span
+                    class="update_profile_info__location"
+                    style="
+                      background-color: rgb(83, 83, 83);
+                      cursor: pointer;
+                      padding: 3px;
+                    "
+                    >✏️</span
+                  >
+
+                  <div class="input-and-add-button-location2 d-none">
+                    <input
+                      type="text"
+                      name="location"
+                      id="location"
+                      class="location-input"
+                    />
+
+                    <button
+                      class="btn btn-success add-location-submit"
+                      style="font-size: 0.8rem"
+                    >
+                      Add
+                    </button>
+                  </div>
+
+                  {% else %}
+                  <!--  -->
+                  {% endif %} {% else %}
+                  <!--  -->
+                  {% if request.user == user %}
+
                   <button
                     class="btn btn-warning add-location-btn"
                     style="font-size: 0.9rem"
@@ -156,15 +238,60 @@
                   </button>
 
                   <div class="input-and-add-button-location d-none">
-                    <input type="text" name="location" id="location" />
+                    <input
+                      type="text"
+                      name="location"
+                      id="location"
+                      class="location-input"
+                    />
 
-                    <button class="btn btn-success" style="font-size: 0.8rem">
+                    <button
+                      class="btn btn-success add-location-submit"
+                      style="font-size: 0.8rem"
+                    >
                       Add
                     </button>
                   </div>
+
+                  <span class="location-txt"></span>
+                  {% else %} No Info {% endif %}
+                  <!--  -->
+                  {% endif %}
                 </li>
                 <li>
-                  Works at:
+                  Works at: {% if user.job %}
+                  <span class="job-txt">{{ user.job }}</span>
+                  <!--  -->
+                  {% if request.user == user %}
+                  <span
+                    class="update_profile_info__job"
+                    style="
+                      background-color: rgb(83, 83, 83);
+                      cursor: pointer;
+                      padding: 3px;
+                    "
+                    >✏️</span
+                  >
+
+                  <div class="input-and-add-button-job2 d-none">
+                    <input type="text" name="job" id="job" class="job-input" />
+
+                    <button
+                      class="btn btn-success add-job-submit"
+                      style="font-size: 0.8rem"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {% else %}
+                  <!--  -->
+                  {% endif %}
+
+                  <!--  -->
+                  {% else %}
+
+                  <!--  -->
+                  {% if request.user == user %}
                   <button
                     class="btn btn-warning add-job-btn"
                     style="font-size: 0.9rem"
@@ -173,14 +300,22 @@
                   </button>
 
                   <div class="input-and-add-button-job d-none">
-                    <input type="text" name="job" id="job" />
+                    <input type="text" name="job" id="job" class="job-input" />
 
-                    <button class="btn btn-success" style="font-size: 0.8rem">
+                    <button
+                      class="btn btn-success add-job-submit"
+                      style="font-size: 0.8rem"
+                    >
                       Add
                     </button>
                   </div>
+
+                  <span class="job-txt"></span>
+                  {% else %} No Info {% endif %}
+                  <!--  -->
+                  {% endif %}
                 </li>
-                <li>Joined: January 2020</li>
+                <li>Joined: {{ user.date_joined|date:"F Y" }}</li>
               </ul>
             </section>
 
@@ -188,18 +323,19 @@
             <section id="profile-images" class="mb-3 media-images">
               <h4>Images</h4>
               <div class="photo-grid">
-                <img
-                  src="/static/media/{{request.user.avatar}}"
-                  alt="Photo 1"
-                />
-                <img
-                  src="/static/media/{{request.user.avatar}}"
-                  alt="Photo 2"
-                />
-                <img
-                  src="/static/media/{{request.user.avatar}}"
-                  alt="Photo 3"
-                />
+                {% if user_media %}
+                <!--  -->
+                {% for media in user_media|first_n_items:6 %}
+                <!--  -->
+                {% if media.media_type == 'profile' %}
+                <img src="{{ media.media_file_link }}" alt="Profile Picture" />
+                {% elif media.media_type == 'background' %}
+                <img src="{{ media.media_file_link }}" alt="Background Image" />
+                {% endif %} {% endfor %}
+                <!--  -->
+                {% else %}
+                <p>No Media Files</p>
+                {% endif %}
                 <!-- More photos can go here -->
               </div>
             </section>
@@ -211,7 +347,7 @@
           <!-- Shared Post -->
           <article class="post shared-post feed-posts">
             <div class="post-header">
-              <img src="default-boy-avatar.jpg" alt="User Avatar" />
+              <img src="/static/media/{{user.avatar}}" alt="User Avatar" />
               <div class="post-user-info">
                 <h4>Username</h4>
                 <!-- Sharer's name -->
@@ -226,7 +362,7 @@
               <div class="original-post">
                 <div class="post-header">
                   <img
-                    src="default-boy-avatar.jpg"
+                    src="/static/media/{{user.avatar}}"
                     alt="Original User Avatar"
                   />
                   <div class="post-user-info">
@@ -241,7 +377,10 @@
                     <p>This is the original post content!</p>
                   </div>
                   <div class="media">
-                    <img src="img1 (1).svg" alt="Original Post Image" />
+                    <img
+                      src="/static/media/{{user.avatar}}"
+                      alt="Original Post Image"
+                    />
                   </div>
                 </div>
                 <div class="post-actions">
@@ -257,7 +396,7 @@
           <!-- Post with Text -->
           <article class="post feed-posts">
             <div class="post-header">
-              <img src="default-boy-avatar.jpg" alt="User Avatar" />
+              <img src="/static/media/{{user.avatar}}" alt="User Avatar" />
               <div class="post-user-info">
                 <h4>Username</h4>
                 <p>Posted 2 hours ago</p>
@@ -329,44 +468,6 @@
       <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
       <p>Friend 3</p>
     </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 1</p>
-    </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 2</p>
-    </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 3</p>
-    </li>
-
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 1</p>
-    </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 2</p>
-    </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 3</p>
-    </li>
-
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 1</p>
-    </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 2</p>
-    </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 3</p>
-    </li>
   </ul>
 </div>
 
@@ -384,25 +485,57 @@
     class="photo-grid tab-photo-grid"
     style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"
   >
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 1" />
-    <video controls>
+    <!-- <video controls>
       <source src="chat.mp4" type="video/mp4" />
       Your browser does not support the video tag.
-    </video>
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 3" />
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 4" />
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 1" />
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 2" />
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 3" />
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 4" />
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 1" />
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 2" />
-    <img src="/static/media/{{request.user.avatar}}" alt="Photo 3" />
-    <video controls>
-      <source src="chat.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-    <!-- More photos can go here -->
+    </video> -->
+    {% for media in user_media %}
+    <!--  -->
+    <div class="image-container__media_profile">
+      <!-- Show images based on type -->
+      {% if media.media_type == 'profile' %}
+      <img src="{{ media.media_file_link }}" alt="Profile Picture" />
+      {% elif media.media_type == 'background' %}
+      <img src="{{ media.media_file_link }}" alt="Background Image" />
+      {% endif %}
+
+      <!-- Three-dot menu -->
+      {% if user == request.user %}
+      <div class="menu-container__media_profile">
+        <button
+          class="menu-btn"
+          style="color: red; background: #282828; padding: 0 10px"
+        >
+          ⋮
+        </button>
+        <div class="dropdown-menu" style="min-width: auto">
+          <button
+            class="delete-btn mb-2 dropdown-item"
+            data-id="{{ media.id }}"
+          >
+            🗑️ Delete
+          </button>
+
+          <button
+            class="setCover-btn dropdown-item mb-2"
+            data-id="{{ media.id }}"
+          >
+            🖼️ Set as cover image
+          </button>
+
+          <button class="setProfile-btn dropdown-item" data-id="{{ media.id }}">
+            👤 Set as profile image
+          </button>
+        </div>
+      </div>
+
+      {% else %}
+      <!--  -->
+      {% endif %}
+    </div>
+
+    {% endfor %}
+    <!--  More photos can go here  -->
   </div>
 </div>
 
@@ -412,8 +545,140 @@
 <!-- Modal for notifications -->
 {% include 'mainApp/components/notifications_modal.html' %}
 
+<!-- Edit Profile Modal -->
+<div
+  class="modal fade"
+  id="editProfileModal"
+  tabindex="-1"
+  aria-labelledby="editProfileModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form
+          id="edit-profile-form"
+          enctype="multipart/form-data"
+          method="POST"
+          action="/profile/Update-Profile-Pictures/"
+        >
+          {% csrf_token %}
+          <!-- Current Profile Picture -->
+          <div class="mb-3">
+            <label for="currentProfilePicture__profile" class="form-label"
+              >Current Profile Picture</label
+            >
+            <div>
+              <img
+                src="/static/media/{{user.avatar}}"
+                alt="Current Profile Picture"
+                id="currentProfilePicture__profile"
+                class="img-thumbnail"
+                width="150px"
+                style="object-fit: contain"
+              />
+            </div>
+
+            <div class="mt-2">
+              <img
+                id="newProfilePicturePreview__profile"
+                class="img-thumbnail"
+                width="150px"
+                style="display: none; object-fit: contain"
+              />
+            </div>
+          </div>
+
+          <!-- New Profile Picture -->
+          <div class="mb-3">
+            <label for="newProfilePicture" class="form-label"
+              >New Profile Picture</label
+            >
+            <input
+              type="file"
+              id="newProfilePictureInput__profile"
+              class="form-control every_input__pictures"
+              accept="image/*"
+              name="avatar"
+            />
+          </div>
+
+          <!-- Current Background Picture -->
+          <div class="mb-3">
+            <label for="currentBackgroundPicture__profile" class="form-label"
+              >Current Background Picture</label
+            >
+            <div>
+              <img
+                src="/static/media/{{user.background_image}}"
+                alt="Current Background Picture"
+                id="currentBackgroundPicture__profile"
+                class="img-thumbnail"
+                width="300px"
+                style="object-fit: contain"
+              />
+            </div>
+
+            <div class="mt-2">
+              <img
+                id="newBackgroundPicturePreview__profile"
+                class="img-thumbnail"
+                width="300px"
+                style="display: none; object-fit: contain"
+              />
+            </div>
+          </div>
+
+          <!-- New Background Picture -->
+          <div class="mb-3">
+            <label for="newBackgroundPictureInput__profile" class="form-label"
+              >New Background Picture</label
+            >
+            <input
+              type="file"
+              id="newBackgroundPictureInput__profile"
+              class="form-control every_input__pictures"
+              accept="image/*"
+              name="background_image"
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <div class="modal-footer">
+            <button
+              type="submit"
+              id="submit-button"
+              class="btn btn-primary savechanges__forUpdatePictures__profile"
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!--  -->
+{% endblock content %}
+
 <!--  -->
 {% block scripts %}
-
-<script src="{% static 'js/profile.js' %}"></script>
-{% endblock scripts %} {% endblock content %}
+<script type="module" src="{% static 'js/edit_profile1.js' %}"></script>
+<script src="{% static 'js/profile1.js' %}"></script>
+{% endblock scripts %}

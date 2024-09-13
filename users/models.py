@@ -39,6 +39,11 @@ class User(AbstractUser):
     # Other common profile fields
     bio = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', default='avatars/default-boy-avatar.jpg')
+    location = models.CharField(max_length=255, blank=True, null=True)
+    job = models.CharField(max_length=255, blank=True, null=True)
+    background_image = models.ImageField(upload_to='backgrounds/', default='backgrounds/No Image.svg', blank=True, null=True)
+
+    setup_profile = models.BooleanField(default=False)
 
     @property
     def full_birth_date(self):
@@ -62,3 +67,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+    
+
+class UserMedia(models.Model):
+    user = models.ForeignKey(User, related_name='user_media', on_delete=models.CASCADE)
+    media_file_link = models.CharField(max_length=250)  # Store the media file link
+    media_type = models.CharField(max_length=50)  # Profile, background, or other
+    uploaded_at = models.DateTimeField(auto_now_add=True)  # Track when the media was uploaded
+
+    def __str__(self):
+        return f'{self.media_type} for {self.user.email}'
