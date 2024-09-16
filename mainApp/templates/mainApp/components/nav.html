@@ -15,6 +15,7 @@
         id="search-input__nav-mobile"
         placeholder="Find Friends"
         style="font-size: 0.9rem"
+        data-user_id="{{request.user.pk}}"
       />
       <button>🔍</button>
 
@@ -36,6 +37,7 @@
         id="search-input__nav-desktop"
         placeholder="Find Friends"
         style="font-size: 0.9rem"
+        data-user_id="{{request.user.pk}}"
       />
       <button>🔍</button>
 
@@ -60,7 +62,13 @@
         data-bs-target="#staticBackdrop2"
         data-title="Notifications"
       >
-        <a href="#">🔔 <span class="text-fornav-icons">Notifications</span></a>
+        <a
+          href="#"
+          class="notification_a_tag_for_count open_notifications_modal_andretrieve_notifications"
+          >🔔 <span class="text-fornav-icons">Notifications</span>
+
+          <div class="notification_count">{{initial_notifications_length}}</div>
+        </a>
       </li>
       <li>
         <a href="{% url 'logout' %}"

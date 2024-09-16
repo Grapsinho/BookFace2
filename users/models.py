@@ -26,8 +26,10 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     email = models.EmailField(null=True, unique=True)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255,)
+    last_name = models.CharField(max_length=255,)
+
+    new_username = models.CharField(max_length=255, blank=True, null=True, db_index=True)
 
     gender = models.CharField(max_length=10, blank=True, null=True)
 
@@ -60,6 +62,10 @@ class User(AbstractUser):
     
     def save(self, *args, **kwargs):
         self.username = self.email  # Ensure username stays synced with email
+        # Generate new_username based on first_name and last_name
+        if not self.new_username:
+            self.new_username = f"{self.first_name.lower()} {self.last_name.lower()}"
+        
         super().save(*args, **kwargs)
     
     class Meta:

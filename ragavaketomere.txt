@@ -1,21 +1,121 @@
-
-post, megobrebi, shetyobineba, mesijebi, komentarebi
-
-karoche rac sachiroa profilestvis jer magas vizav anu uralod ro iuzeris profile movawyo ra postebi da ragac ara
-background foto da ase shemdeg
-
-
-
+post, mesijebi, komentarebi
 
 
 
 DONE login&register password change
 DONE setup profile
+DONE profile features about images
 
-NEXT davamtavreb set covers da backs
+NEXT vamateb searchs iuzerebsitvis
 
 
 
+DONE mokled movrchi send friend request da notifications
+
+DONE avamushavo buttonebi damateba da darejecteba ratqmunda notificationebit
+
+DONE megobrebis washla, notificationebeis washla batonze klikit
+
+DONE shevamowmo yvelaferi user damateba, requestis gagzavna, notification, washla megobris, notification washla, decline request,
+
+DONE davamato profilze megorebic da davqesho barem optimizacia gavuketo profile pages
+
+DONE search friends listshi ra
+
+მოკლედ რაც არუნდა იყოს ხვალ მოვრჩები მეგობრებს რა
+
+/////////////////////////////// DONE //////////////////////////////////////
+2. Profiles & Friendships
+Goal: Let users create profiles and manage friendships.
+
+Step 1: Extend the User model to include fields like bio, location, profile picture, job, and background image (you’re already doing this).
+Step 2: Create a ‘friendship’ model to handle friend requests. Fields include sender, receiver, status (pending, accepted).
+Step 3: Develop views and AJAX endpoints for sending/accepting friend requests.
+Step 4: Build a ‘Friends’ section on the user profile to list confirmed friends.
+
+/////////////////////////////// DONE //////////////////////////////////////
+
+3. Posts & News Feed
+Goal: Allow users to create posts and view a personalized news feed.
+
+Step 1: Create a Post model with fields like author, content, created_at, and media.
+Step 2: Implement the UI for creating a post. Allow text, image, and video uploads.
+Step 3: Build a News Feed page that fetches posts from the user’s friends in chronological order.
+Step 4: Implement pagination or infinite scroll for performance.
+
+                <div style="padding-inline: .5rem;">
+                  <a href="#" class="d-flex align-items-center gap-2" style="text-decoration: none; color: black;">
+                    <img src="default-boy-avatar.jpg" style="width: 50px;" alt="">
+                    <li>${friend}</li>
+                  </a>
+                </div>
+
+4. Likes, Comments, and Reactions
+Goal: Let users engage with posts through likes, comments, and reactions.
+
+Step 1: Create a Like model linked to Post and User.
+Step 2: Add a Comment model with post, user, content, and created_at fields.
+Step 3: Implement AJAX for adding likes, comments, and reactions dynamically without reloading the page.
+Step 4: Design a variety of reactions (like Facebook's emojis) if you want more than simple likes.
+
+
+5. Real-time Communication
+Goal: Enable messaging and real-time notifications.
+
+Step 1: Set up Django Channels for WebSocket support.
+Step 2: Create a Message model to store private conversations between users.
+Step 3: Build a simple chat UI using WebSockets to push and receive messages instantly.
+Step 4: Implement real-time notifications for friend requests, messages, and reactions using WebSockets.
+
+
+6. Search Functionality
+Goal: Let users search for friends, posts, and other content.
+
+Step 1: Implement a basic search view using Django’s search and full-text search.
+Step 2: Create a search bar in the UI and display results for users, posts, or groups.
+Step 3: Use pagination to display large sets of results efficiently.
+
+
+7. Media Handling
+Goal: Enable users to upload images, videos, and other media.
+
+Step 1: Add media fields to your Post model to support file uploads.
+Step 2: Configure Django to store and serve media files (ensure correct media root setup).
+Step 3: Add functionality to preview media uploads on the client side using JavaScript.
+Step 4: Implement image compression and video thumbnail generation to optimize media handling.
+
+
+8. Privacy Settings
+Goal: Give users control over who can see their posts and profiles.
+
+Step 1: Add privacy options to the user profile (e.g., ‘Public’, ‘Friends Only’, ‘Private’).
+Step 2: Implement privacy settings on posts, allowing users to choose visibility.
+Step 3: Modify your views and queries to respect privacy settings before displaying data.
+
+
+9. Notifications
+Goal: Notify users of new interactions such as friend requests, likes, or messages.
+
+Step 1: Create a Notification model with fields like user, event_type, trigger_user, is_read.
+Step 2: Develop real-time notification logic using Django Channels.
+Step 3: Add a notification icon to the UI that updates in real time.
+
+
+10. Groups & Events
+Goal: Enable users to create and join groups or events.
+
+Step 1: Create Group and Event models with fields for name, description, admin, and members.
+Step 2: Add views for creating, joining, and managing groups and events.
+Step 3: Show a feed for group posts similar to the regular news feed.
+
+
+11. Scalability & Performance
+Goal: Ensure your application can scale effectively.
+
+Step 1: Implement caching (e.g., Redis) to reduce database queries on frequently accessed pages.
+Step 2: Use asynchronous task queues like Celery to handle background jobs (e.g., notifications, media processing).
+Step 3: Optimize database queries (e.g., using select_related and indexing on frequently queried fields).
+Step 4: Set up load balancing and multiple servers to handle a large number of concurrent users.
 
 
 

@@ -24,12 +24,14 @@
   <a href="{% url 'profile' request.user %}" class="nav-link">👤 Profile</a>
   <a
     href="#notifications"
-    class="nav-link"
+    class="nav-link notification_a_tag_for_count open_notifications_modal_andretrieve_notifications"
     data-bs-toggle="modal"
     data-bs-target="#staticBackdrop2"
     data-title="Notifications"
-    >🔔 Notifications</a
-  >
+    >🔔 Notifications
+
+    <div class="notification_count">{{initial_notifications_length}}</div>
+  </a>
   <a href="{% url 'logout' %}" class="nav-link">🚪 Logout</a>
 </nav>
 
@@ -52,7 +54,7 @@
     />
     <div class="profile-details">
       <h2>{{ user.first_name }} {{ user.last_name }}</h2>
-      <p>@{{ user.first_name }}</p>
+      <p>@{{ user.new_username }}</p>
       <p class="bio">
         Bio: <span class="bio-txt">{{ user.bio }}</span>
 
@@ -98,7 +100,24 @@
       {% else %}
 
       <div class="profile-buttons">
-        <button>Add Friend</button>
+        {% if are_friends %}
+        <button
+          type="button"
+          class="delete_from_friends"
+          data-unfriend_user_id="{{user.id}}"
+        >
+          Unfriend
+        </button>
+        {% elif friend_request_sent %}
+        <p>Friend request already sent.</p>
+        {% elif friend_request_received %}
+        <p>Friend request already received.</p>
+        {% else %}
+        <button class="add_friend_btn_profile" data-receiver_id="{{user.id}}">
+          Add Friend
+        </button>
+        {% endif %}
+
         <button class="friend" data-name="Friend 1">Message</button>
       </div>
       {% endif %}
@@ -111,12 +130,16 @@
   <a href="{% url 'profile' request.user %}" class="nav-link">👤</a>
   <a
     href="#notifications"
-    class="nav-link"
+    class="nav-link notification_a_tag_for_count open_notifications_modal_andretrieve_notifications"
     data-bs-toggle="modal"
     data-bs-target="#staticBackdrop2"
     data-title="Notifications"
-    >🔔</a
-  >
+    >🔔
+
+    <div class="notification_count_mobile">
+      {{initial_notifications_length}}
+    </div>
+  </a>
   <a href="{% url 'logout' %}" class="nav-link">🚪</a>
 </nav>
 
@@ -449,6 +472,7 @@
     <input
       type="text"
       id="search-input__nav-desktop"
+      class="search-input__nav-profile"
       placeholder="Find Friends"
       style="font-size: 0.9rem"
     />
@@ -456,18 +480,19 @@
   </div>
 
   <ul class="friend-list">
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 1</p>
+    {% for i in user_friends %}
+    <li class="friend-item">
+      <a
+        href="{% url 'profile' i.friend_email %}"
+        style="display: flex; gap: 0.5rem; align-items: center"
+      >
+        <img src="/static/media/{{i.friend_avatar}}" alt="Friend Avatar" />
+        <p class="friend-name">
+          {{i.friend_first_name}} {{i.friend_last_name}}
+        </p>
+      </a>
     </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 2</p>
-    </li>
-    <li>
-      <img src="/static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-      <p>Friend 3</p>
-    </li>
+    {% endfor %}
   </ul>
 </div>
 
@@ -680,5 +705,6 @@
 <!--  -->
 {% block scripts %}
 <script type="module" src="{% static 'js/edit_profile1.js' %}"></script>
-<script src="{% static 'js/profile1.js' %}"></script>
+<script src="{% static 'js/profile.js' %}"></script>
+<script type="module" src="{% static 'js/friends1.js' %}"></script>
 {% endblock scripts %}

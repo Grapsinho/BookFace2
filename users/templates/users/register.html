@@ -221,19 +221,22 @@
           </div>
           <button type="submit" class="btn btn-primary w-100">Register</button>
 
+          <p
+            id="error-message"
+            style="color: #fff; padding: 1rem; margin-top: 1rem"
+          ></p>
+
           <div class="account-question">
             <p>
               Already have an account?
               <a href="{% url 'login' %}" class="btn btn-link">Login</a>
             </p>
           </div>
-
-          <p id="error-message"></p>
         </form>
       </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{% static 'js/registration.js' %}"></script>
+    <script src="{% static 'js/registration1.js' %}"></script>
   </body>
 </html>

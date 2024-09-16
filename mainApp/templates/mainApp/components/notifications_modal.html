@@ -1,3 +1,5 @@
+{% load static %}
+
 <!-- Modal for notifications -->
 <div
   class="modal fade"
@@ -25,40 +27,28 @@
         <li class="nav-item" role="presentation">
           <button
             class="nav-link active"
-            id="requests-tab"
+            id="notifications-tab"
             data-bs-toggle="tab"
-            data-bs-target="#requests"
+            data-bs-target="#notifications"
             role="tab"
-            aria-controls="requests"
+            aria-controls="notifications"
             aria-selected="true"
           >
-            Requests
+            Notifications
           </button>
         </li>
+
         <li class="nav-item" role="presentation">
           <button
             class="nav-link"
-            id="declined-tab"
+            id="messages-tab"
             data-bs-toggle="tab"
-            data-bs-target="#declined"
+            data-bs-target="#messages"
             role="tab"
-            aria-controls="declined"
+            aria-controls="messages"
             aria-selected="false"
           >
-            Declined
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button
-            class="nav-link"
-            id="accepted-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#accepted"
-            role="tab"
-            aria-controls="accepted"
-            aria-selected="false"
-          >
-            Accepted
+            Messages
           </button>
         </li>
       </ul>
@@ -69,34 +59,42 @@
         id="notificationTabContent"
         style="height: 300px; overflow-y: scroll"
       >
-        <!-- Requests Section -->
         <div
           class="tab-pane fade show active"
-          id="requests"
+          id="notifications"
           role="tabpanel"
-          aria-labelledby="requests-tab"
+          aria-labelledby="notifications-tab"
         >
-          <div class="modal-body">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <a href="#">
+          <div class="modal-body notifications_modal_body">
+            {% for i in initial_notifications %}
+
+            <!--  -->
+            {% if i.notification_type == "friend_request" %}
+            <div class="d-flex align-items-center gap-2 my-3">
+              <a href="{% url 'profile' i.sender__email %}">
                 <img
-                  src="/static/media/{{user.avatar}}"
+                  src="/static/media/{{i.sender__avatar}}"
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
               <div style="display: flex; flex-direction: column">
-                <span style="color: black">{{i.sender__full_name}}</span>
+                <span style="color: black"
+                  >{{i.sender__first_name}} {{i.sender__last_name}}
+                  <span style="font-size: 0.9rem">Sent You Friend Request</span>
+                </span>
                 <div class="d-flex gap-2">
                   <button
                     class="btn btn-success add_friend_appr"
-                    data-id="{{i.sender__pk}}"
+                    data-id="{{i.sender__id}}"
+                    data-notificationId="{{i.id}}"
                     style="padding: 2px 0; width: 100px"
                   >
                     Accept
                   </button>
                   <button
                     class="btn btn-danger decline_friend_request"
-                    data-id="{{i.sender__pk}}"
+                    data-id="{{i.sender__id}}"
+                    data-notificationId="{{i.id}}"
                     style="padding: 2px 0; width: 100px"
                   >
                     Decline
@@ -104,64 +102,144 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Declined Section -->
-        <div
-          class="tab-pane fade"
-          id="declined"
-          role="tabpanel"
-          aria-labelledby="declined-tab"
-        >
-          <div
-            class="modal-body d-flex"
-            style="flex-direction: column; gap: 1rem"
-          >
-            <!-- Content for declined requests -->
-            <span style="color: black; background: #e0e0e0; padding: 0.5rem">
-              {{i.receiver__full_name}} has declined your friend request
-              <span
+            {% elif i.notification_type == "friend_acceptance" %}
+            <p
+              style="
+                color: black;
+                background: #e0e0e0;
+                padding: 0.5rem;
+                margin-block: 0.5rem;
+              "
+            >
+              {{i.sender__first_name}} {{i.sender__last_name}} has accepted your
+              friend request
+              <button
                 class="delete_message_dec"
-                data-id="{{i.pk}}"
+                data-id="{{i.id}}"
                 style="
                   font-size: 1.2rem;
-                  background: rgb(122, 92, 92);
-                  color: white;
                   cursor: pointer;
                   padding: 0.2rem;
+                  background: none;
+                  border: none;
                 "
-                >❌</span
+                type="button"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                data-bs-title="Delete Notification"
               >
-            </span>
+                🗑️
+              </button>
+            </p>
+            {% elif i.notification_type == "friend_rejection" %}
+            <p
+              style="
+                color: black;
+                background: #e0e0e0;
+                padding: 0.5rem;
+                margin-block: 0.5rem;
+              "
+            >
+              {{i.sender__first_name}} {{i.sender__last_name}} has rejected your
+              friend request
+              <button
+                class="delete_message_dec"
+                data-id="{{i.id}}"
+                style="
+                  font-size: 1.2rem;
+                  cursor: pointer;
+                  padding: 0.2rem;
+                  background: none;
+                  border: none;
+                "
+                type="button"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                data-bs-title="Delete Notification"
+              >
+                🗑️
+              </button>
+            </p>
+            {% elif i.notification_type == "unfriend" %}
+
+            <div
+              class="d-flex align-items-center gap-2 my-3 container_for_unfriend_notification"
+            >
+              <a href="{% url 'profile' i.sender__email %}">
+                <img
+                  src="/static/media/{{i.sender__avatar}}"
+                  style="border-radius: 50%; width: 50px; height: 50px"
+                />
+              </a>
+              <div style="display: flex; flex-direction: column">
+                <span style="color: black"
+                  >{{i.sender__first_name}} {{i.sender__last_name}}</span
+                >
+
+                <div>
+                  <span style="font-size: 0.9rem"
+                    >Has removed you as a friend.</span
+                  >
+
+                  <button
+                    class="delete_message_dec"
+                    data-id="{{i.id}}"
+                    style="
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0.2rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-custom-class="custom-tooltip"
+                    data-bs-title="Delete Notification"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+            {% endif %} {% endfor %}
           </div>
         </div>
 
-        <!-- Accepted Section -->
+        <!-- Messages Section -->
         <div
           class="tab-pane fade"
-          id="accepted"
+          id="messages"
           role="tabpanel"
-          aria-labelledby="accepted-tab"
+          aria-labelledby="messages-tab"
         >
           <div class="modal-body">
-            <!-- Content for accepted requests -->
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <li style="color: black">
-                {{i.receiver__full_name}} has accepted your friend request
-                <span
-                  class="delete_message_dec"
-                  data-id="{{i.pk}}"
-                  style="
-                    font-size: 1.2rem;
-                    background: rgb(122, 92, 92);
-                    color: white;
-                    cursor: pointer;
-                    padding: 0.2rem;
-                  "
-                  >❌</span
-                >
-              </li>
+            <div class="message-preview notification_message_cont">
+              <div class="user-image">
+                <img src="/static/media/{{request.user.avatar}}" alt="User 1" />
+              </div>
+              <div class="message-details">
+                <div class="username">Dalaca</div>
+                <div class="message-text">
+                  You: Hey, how are you doing today?...
+                </div>
+              </div>
+              <div class="message-time">2h</div>
+            </div>
+
+            <div class="message-preview notification_message_cont">
+              <div class="user-image">
+                <img src="/static/media/{{request.user.avatar}}" alt="User 1" />
+              </div>
+              <div class="message-details">
+                <div class="username">Dalaca2</div>
+                <div class="message-text" style="color: #fff">
+                  Hey, how are you doing today?...
+                </div>
+              </div>
+              <div class="message-time">2h</div>
             </div>
           </div>
         </div>
@@ -176,3 +254,5 @@
     </div>
   </div>
 </div>
+
+<script type="module" src="{% static 'js/notification.js' %}"></script>

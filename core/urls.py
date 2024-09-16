@@ -16,6 +16,12 @@ urlpatterns = [
     # profile setup urls
     path('', include('user_profile.urls')),
 
+    # notifications urls
+    path('notifications/api/', include('notifications.urls')),
+
+    # profile setup urls
+    path('friendship/', include('friendship.urls')),
+
     #for development
     path("__debug__/", include(debug_toolbar.urls)),
 ]

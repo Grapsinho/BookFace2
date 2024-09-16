@@ -113,6 +113,8 @@ function sanitizeInput(userInput) {
               const errorResponse = error.responseJSON.non_field_errors;
 
               errorResponse.forEach((element) => {
+                document.getElementById("error-message").style.backgroundColor =
+                  "#d01c1cb0";
                 document.getElementById("error-message").textContent = element;
               });
             } catch (error) {

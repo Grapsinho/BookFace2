@@ -259,3 +259,32 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 //////////////////////////// ends here /////////////////////////////
+
+/////////////////////////// search friends in friend list ////////////////////////////
+
+const input_for_find_friends = document.querySelector(
+  ".search-input__nav-profile"
+);
+
+input_for_find_friends.addEventListener("input", () => {
+  setTimeout(() => {
+    console.log(input_for_find_friends.value);
+    // Get all the friend items from the list
+    let friendItems = document.querySelectorAll(".friend-item");
+
+    // Loop through each friend item
+    friendItems.forEach(function (item) {
+      // Get the friend's full name (first name + last name)
+      let friendName = item
+        .querySelector(".friend-name")
+        .textContent.toLowerCase();
+
+      // Check if the friend's name includes the input value
+      if (friendName.includes(input_for_find_friends.value)) {
+        item.style.display = "block"; // Show the item if it matches
+      } else {
+        item.style.display = "none"; // Hide the item if it doesn't match
+      }
+    });
+  }, 700);
+});

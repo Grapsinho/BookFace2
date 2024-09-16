@@ -185,7 +185,7 @@ class RefreshAccessTokenView(APIView):
         refresh_token = request.COOKIES.get('refresh_token')
 
         if not refresh_token:
-            return Response({"message": "Refresh token missing"}, status=400)
+            return Response({"message": 'logout qeni'}, status=400)
 
         try:
             # Create RefreshToken object from the refresh_token

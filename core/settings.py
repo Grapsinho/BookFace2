@@ -26,6 +26,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,6 +38,9 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'mainApp.apps.MainappConfig',
     'user_profile.apps.UserProfileConfig',
+    'friendship.apps.FriendshipConfig',
+    'notifications.apps.NotificationsConfig',
+    'search.apps.SearchConfig',
 
     #api
     'rest_framework',
@@ -108,16 +112,52 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
+ASGI_APPLICATION = "core.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+db_host = os.environ.get('DB_HOST')
+db_port = os.environ.get('DB_PORT')
+db_name = os.environ.get('DB_NAME')
+db_user = os.environ.get('DB_USER')
+db_pass = os.environ.get('DB_PASS')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': db_name,
+        'USER': db_user,
+        'PASSWORD': db_pass,
+        'HOST': db_host,
+        'PORT': db_port,
     }
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # Assuming you have Redis running locally
+        },
+    },
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

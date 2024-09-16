@@ -10,6 +10,8 @@ from rest_framework import status
 import json
 from core import settings
 
+from rest_framework.permissions import IsAuthenticated
+
 from django.core.exceptions import ObjectDoesNotExist
 
 def create_or_update_media(user, image_field, media_type):
@@ -22,6 +24,8 @@ def create_or_update_media(user, image_field, media_type):
         )
 
 class ProfileSetupView(View):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         user = request.user
         form = ProfileSetupForm(instance=user)
@@ -59,6 +63,7 @@ class ProfileSetupView(View):
 
 class UpdateJobOrLocation(APIView):
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         data = json.loads(request.body)
@@ -89,6 +94,7 @@ class UpdateJobOrLocation(APIView):
 
 class UpdateProfilePictures(APIView):
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         form = ProfilePicturesUpdateForm(request.POST, request.FILES, instance=request.user)
@@ -112,6 +118,7 @@ class UpdateProfilePictures(APIView):
         
 class DeleteImages(APIView):
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         data = json.loads(request.body)
@@ -150,6 +157,7 @@ class DeleteImages(APIView):
         
 class SetCoverOrProfile(APIView):
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         data = json.loads(request.body)
