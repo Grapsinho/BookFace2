@@ -13,55 +13,126 @@
           <img
             src="static/media/{{request.user.avatar}}"
             alt=""
-            style="width: 3.5rem; height: 3.5rem"
+            style="width: 3.5rem; height: 3.5rem; border-radius: 50%"
           />
         </div>
         <div class="user-info">
-          <div class="full-name">GeeksforGeeks</div>
-        </div>
-      </div>
-      <div class="post-content">
-        <textarea
-          name="post-desc"
-          id="post-desc"
-          cols="30"
-          rows="5"
-          placeholder="What's on you mind?"
-          style="background-color: #f9f9f9"
-        ></textarea>
-        <div class="add-to-your-post">
-          <span class="add-to-post-text">Add to your post</span>
-          <div class="add-to-post-icons">
-            <input
-              type="file"
-              name="media"
-              id="media"
-              accept="image/*,video/*"
-            />
-            <label for="media">
-              <div class="photo-video"></div>
-              <img
-                id="image-preview"
-                src=""
-                alt="Image preview"
-                style="display: none; width: 100px"
-              />
-              <video
-                id="video-preview"
-                controls
-                style="display: none; max-width: 100%; max-height: 100px"
-              ></video>
-              <button
-                id="remove-preview"
-                style="display: none; margin-bottom: 0.4rem"
-              >
-                Remove
-              </button>
-            </label>
+          <div class="full-name">
+            {{ request.user.first_name }} {{ request.user.last_name }}
           </div>
         </div>
-        <button class="post-btn" disabled>Post</button>
       </div>
+      <form method="post" enctype="multipart/form-data" id="post-form">
+        {% csrf_token %}
+
+        <div class="post-content">
+          <textarea
+            id="post-desc"
+            name="text"
+            cols="30"
+            rows="5"
+            placeholder="What's on you mind?"
+            style="background-color: #f9f9f9"
+          ></textarea>
+          <div class="add-to-your-post">
+            <span class="add-to-post-text">Add to your post</span>
+            <div class="add-to-post-icons">
+              <input
+                type="file"
+                name="media"
+                id="media"
+                accept="image/*,video/*"
+              />
+              <label for="media">
+                <div class="photo-video"></div>
+                <img
+                  id="image-preview"
+                  src=""
+                  alt="Image preview"
+                  style="display: none; width: 100px"
+                />
+                <video
+                  id="video-preview"
+                  controls
+                  style="display: none; max-width: 100%; max-height: 100px"
+                ></video>
+                <button
+                  id="remove-preview"
+                  style="display: none; margin-bottom: 0.4rem"
+                  type="button"
+                >
+                  Remove
+                </button>
+              </label>
+            </div>
+          </div>
+
+          <div class="tags-section">
+            <label for="tags"
+              >Select up to 5 tags:
+              <a
+                href="#"
+                type="button"
+                class="link-primary link-underline-opacity-100-hover"
+                data-bs-toggle="modal"
+                data-bs-target="#modalForExplainTags"
+                >Learn more</a
+              ></label
+            >
+            <div id="tags-wrapper">
+              {% for tag in tags %}
+              <input
+                type="checkbox"
+                name="tags"
+                value="{{ tag.id }}"
+                id="tag-{{ tag.id }}"
+                class="tag-checkbox"
+              />
+              <label for="tag-{{ tag.id }}">{{ tag.name }}</label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <button class="post-btn" id="create_post--btn" type="button" disabled>
+            Post
+          </button>
+        </div>
+      </form>
     </section>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="modalForExplainTags"
+  tabindex="-1"
+  aria-labelledby="modalForExplainTagsLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalForExplainTagsLabel">
+          Learn More About Tags
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" style="color: black">
+        Tags help categorize posts, making it easier for users to discover
+        content based on specific interests. They improve searchability,
+        organization, and engagement within the platform.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 </div>

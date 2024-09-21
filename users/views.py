@@ -204,6 +204,8 @@ class RefreshAccessTokenView(APIView):
                 samesite='Lax',
                 path='/'
             )
+
+            
             return response
 
         except TokenError as e:

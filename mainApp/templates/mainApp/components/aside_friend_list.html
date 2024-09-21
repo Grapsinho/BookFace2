@@ -16,15 +16,17 @@
       </div>
 
       <ul style="padding-left: 0">
+        {% for i in user_friends %}
         <li class="friend" style="cursor: pointer">
-          <img src="static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-          <p class="friend_name" data-name="Friend 1">Friend 1</p>
+          <img src="static/media/{{i.friend_avatar}}" alt="Friend Avatar" />
+          <p
+            class="friend_name"
+            data-name="{{i.friend_first_name}} {{i.friend_last_name}}"
+          >
+            {{i.friend_first_name}} {{i.friend_last_name}}
+          </p>
         </li>
-        <li class="friend" style="cursor: pointer">
-          <img src="static/media/{{request.user.avatar}}" alt="Friend Avatar" />
-          <p class="friend_name" data-name="Friend 2">Friend 2</p>
-        </li>
-        <!-- More friends -->
+        {% endfor %}
       </ul>
     </section>
   </div>

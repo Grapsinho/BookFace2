@@ -6,9 +6,7 @@ DONE login&register password change
 DONE setup profile
 DONE profile features about images
 
-NEXT vamateb searchs iuzerebsitvis
-
-
+DONE vamateb searchs iuzerebsitvis
 
 DONE mokled movrchi send friend request da notifications
 
@@ -22,7 +20,162 @@ DONE davamato profilze megorebic da davqesho barem optimizacia gavuketo profile 
 
 DONE search friends listshi ra
 
-მოკლედ რაც არუნდა იყოს ხვალ მოვრჩები მეგობრებს რა
+
+DONE eseigi vamateb posts jerjerobit marto davamatot da profilze gamovachinot
+
+DONE eseigi posti emateba chveulebrivad aseve ematebe user mediashi url
+
+exla ro moval avamushaveb likes da comments
+
+DONE da uechveli davamateb imas ro fotoebi da videoebi davaoptimiziro ra
+
+DONE postis update
+
+Done eseigi potos validacia da shemdeg ukve davaabdeiteb posts mere davamateb likes da comments
+
+
+
+eseigi saits aklia celery da videos optimizacia
+
+mokled mere saits davumateb celery notificationebistvis!!!!!!!!!!!!!
+
+
+
+
+Core Concept:
+We will implement a recommendation system where posts are recommended to users based on tags. Users will select tags that represent their interests, and posts will be tagged with relevant topics. We will also enhance the system by incorporating user interactions (likes, comments) and collaborative filtering to recommend more personalized content.
+
+Step-by-Step Process:
+1. Tags System for Posts and Users:
+Tags will categorize both posts and user interests.
+Users will select at least one tag representing their interests when creating a profile or updating their preferences.
+Posts will be tagged with relevant topics when created.
+Models:
+Tag: Stores all the available tags (topics) that can be applied to posts and user interests.
+Post: Stores the content of the post (text, image, video) and has a many-to-many relationship with tags.
+UserInterest: Each user will have a set of tags representing their interests, allowing us to match posts with similar tags.
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='posts/images/', blank=True, null=True)
+    video = models.FileField(upload_to='posts/videos/', blank=True, null=True)
+    tags = models.ManyToManyField(Tag, related_name='posts')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class UserInterest(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    tags = models.ManyToManyField(Tag, related_name='interested_users')
+2. Recommendation Logic Based on Tags:
+Tag Matching: When recommending posts to a user, we will first check for posts that have tags matching the user’s interests.
+Posts that contain tags from the user's interest list will be prioritized for recommendations.
+Example Logic:
+
+def recommend_posts(user):
+    # Get the user's interests (tags)
+    user_interests = user.userinterest.tags.all()
+    
+    # Filter posts that match the user's interests
+    recommended_posts = Post.objects.filter(tags__in=user_interests).distinct().order_by('-created_at')[:10]
+    
+    return recommended_posts
+The user will see posts that are most relevant based on their selected tags.
+3. Enhancement 1: Interaction-Based Recommendations:
+In addition to tag-based recommendations, we will track user interactions (likes, comments, shares) and recommend posts based on the types of posts a user interacts with.
+Posts that a user frequently engages with (even if they don’t exactly match their interests) will also be recommended.
+Enhancement Logic:
+
+def recommend_posts(user):
+    # Get the user's interests (tags)
+    user_interests = user.userinterest.tags.all()
+    
+    # Get posts based on tags
+    tag_based_posts = Post.objects.filter(tags__in=user_interests).distinct()
+
+    # Get posts based on the user's past interactions
+    interaction_based_posts = Post.objects.filter(
+        Q(likes__user=user) | Q(comments__user=user)
+    ).distinct()
+
+    # Combine and order posts (most recent or popular first)
+    combined_posts = tag_based_posts.union(interaction_based_posts).order_by('-created_at', '-likes_count')
+    
+    return combined_posts
+Union allows us to combine tag-based and interaction-based posts.
+Posts are sorted by creation date and popularity (likes).
+4. Enhancement 2: Collaborative Filtering (Similar User Interests):
+We will also recommend posts based on the behavior of other users who have similar interests.
+If users with similar tags like or interact with certain posts, those posts will be recommended to each other.
+Example Logic:
+
+def recommend_posts(user):
+    # Get the user's interests (tags)
+    user_interests = user.userinterest.tags.all()
+
+    # Find other users with similar tags
+    similar_users = UserInterest.objects.filter(tags__in=user_interests).exclude(user=user)
+    
+    # Get posts liked or interacted with by similar users
+    similar_user_posts = Post.objects.filter(
+        Q(likes__user__in=[su.user for su in similar_users]) |
+        Q(comments__user__in=[su.user for su in similar_users])
+    ).distinct()
+
+    # Get the user's own tag-based posts
+    tag_based_posts = Post.objects.filter(tags__in=user_interests).distinct()
+
+    # Combine all posts, ensuring uniqueness and ordering by relevance
+    combined_posts = tag_based_posts.union(similar_user_posts).order_by('-created_at', '-likes_count')
+    
+    return combined_posts
+Posts liked or commented on by users with similar interests will be recommended to each other.
+This ensures that users who enjoy similar content will get relevant recommendations from their shared network of interests.
+5. Enhancement 3: Popularity and Recency of Posts:
+Posts with higher engagement (likes, comments, shares) will get prioritized in the recommendation system.
+Additionally, more recent posts should be favored, as users generally prefer fresh content.
+Logic Adjustments:
+
+Ensure that posts are ordered by their likes_count, comments_count, and created_at.
+Posts that are both popular and recent will be prioritized.
+Summary of the Recommendation System Workflow:
+Tag Matching:
+
+We first match posts to the user's interests by comparing post tags with the user’s interest tags.
+Interaction-Based Recommendations:
+
+Posts that the user interacts with (likes, comments) are prioritized, even if they don’t match tags perfectly.
+Collaborative Filtering:
+
+Posts that other users with similar interests have interacted with will be recommended to users.
+Post Popularity and Recency:
+
+We will give higher priority to posts that are both popular (high likes/comments) and recent, to ensure that engaging content is shown to the user.
+Benefits of This Approach:
+Personalization: Posts will be personalized to each user’s interests.
+Diversity: Users will see a mix of tag-based posts, interaction-based posts, and posts liked by others with similar interests.
+Dynamic: The system adapts based on the user’s ongoing interactions, providing fresh and relevant content continuously.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /////////////////////////////// DONE //////////////////////////////////////
 2. Profiles & Friendships
@@ -35,6 +188,7 @@ Step 4: Build a ‘Friends’ section on the user profile to list confirmed frie
 
 /////////////////////////////// DONE //////////////////////////////////////
 
+/////////////////////////////// NEXT //////////////////////////////////////
 3. Posts & News Feed
 Goal: Allow users to create posts and view a personalized news feed.
 
@@ -43,13 +197,6 @@ Step 2: Implement the UI for creating a post. Allow text, image, and video uploa
 Step 3: Build a News Feed page that fetches posts from the user’s friends in chronological order.
 Step 4: Implement pagination or infinite scroll for performance.
 
-                <div style="padding-inline: .5rem;">
-                  <a href="#" class="d-flex align-items-center gap-2" style="text-decoration: none; color: black;">
-                    <img src="default-boy-avatar.jpg" style="width: 50px;" alt="">
-                    <li>${friend}</li>
-                  </a>
-                </div>
-
 4. Likes, Comments, and Reactions
 Goal: Let users engage with posts through likes, comments, and reactions.
 
@@ -57,8 +204,9 @@ Step 1: Create a Like model linked to Post and User.
 Step 2: Add a Comment model with post, user, content, and created_at fields.
 Step 3: Implement AJAX for adding likes, comments, and reactions dynamically without reloading the page.
 Step 4: Design a variety of reactions (like Facebook's emojis) if you want more than simple likes.
+/////////////////////////////// NEXT //////////////////////////////////////
 
-
+/////////////////////////////// DONE //////////////////////////////////////
 5. Real-time Communication
 Goal: Enable messaging and real-time notifications.
 
@@ -66,16 +214,18 @@ Step 1: Set up Django Channels for WebSocket support.
 Step 2: Create a Message model to store private conversations between users.
 Step 3: Build a simple chat UI using WebSockets to push and receive messages instantly.
 Step 4: Implement real-time notifications for friend requests, messages, and reactions using WebSockets.
+/////////////////////////////// DONE //////////////////////////////////////
 
-
+/////////////////////////////// DONE //////////////////////////////////////
 6. Search Functionality
 Goal: Let users search for friends, posts, and other content.
 
 Step 1: Implement a basic search view using Django’s search and full-text search.
 Step 2: Create a search bar in the UI and display results for users, posts, or groups.
 Step 3: Use pagination to display large sets of results efficiently.
+/////////////////////////////// DONE //////////////////////////////////////
 
-
+/////////////////////////////// DONE //////////////////////////////////////
 7. Media Handling
 Goal: Enable users to upload images, videos, and other media.
 
@@ -83,7 +233,7 @@ Step 1: Add media fields to your Post model to support file uploads.
 Step 2: Configure Django to store and serve media files (ensure correct media root setup).
 Step 3: Add functionality to preview media uploads on the client side using JavaScript.
 Step 4: Implement image compression and video thumbnail generation to optimize media handling.
-
+/////////////////////////////// DONE //////////////////////////////////////
 
 8. Privacy Settings
 Goal: Give users control over who can see their posts and profiles.
@@ -92,14 +242,14 @@ Step 1: Add privacy options to the user profile (e.g., ‘Public’, ‘Friends 
 Step 2: Implement privacy settings on posts, allowing users to choose visibility.
 Step 3: Modify your views and queries to respect privacy settings before displaying data.
 
-
+/////////////////////////////// DONE //////////////////////////////////////
 9. Notifications
 Goal: Notify users of new interactions such as friend requests, likes, or messages.
 
 Step 1: Create a Notification model with fields like user, event_type, trigger_user, is_read.
 Step 2: Develop real-time notification logic using Django Channels.
 Step 3: Add a notification icon to the UI that updates in real time.
-
+/////////////////////////////// DONE //////////////////////////////////////
 
 10. Groups & Events
 Goal: Enable users to create and join groups or events.

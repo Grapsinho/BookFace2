@@ -1,4 +1,4 @@
-import { sendRequest } from "./utility.js";
+import { sendRequestInUtility } from "./utility.js";
 
 // Function to preview the profile picture
 document
@@ -104,7 +104,7 @@ function submitForm__edit_profile() {
         xhr.responseJSON?.detail ===
         "Authentication credentials were not provided or are invalid."
       ) {
-        refreshTokenAndRetry__edit_profile(); // Refresh the token and retry the form submission
+        refreshTokenAndRetry__edit_profile(() => submitForm__edit_profile());
       } else {
         // Handle other errors (e.g., show an error message)
         console.error("Error while updating profile", xhr);
@@ -150,7 +150,7 @@ function setCoverOrProfilePicture(media_id, value) {
   data["type"] = value;
   data["mediaId"] = media_id;
 
-  sendRequest(
+  sendRequestInUtility(
     "/profile/SetCoverOrProfile/", // Your API endpoint
     "POST", // მეთოდი
     data, // რას ვაგზავნით
@@ -170,30 +170,13 @@ function setCoverOrProfilePicture(media_id, value) {
         "Authentication credentials were not provided or are invalid."
       ) {
         // ვარეფრეშებთ ტოკენს
-        refreshTokenAndRetry(() => setCoverOrProfilePicture(media_id, value)); // Retry after refreshing token
+        refreshTokenAndRetry__edit_profile(() =>
+          setCoverOrProfilePicture(media_id, value)
+        ); // Retry after refreshing token
       }
 
       if (xhr.responseJSON?.detail === "Media object not found.") {
         alert("Media object not found.");
-      }
-    }
-  );
-}
-
-// ტოკენის რეფრეში
-function refreshTokenAndRetry(retryCallback) {
-  sendRequest(
-    "/auth/token/refresh/",
-    "POST",
-    {},
-    function (data) {
-      console.log("Token refreshed successfully", data);
-      retryCallback(); // Retry original request after token refresh
-    },
-    function (error) {
-      console.error("Token refresh failed", error);
-      if (error.responseJSON?.message === "logout qeni") {
-        window.location.href = `${location.protocol}//${location.host}/auth/logout/`;
       }
     }
   );

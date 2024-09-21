@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'friendship.apps.FriendshipConfig',
     'notifications.apps.NotificationsConfig',
     'search.apps.SearchConfig',
+    'posts.apps.PostsConfig',
 
     #api
     'rest_framework',

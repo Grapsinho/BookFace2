@@ -45,10 +45,47 @@ const createPostSection = document.querySelector(".create-post2");
 
 document.body.style.overflowX = "none";
 
-textarea.addEventListener("input", () => {
-  if (textarea.value != "") postBtn.disabled = false;
-  else postBtn.disabled = true;
+/////////////////// es kodi aqamde ///////////////////
+const tagsWrapper = document.getElementById("tags-wrapper");
+
+// Limit tag selection to 5
+const tagCheckboxes = document.querySelectorAll(".tag-checkbox");
+let selectedTags = 0;
+
+tagCheckboxes.forEach(function (checkbox) {
+  checkbox.addEventListener("change", function () {
+    if (this.checked) {
+      selectedTags++;
+    } else {
+      selectedTags--;
+    }
+
+    if (selectedTags > 5) {
+      this.checked = false;
+      selectedTags--;
+      alert("You can only select up to 5 tags.");
+    }
+  });
 });
+
+function checkFormValidity() {
+  const isTextFilled = textarea.value.trim() !== "";
+  const isTagSelected =
+    tagsWrapper.querySelector('input[type="checkbox"]:checked') !== null;
+
+  if (isTextFilled && isTagSelected) {
+    postBtn.removeAttribute("disabled"); // Enable the button
+  } else {
+    postBtn.setAttribute("disabled", ""); // Disable the button
+  }
+}
+
+// Event listeners
+textarea.addEventListener("input", checkFormValidity);
+
+tagsWrapper.addEventListener("change", checkFormValidity);
+
+/////////////////// es kodi aqamde ///////////////////
 
 document.getElementById("media").addEventListener("change", function (event) {
   const file = event.target.files[0];

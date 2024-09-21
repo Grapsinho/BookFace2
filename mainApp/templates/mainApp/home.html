@@ -14,6 +14,40 @@
   type="text/css"
   media="screen"
 />
+
+<style>
+  /* Modal and Progress Bar styles */
+  .modal-for-progressbar-create_post {
+    margin-bottom: 1rem;
+  }
+  .modal-for-progressbar-create_post .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+  }
+  .modal-for-progressbar-create_post .progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  .modal-for-progressbar-create_post .progress-fill {
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.5s ease;
+  }
+
+  .magariAlteri {
+    position: fixed;
+    top: 10px;
+    z-index: -1012312;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+</style>
 {% endblock css %}
 <!-- Page Content -->
 
@@ -28,6 +62,19 @@
     <section id="create-post">
       <div class="open-post-create-thing">What's on your mind?</div>
     </section>
+
+    <div
+      id="progress-modal"
+      class="modal-for-progressbar-create_post"
+      style="display: none"
+    >
+      <div class="modal-content">
+        <h2 style="font-size: 1rem">Creating your post...</h2>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- News Feed -->
     <section id="news-feed">
@@ -63,12 +110,25 @@
 <!-- Share Modal (Bootstrap) -->
 {% include 'mainApp/components/share_modal.html' %}
 <!--  -->
+
+<div
+  class="alert alert-warning alert-dismissible fade hide magariAlteri"
+  role="alert"
+>
+  Video file is too large. Maximum size allowed is 10MB.
+  <button
+    type="button"
+    class="btn-close"
+    data-bs-dismiss="alert"
+    aria-label="Close"
+  ></button>
+</div>
 {% endblock content %}
 
 <!--  -->
 {% block scripts %}
 
 <script src="{% static 'js/home1.js' %}"></script>
-
+<script type="module" src="{% static 'js/crud_post1.js' %}"></script>
 <script src="{% static 'js/search.js' %}"></script>
 {% endblock scripts %}

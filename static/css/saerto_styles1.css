@@ -112,10 +112,6 @@ h4 {
   margin-top: 10px;
 }
 
-.posts-area-mainpage-profilepage details[open] {
-  padding: 10px 0;
-}
-
 .posts-area-mainpage-profilepage details summary {
   cursor: pointer;
   font-weight: bold;
@@ -126,14 +122,19 @@ h4 {
   color: #165ecf;
 }
 
-.posts-area-mainpage-profilepage .comment {
+.posts-area-mainpage-profilepage .add-comment {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  flex-direction: column;
+
   padding: 5px 0;
   border-bottom: 1px solid #ddd;
 }
 
-.posts-area-mainpage-profilepage .add-comment {
-  display: flex;
-  margin-top: 10px;
+.posts-area-mainpage-profilepage .comments {
+  max-height: 200px;
+  overflow-y: scroll;
 }
 
 .posts-area-mainpage-profilepage .add-comment input {
@@ -141,7 +142,6 @@ h4 {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  margin-right: 5px;
 }
 
 .posts-area-mainpage-profilepage .add-comment button {
@@ -152,6 +152,7 @@ h4 {
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  margin-block: 0.5rem;
 }
 
 .posts-area-mainpage-profilepage .add-comment button:hover {
@@ -390,4 +391,50 @@ h4 {
   font-size: 12px;
   color: #bbb;
   white-space: nowrap;
+}
+
+/* Tag buttons container */
+#tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Tag checkboxes styled as buttons */
+input[type="checkbox"].tag-checkbox {
+  display: none; /* Hide default checkbox */
+}
+
+/* Default tag label styling (unselected) */
+#tags-wrapper label {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  background-color: #f3f3f3;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #333;
+  transition: background-color 0.2s, color 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#tags-wrapper label:hover {
+  background-color: #e0e0e0;
+}
+
+/* Selected tag style */
+input[type="checkbox"].tag-checkbox:checked + label {
+  background-color: #007bff !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.5) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  #tags-wrapper {
+    gap: 5px;
+  }
+
+  #tags-wrapper label {
+    padding: 0.3rem 0.8rem;
+  }
 }

@@ -1,0 +1,114 @@
+[
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 1,
+      "name": "travel"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 2,
+      "name": "food"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 3,
+      "name": "fitness"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 4,
+      "name": "family"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 5,
+      "name": "friends"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 6,
+      "name": "fun"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 7,
+      "name": "music"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 8,
+      "name": "technology"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 9,
+      "name": "work"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 10,
+      "name": "health"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 11,
+      "name": "sports"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 12,
+      "name": "fashion"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 13,
+      "name": "nature"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 14,
+      "name": "education"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 15,
+      "name": "art"
+    }
+  },
+  {
+    "model": "posts.tag",
+    "fields": {
+      "id": 16,
+      "name": "animals"
+    }
+  }
+]

@@ -1,5 +1,6 @@
 const addFriendBtn = document.querySelector(".add_friend_btn_profile");
 const delete_from_friends = document.querySelector(".delete_from_friends");
+const add_friend_btn_setup = document.querySelectorAll(".add-friend-btn-setup");
 
 // General function to send requests using fetch
 export function sendRequest(url, method, data, successCallback, errorCallback) {
@@ -30,7 +31,6 @@ export function sendRequest(url, method, data, successCallback, errorCallback) {
         data2.detail ===
         "Authentication credentials were not provided or are invalid."
       ) {
-        console.log();
         refreshTokenAndRetry(() =>
           sendRequest(url, method, data, successCallback, errorCallback)
         ); // Retry if token issue
@@ -44,7 +44,7 @@ export function sendRequest(url, method, data, successCallback, errorCallback) {
 }
 
 // Function to send a friend request
-function sendFriendRequest(receiverId) {
+function sendFriendRequest(receiverId, button) {
   const data = { receiver_id: receiverId };
 
   sendRequest(
@@ -53,8 +53,8 @@ function sendFriendRequest(receiverId) {
     data, // Data to be sent (receiver's ID)
     function (response) {
       // Success callback
-      addFriendBtn.textContent = "Request Sent";
-      addFriendBtn.style.pointerEvents = "none";
+      button.textContent = "Request Sent";
+      button.style.pointerEvents = "none";
     },
     function (error) {
       // Error callback
@@ -156,13 +156,20 @@ function removeFriend(remove_friend_id, button) {
 
 // Example usage: Adding click event listener for the "Add Friend" button
 document.addEventListener("DOMContentLoaded", function () {
+  if (add_friend_btn_setup) {
+    add_friend_btn_setup.forEach((element) => {
+      element.addEventListener("click", () => {
+        const receiverId = element.getAttribute("data-receiver_id");
+        sendFriendRequest(receiverId, element);
+      });
+    });
+  }
+
   if (addFriendBtn) {
     addFriendBtn.addEventListener("click", function () {
       const receiverId = this.getAttribute("data-receiver_id");
-      sendFriendRequest(receiverId);
+      sendFriendRequest(receiverId, addFriendBtn);
     });
-  } else {
-    console.log("Add Friend button not found on the page.");
   }
 
   if (delete_from_friends) {
@@ -170,8 +177,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const unfriend_user_id = this.getAttribute("data-unfriend_user_id");
       removeFriend(unfriend_user_id, delete_from_friends);
     });
-  } else {
-    console.log("Delete Friend button not found on the page.");
   }
 });
 
@@ -182,7 +187,7 @@ function refreshTokenAndRetry(retryCallback) {
     "POST",
     {}, // No additional data needed for token refresh
     function (data) {
-      console.log("Token refreshed successfully");
+      console.log("Token refreshed successfully", data);
 
       if (data.message === "logout qeni") {
         window.location.href = `${location.protocol}//${location.host}/auth/logout/`; // Redirect to logout if needed

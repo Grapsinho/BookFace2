@@ -14,6 +14,33 @@
   type="text/css"
   media="screen"
 />
+
+<style>
+  .three_dot_for_post_edit_delete .dropdown-toggle::after {
+    display: none;
+  }
+
+  .three_dot_for_post_edit_delete li {
+    cursor: pointer;
+  }
+
+  .dropstart .dropdown-toggle::before {
+    display: none;
+  }
+
+  .alert-success {
+    display: none;
+  }
+
+  .magariAlteri,
+  .magariAlteri2 {
+    position: fixed;
+    top: 10px;
+    z-index: -1012312;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+</style>
 {% endblock css %}
 <!-- Page Content -->
 
@@ -40,6 +67,7 @@
   <div class="profile-cover" style="position: relative; overflow: hidden">
     <img
       src="/static/media/{{user.background_image}}"
+      loading="lazy"
       alt="Cover Photo"
       style="bottom: -90px; position: absolute; height: 400px"
     />
@@ -48,6 +76,7 @@
   <div class="profile-info container">
     <img
       src="/static/media/{{user.avatar}}"
+      loading="lazy"
       alt="User Avatar"
       class="profile-avatar"
       style="object-fit: cover"
@@ -351,9 +380,17 @@
                 {% for media in user_media|first_n_items:6 %}
                 <!--  -->
                 {% if media.media_type == 'profile' %}
-                <img src="{{ media.media_file_link }}" alt="Profile Picture" />
+                <img
+                  src="{{ media.media_file_link }}"
+                  alt="Profile Picture"
+                  loading="lazy"
+                />
                 {% elif media.media_type == 'background' %}
-                <img src="{{ media.media_file_link }}" alt="Background Image" />
+                <img
+                  src="{{ media.media_file_link }}"
+                  alt="Background Image"
+                  loading="lazy"
+                />
                 {% endif %} {% endfor %}
                 <!--  -->
                 {% else %}
@@ -367,91 +404,159 @@
 
         <!-- Right Column: User Posts -->
         <main id="profile-posts" class="posts-area-mainpage-profilepage">
-          <!-- Shared Post -->
-          <article class="post shared-post feed-posts">
-            <div class="post-header">
-              <img src="/static/media/{{user.avatar}}" alt="User Avatar" />
-              <div class="post-user-info">
-                <h4>Username</h4>
-                <!-- Sharer's name -->
-                <p>Shared 2 hours ago</p>
-                <!-- Time of sharing -->
-              </div>
-            </div>
-            <div class="post-content">
-              <p>Look at this amazing post I found!</p>
-              <!-- Sharer's message -->
-              <!-- Original Post -->
-              <div class="original-post">
-                <div class="post-header">
-                  <img
-                    src="/static/media/{{user.avatar}}"
-                    alt="Original User Avatar"
-                  />
-                  <div class="post-user-info">
-                    <h4>Original Username</h4>
-                    <!-- Original Poster's name -->
-                    <p>Posted 5 hours ago</p>
-                    <!-- Time of original post -->
-                  </div>
-                </div>
-                <div class="post-content">
-                  <div class="post-description">
-                    <p>This is the original post content!</p>
-                  </div>
-                  <div class="media">
-                    <img
-                      src="/static/media/{{user.avatar}}"
-                      alt="Original Post Image"
-                    />
-                  </div>
-                </div>
-                <div class="post-actions">
-                  <div class="like-section">
-                    <button>👍 Like</button>
-                    <span class="like-count">15 Likes</span>
-                    <!-- Number of likes -->
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-          <!-- Post with Text -->
+          {% for post in posts_for_user %}
           <article class="post feed-posts">
-            <div class="post-header">
-              <img src="/static/media/{{user.avatar}}" alt="User Avatar" />
-              <div class="post-user-info">
-                <h4>Username</h4>
-                <p>Posted 2 hours ago</p>
+            <div class="post-header justify-content-between">
+              <div class="d-flex">
+                <img
+                  src="/static/media/{{user.avatar}}"
+                  loading="lazy"
+                  alt="User Avatar"
+                />
+                <div class="post-user-info" style="align-self: flex-end">
+                  <h4>{{user.first_name}} {{user.last_name}}</h4>
+                  <p>Posted {{ post.created_at|timesince }} ago</p>
+                </div>
               </div>
+
+              {% if post.user == request.user %}
+              <div class="three_dot_for_post_edit_delete dropstart">
+                <button
+                  class="dropdown-toggle"
+                  style="
+                    color: rgb(0, 0, 0);
+                    font-size: 1.4rem;
+                    background: none;
+                    border: none;
+                  "
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  ⋮
+                </button>
+
+                <ul class="dropdown-menu">
+                  <li
+                    class="dropdown-item delete_post--btn"
+                    data-postId="{{post.id}}"
+                  >
+                    🗑️ Delete
+                  </li>
+                  <li
+                    class="dropdown-item edit_post--btn"
+                    data-postId="{{post.id}}"
+                  >
+                    ✏️ Edit
+                  </li>
+                </ul>
+              </div>
+              {% endif %}
             </div>
             <div class="post-content">
-              <p>This is a sample text post.</p>
+              <p class="post_text_edit_for">{{post.text}}</p>
+
+              {% if post.video %}
+              <video controls>
+                <source
+                  src="/static/media/{{post.video}}"
+                  loading="lazy"
+                  type="video/mp4"
+                  class="video_post_source"
+                />
+                Your browser does not support the video tag.
+              </video>
+              {% elif post.image %}
+
+              <div class="media">
+                <img
+                  src="/static/media/{{post.image}}"
+                  alt="Post Image"
+                  class="post_media_file"
+                  loading="lazy"
+                />
+              </div>
+
+              {% endif %}
+
+              <div class="tags mt-2">
+                {% for tag in post.tags.all %}
+                <span class="tag">#{{tag.name}}</span>
+                {% endfor %}
+              </div>
             </div>
             <div class="post-actions">
               <div class="like-section">
-                <button>👍 Like</button>
-                <span class="like-count">15 Likes</span>
-                <!-- Number of likes -->
+                {% if request.user == post.user %}
+                <button class="btn" disabled>👍 Like</button>
+                {% else %}
+                <button class="addLikeOnPost" data-post_id="{{post.pk}}">
+                  {% if post.user_liked %}
+                  <!--  -->
+                  👎 Unlike {% else %}
+                  <!--  -->
+                  👍 Like {% endif %}
+                </button>
+                {% endif %}
+
+                <span class="like-count"
+                  ><span class="like_countNumber">{{ post.like_count }}</span>
+                  Likes</span
+                >
               </div>
             </div>
             <!-- Hidden Comment Section -->
             <details>
               <summary>View Comments</summary>
-              <div class="comments">
-                <!-- Comment -->
-                <div class="comment">
-                  <p><strong>Friend:</strong> Nice post!</p>
-                </div>
-                <!-- Add a Comment -->
+
+              <div>
                 <div class="add-comment">
                   <input type="text" placeholder="Write a comment..." />
                   <button>Post</button>
+
+                  <div class="comments">
+                    <p class="noCommentPWashaleMere">No Comments For Now.</p>
+
+                    <!-- <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div>
+
+                    <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div>
+
+                    <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div>
+
+                    <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div>
+
+                    <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div>
+
+                    <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div>
+
+                    <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div>
+
+                    <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div>
+
+                    <div class="comment">
+                      <p><strong>Friend:</strong> Nice post!</p>
+                    </div> -->
+                  </div>
                 </div>
               </div>
             </details>
           </article>
-          <!-- More user posts -->
+          {% endfor %}
         </main>
       </div>
     </div>
@@ -486,7 +591,11 @@
         href="{% url 'profile' i.friend_email %}"
         style="display: flex; gap: 0.5rem; align-items: center"
       >
-        <img src="/static/media/{{i.friend_avatar}}" alt="Friend Avatar" />
+        <img
+          src="/static/media/{{i.friend_avatar}}"
+          loading="lazy"
+          alt="Friend Avatar"
+        />
         <p class="friend-name">
           {{i.friend_first_name}} {{i.friend_last_name}}
         </p>
@@ -519,9 +628,23 @@
     <div class="image-container__media_profile">
       <!-- Show images based on type -->
       {% if media.media_type == 'profile' %}
-      <img src="{{ media.media_file_link }}" alt="Profile Picture" />
+      <img
+        src="{{ media.media_file_link }}"
+        alt="Profile Picture"
+        loading="lazy"
+      />
       {% elif media.media_type == 'background' %}
-      <img src="{{ media.media_file_link }}" alt="Background Image" />
+      <img
+        src="{{ media.media_file_link }}"
+        alt="Background Image"
+        loading="lazy"
+      />
+      {% elif media.media_type == 'post_image' %}
+      <img
+        src="/static{{ media.media_file_link }}"
+        alt="post_image"
+        loading="lazy"
+      />
       {% endif %}
 
       <!-- Three-dot menu -->
@@ -605,6 +728,7 @@
             <div>
               <img
                 src="/static/media/{{user.avatar}}"
+                loading="lazy"
                 alt="Current Profile Picture"
                 id="currentProfilePicture__profile"
                 class="img-thumbnail"
@@ -645,6 +769,7 @@
             <div>
               <img
                 src="/static/media/{{user.background_image}}"
+                loading="lazy"
                 alt="Current Background Picture"
                 id="currentBackgroundPicture__profile"
                 class="img-thumbnail"
@@ -699,12 +824,134 @@
     </div>
   </div>
 </div>
+
+<div
+  class="alert alert-success"
+  role="alert"
+  style="position: fixed; bottom: 0; right: 0; z-index: 123421"
+>
+  A simple success alert—check it out!
+</div>
+
+<!-- Edit Post Modal -->
+<div
+  class="modal fade"
+  id="editPostModal"
+  tabindex="-1"
+  aria-labelledby="editPostModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editPostModalLabel">Edit Post</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- The post structure, but editable -->
+        <form id="editPostForm" method="patch" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="post-content">
+            <!-- Editable Post Text -->
+            <div class="mb-3">
+              <label for="editPostText" class="form-label">Post Text</label>
+              <textarea
+                class="form-control"
+                id="editPostText"
+                rows="3"
+                name="text"
+              ></textarea>
+            </div>
+
+            <!-- Editable Media (Image or Video) -->
+            <div class="mb-3">
+              <label for="editPostMedia" class="form-label"
+                >Post Media (Optional)</label
+              >
+              <div id="currentMedia"></div>
+              <input
+                type="file"
+                class="form-control"
+                name="media"
+                id="editPostMedia"
+              />
+            </div>
+
+            <!-- Editable Tags -->
+            <div class="tags-section mb-3">
+              <label for="tags">Select up to 5 tags: </label>
+              <div id="tags-wrapper">
+                {% for tag in tags %}
+                <input
+                  type="checkbox"
+                  name="tags"
+                  value="{{ tag.name }}"
+                  id="tag-{{ tag.id }}"
+                  data-name_tag="{{ tag.name }}"
+                  class="tag-checkbox"
+                />
+                <label for="tag-{{ tag.id }}">{{ tag.name }}</label>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Post ID (Hidden) -->
+            <input type="hidden" id="editPostId" name="postId" />
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary edit_post_save_button_modal"
+          >
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="alert alert-warning alert-dismissible fade hide magariAlteri"
+  role="alert"
+>
+  Video file is too large. Maximum size allowed is 10MB.
+  <button
+    type="button"
+    class="btn-close"
+    data-bs-dismiss="alert"
+    aria-label="Close"
+  ></button>
+</div>
+
+<div
+  class="alert alert-warning alert-dismissible fade hide magariAlteri2"
+  role="alert"
+>
+  <span class="alertText"> </span>
+  <button
+    type="button"
+    class="btn-close"
+    data-bs-dismiss="alert"
+    aria-label="Close"
+  ></button>
+</div>
+
 <!--  -->
 {% endblock content %}
 
 <!--  -->
 {% block scripts %}
-<script type="module" src="{% static 'js/edit_profile1.js' %}"></script>
+<script type="module" src="{% static 'js/edit_profile.js' %}"></script>
 <script src="{% static 'js/profile.js' %}"></script>
 <script type="module" src="{% static 'js/friends1.js' %}"></script>
+
+<script type="module" src="{% static 'js/crud_post1.js' %}"></script>
+
+<script type="module" src="{% static 'js/likeandcomment.js' %}"></script>
 {% endblock scripts %}

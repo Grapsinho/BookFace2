@@ -9,6 +9,12 @@ from users.exceptions import AuthenticationRedirectException
 from rest_framework import status
 import json
 from core import settings
+from django.db.models import Count, F, Value
+from django.db.models.functions import Coalesce
+from django.core.cache import cache
+import os
+
+from posts.models import Tag, UserInterest
 
 from rest_framework.permissions import IsAuthenticated
 
@@ -46,7 +52,7 @@ class ProfileSetupView(View):
                 UserMedia.objects.create(
                     user=request.user,
                     media_file_link=avatar_path,
-                    media_type='profile',  # Indicating that this is a profile image
+                    media_type='profile',
                 )
 
             # Process the background image if uploaded
@@ -55,9 +61,9 @@ class ProfileSetupView(View):
                 UserMedia.objects.create(
                     user=request.user,
                     media_file_link=background_image_path,
-                    media_type='background',  # Indicating that this is a background image
+                    media_type='background',
                 )
-            return redirect('profile', email=request.user.email)  # Redirect to the profile page after saving
+            return redirect('AddFriendsAndInterests')
         else:
             return render(request, 'user_profile/profile_setup.html', {'form': form})
 
@@ -145,6 +151,9 @@ class DeleteImages(APIView):
                     request.user.avatar = 'avatars/default-boy-avatar.jpg'
                 else:
                     request.user.avatar = 'avatars/default-girl-avatar.jpg'
+            else:
+                # Delete the media file from the server
+                os.remove('static' + media_link)
 
             request.user.save()
 
@@ -184,5 +193,45 @@ class SetCoverOrProfile(APIView):
 
         except ObjectDoesNotExist:
             return Response({"detail": "Media object not found"}, status=status.HTTP_404_NOT_FOUND)
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)
+        
+class AddFriendsAndInterests(View):
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        try:
+            cache_key = 'popular_users'
+            popular_users = cache.get(cache_key)
+
+            if popular_users is None:
+                popular_users = User.objects.annotate(
+                    user_friend_count=Count('user_friendships'),
+                    friend_friend_count=Count('friend_friendships'),
+                    total_friend_count=Coalesce(F('user_friend_count') + F('friend_friend_count'), Value(0))
+                ).exclude(
+                    id=request.user.pk
+                ).order_by('-total_friend_count')[:14]
+
+                cache.set(cache_key, popular_users, timeout=2 * 24 * 60)
+
+            return render(request, 'user_profile/done_profile_setup.html', {'popular_users': popular_users})
+        except AuthenticationRedirectException as a:
+            return redirect('logout')
+
+    def post(self, request):
+        data = json.loads(request.body)
+
+        user_interests_tags = data
+
+        try:
+            user_interest, created = UserInterest.objects.get_or_create(user=request.user)
+            tags = Tag.objects.filter(name__in=user_interests_tags)
+            user_interest.tags.add(*tags)
+            user_interest.save()
+
+            context = {"message": "Tags Added"}
+            return Response(context, status=status.HTTP_200_OK)
+
         except AuthenticationRedirectException as e:
             return Response({"detail": str(e)}, status=401)

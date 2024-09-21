@@ -1,0 +1,97 @@
+<article class="post feed-posts">
+  <div class="post-header justify-content-between">
+    <div class="d-flex">
+      <img
+        src="/static/media/{{post.user.avatar}}"
+        loading="lazy"
+        alt="User Avatar"
+      />
+      <div class="post-user-info" style="align-self: flex-end">
+        <h4>{{post.user.first_name}} {{post.user.last_name}}</h4>
+        <p>Posted {{ post.created_at|timesince }} ago</p>
+      </div>
+    </div>
+
+    {% if post.user == request.user %}
+    <div class="three_dot_for_post_edit_delete dropstart">
+      <button
+        class="dropdown-toggle"
+        style="
+          color: rgb(0, 0, 0);
+          font-size: 1.4rem;
+          background: none;
+          border: none;
+        "
+        type="button"
+        data-bs-toggle="dropdown"
+      >
+        ⋮
+      </button>
+
+      <ul class="dropdown-menu">
+        <li class="dropdown-item delete_post--btn" data-postId="{{post.id}}">
+          🗑️ Delete
+        </li>
+        <li class="dropdown-item edit_post--btn" data-postId="{{post.id}}">
+          ✏️ Edit
+        </li>
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+  <div class="post-content">
+    <p class="post_text_edit_for">{{post.text}}</p>
+
+    {% if post.video %}
+    <video controls>
+      <source
+        src="/static/media/{{post.video}}"
+        loading="lazy"
+        type="video/mp4"
+        class="video_post_source"
+      />
+      Your browser does not support the video tag.
+    </video>
+    {% elif post.image %}
+
+    <div class="media">
+      <img
+        src="/static/media/{{post.image}}"
+        alt="Post Image"
+        class="post_media_file"
+        loading="lazy"
+      />
+    </div>
+
+    {% endif %}
+
+    <div class="tags mt-2">
+      {% for tag in post.tags.all %}
+      <span class="tag">#{{tag.name}}</span>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="post-actions">
+    <div class="like-section">
+      <button class="btn" disabled>👍 Like</button>
+      <span class="like-count"
+        ><span class="like_countNumber">0</span> Likes</span
+      >
+    </div>
+  </div>
+  <!-- Hidden Comment Section -->
+  <details>
+    <summary>View Comments</summary>
+
+    <div>
+      <div class="add-comment">
+        <input type="text" placeholder="Write a comment..." />
+        <button>Post</button>
+
+        <div class="comments">
+          <p class="noCommentPWashaleMere">No Comments For Now.</p>
+        </div>
+      </div>
+    </div>
+  </details>
+</article>

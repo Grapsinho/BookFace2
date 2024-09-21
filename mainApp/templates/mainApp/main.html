@@ -24,6 +24,34 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
 
+    <style>
+      /* Styles for like notification */
+      .container_for_like_notification {
+        background-color: #eaffea;
+        border-left: 5px solid #28a745;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+
+      /* Styles for unlike notification */
+      .container_for_unlike_notification {
+        background-color: #ffe6e6;
+        border-left: 5px solid #dc3545;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+
+      /* Notification avatar image */
+      .container_for_like_notification img,
+      .container_for_unlike_notification img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+    </style>
+
     {% block css %} {% endblock css %}
 
     <title>{% block page_title %} BookFace {% endblock %}</title>

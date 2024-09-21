@@ -5,6 +5,7 @@
       <img
         src="static/media/{{request.user.avatar}}"
         alt="User Avatar"
+        loading="lazy"
         style="width: 50px; height: 50px"
       />
     </div>
@@ -27,8 +28,12 @@
 
   <div class="fixed-nav-container">
     <div id="user-info" class="eseni_washale__nav">
-      <img src="static/media/{{request.user.avatar}}" alt="User Avatar" />
-      <h3>Username</h3>
+      <img
+        src="static/media/{{request.user.avatar}}"
+        loading="lazy"
+        alt="User Avatar"
+      />
+      <h3>{{request.user.first_name}} {{request.user.last_name}}</h3>
     </div>
     <!-- Search for Friends (Desktop) -->
     <div id="search-friends-desktop" class="eseni_washale__nav">

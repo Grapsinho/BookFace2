@@ -282,13 +282,13 @@ if (reject_requests_friend) {
   });
 }
 
-function refreshTokenAndRetry(retryCallback) {
+function refreshTokenAndRetryForNotification(retryCallback) {
   sendRequest(
     "/auth/token/refresh/",
     "POST",
     {}, // No additional data needed for token refresh
     function (data) {
-      console.log("Token refreshed successfully");
+      console.log("Token refreshed successfully", data);
       retryCallback(); // Retry the original request after the token is refreshed
     },
     function (error) {
@@ -322,7 +322,7 @@ function loadNotifications() {
         "Authentication credentials were not provided or are invalid."
       ) {
         // If authentication fails, refresh the token and retry
-        refreshTokenAndRetry(() => loadNotifications());
+        refreshTokenAndRetryForNotification(() => loadNotifications());
       } else {
         // Extract notifications and total count from the response
         const notifications = data.notifications;
@@ -474,4 +474,109 @@ modalBody.addEventListener("scroll", () => {
   if (modalBody.scrollTop + modalBody.clientHeight >= modalBody.scrollHeight) {
     loadNotifications();
   }
+});
+
+const view_post_notifications_buttons = document.querySelectorAll(
+  ".view_post_notifications"
+);
+
+view_post_notifications_buttons.forEach((element) => {
+  element.addEventListener("click", () => {
+    const notificationId = element.getAttribute("data-post_id");
+
+    $.ajax({
+      type: "POST",
+      url: `${location.protocol}//${location.host}/posts/postForNotification/`,
+      headers: {
+        "X-CSRFToken": csrftoken,
+      },
+      data: JSON.stringify(notificationId),
+      contentType: "application/json",
+      credentials: "include",
+      success: function (response) {
+        console.log(response);
+
+        if (response.success) {
+          const post_cont = document.querySelector(
+            ".modal_body_for_post_likeUnliked"
+          );
+
+          const post = response.data;
+          const author = post.author;
+          const media_type = post.media_type;
+          const media = post.media;
+          const likes_count = post.user_likes;
+          const tags = post.tags.map((tag) => `#${tag}`).join(" "); // Convert tags array to string
+
+          // Prepare the HTML by inserting dynamic data
+          post_cont.innerHTML = `
+              <article class="post feed-posts">
+                  <div class="post-header justify-content-between">
+                      <div class="d-flex">
+                          <img
+                              src="/static${author.avatar}"
+                              loading="lazy"
+                              alt="User Avatar"
+                          />
+                          <div class="post-user-info" style="align-self: flex-end">
+                              <h4>${author.first_name} ${author.last_name}</h4>
+                              <p>Posted ${post.created_at} ago</p>
+                          </div>
+                      </div>
+                  </div>
+      
+                  <div class="post-content">
+                      <p class="post_text_edit_for">${post.title}</p>
+      
+                      ${
+                        media_type === "video"
+                          ? `
+                          <video controls>
+                              <source src="${media}" loading="lazy" type="video/mp4" class="video_post_source" />
+                              Your browser does not support the video tag.
+                          </video>
+                      `
+                          : media_type === "image"
+                          ? `
+                          <div class="media">
+                              <img src="${media}" alt="Post Image" class="post_media_file" loading="lazy" />
+                          </div>
+                      `
+                          : ""
+                      }
+      
+                      <div class="tags mt-2">
+                          ${tags}
+                      </div>
+                  </div>
+      
+                  <div class="post-actions">
+                      <div class="like-section">
+                          <button class="btn" disabled>👍 Like</button>
+                          <span class="like-count"><span class="like_countNumber">${likes_count}</span> Likes</span>
+                      </div>
+                  </div>
+      
+                  <details>
+                      <summary>View Comments</summary>
+                      <div>
+                          <div class="add-comment">
+                              <input type="text" placeholder="Write a comment..." />
+                              <button>Post</button>
+      
+                              <div class="comments">
+                                  <p class="noCommentPWashaleMere">No Comments For Now.</p>
+                              </div>
+                          </div>
+                      </div>
+                  </details>
+              </article>
+          `;
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+  });
 });

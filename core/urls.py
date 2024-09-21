@@ -19,8 +19,11 @@ urlpatterns = [
     # notifications urls
     path('notifications/api/', include('notifications.urls')),
 
-    # profile setup urls
+    # friendship urls
     path('friendship/', include('friendship.urls')),
+
+    # post creation urls
+    path('posts/', include('posts.urls')),
 
     #for development
     path("__debug__/", include(debug_toolbar.urls)),

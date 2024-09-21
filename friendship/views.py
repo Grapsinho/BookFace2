@@ -24,6 +24,8 @@ class SendFriendRequestView(APIView):
         try:
             # Get the receiver user
             receiver = User.objects.get(id=receiver_id)
+
+            print(receiver)
             
             # Ensure sender isn't sending a request to themselves
             if sender == receiver:
@@ -148,7 +150,6 @@ class RemoveFriendRequestView(APIView):
 
         except AuthenticationRedirectException as e:
             return Response({"detail": str(e)}, status=401)
-
 
 class DeleteNotifications(APIView):
     def post(self, request, *args, **kwargs):

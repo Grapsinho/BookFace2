@@ -74,6 +74,7 @@
               <a href="{% url 'profile' i.sender__email %}">
                 <img
                   src="/static/media/{{i.sender__avatar}}"
+                  loading="lazy"
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
@@ -163,13 +164,13 @@
               </button>
             </p>
             {% elif i.notification_type == "unfriend" %}
-
             <div
               class="d-flex align-items-center gap-2 my-3 container_for_unfriend_notification"
             >
               <a href="{% url 'profile' i.sender__email %}">
                 <img
                   src="/static/media/{{i.sender__avatar}}"
+                  loading="lazy"
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
@@ -204,7 +205,114 @@
                 </div>
               </div>
             </div>
-            {% endif %} {% endfor %}
+
+            <!-- Like Notification -->
+            {% elif i.notification_type == "post_like" %}
+            <div
+              class="d-flex align-items-center gap-2 my-3 container_for_like_notification container_for_unfriend_notification"
+            >
+              <a href="{% url 'profile' i.sender__email %}">
+                <img
+                  src="/static/media/{{i.sender__avatar}}"
+                  loading="lazy"
+                  style="border-radius: 50%; width: 50px; height: 50px"
+                />
+              </a>
+              <div style="display: flex; flex-direction: column">
+                <span style="color: black"
+                  >{{i.sender__first_name}} {{i.sender__last_name}}</span
+                >
+                <div>
+                  <span style="font-size: 0.9rem"> Liked your post </span>
+                  <a
+                    href="#"
+                    type="button"
+                    data-post_id="{{i.message}}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop"
+                    class="view_post_notifications"
+                    style="font-size: 0.8rem; color: #007bff"
+                    >View Post</a
+                  >
+
+                  <button
+                    class="delete_message_dec"
+                    data-id="{{i.id}}"
+                    style="
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0.2rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-custom-class="custom-tooltip"
+                    data-bs-title="Delete Notification"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Unlike Notification -->
+            {% elif i.notification_type == "post_unlike" %}
+            <div
+              class="d-flex align-items-center gap-2 my-3 container_for_unlike_notification container_for_unfriend_notification"
+            >
+              <a href="{% url 'profile' i.sender__email %}">
+                <img
+                  src="/static/media/{{i.sender__avatar}}"
+                  loading="lazy"
+                  style="border-radius: 50%; width: 50px; height: 50px"
+                />
+              </a>
+              <div style="display: flex; flex-direction: column">
+                <span style="color: black"
+                  >{{i.sender__first_name}} {{i.sender__last_name}}</span
+                >
+                <div>
+                  <span style="font-size: 0.9rem"> Unliked your post </span>
+                  <a
+                    href="#"
+                    type="button"
+                    data-post_id="{{i.message}}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop"
+                    class="view_post_notifications"
+                    style="font-size: 0.8rem; color: #007bff"
+                    >View Post</a
+                  >
+
+                  <button
+                    class="delete_message_dec"
+                    data-id="{{i.id}}"
+                    style="
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0.2rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-custom-class="custom-tooltip"
+                    data-bs-title="Delete Notification"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {% endif %}
+
+            <!--  -->
+
+            {% endfor %}
           </div>
         </div>
 
@@ -218,7 +326,11 @@
           <div class="modal-body">
             <div class="message-preview notification_message_cont">
               <div class="user-image">
-                <img src="/static/media/{{request.user.avatar}}" alt="User 1" />
+                <img
+                  src="/static/media/{{request.user.avatar}}"
+                  loading="lazy"
+                  alt="User 1"
+                />
               </div>
               <div class="message-details">
                 <div class="username">Dalaca</div>
@@ -231,7 +343,11 @@
 
             <div class="message-preview notification_message_cont">
               <div class="user-image">
-                <img src="/static/media/{{request.user.avatar}}" alt="User 1" />
+                <img
+                  src="/static/media/{{request.user.avatar}}"
+                  loading="lazy"
+                  alt="User 1"
+                />
               </div>
               <div class="message-details">
                 <div class="username">Dalaca2</div>
@@ -255,4 +371,42 @@
   </div>
 </div>
 
-<script type="module" src="{% static 'js/notification.js' %}"></script>
+<div
+  class="modal fade"
+  id="staticBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: #131312">
+      <div class="modal-header">
+        <h1
+          class="modal-title fs-5"
+          id="staticBackdropLabel"
+          style="color: #fff"
+        >
+          Post
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div
+        class="modal-body modal_body_for_post_likeUnliked posts-area-mainpage-profilepage"
+      ></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="{% static 'js/notification1.js' %}"></script>
