@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from users.models import User
 from friendship.models import FriendRequest, Friendship
-from posts.models import Tag, Like
+from posts.models import Tag, Like, Comment
 from notifications.models import Notification
-from django.db.models import Q, Case, When, CharField, Count, Exists, OuterRef
+from django.db.models import Q, Case, When, CharField, Count, Exists, OuterRef, Prefetch
 
 from django.core.cache import cache
 
@@ -15,7 +15,7 @@ def home(request):
 
     notifications = Notification.objects.filter(
         recipient=request.user
-    ).values('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type').order_by('-timestamp')[:7]
+    ).values('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
 
     tags = Tag.objects.all()
 
@@ -107,7 +107,7 @@ class ProfileView(View):
 
         notifications = Notification.objects.filter(
             recipient=request.user
-        ).select_related('sender').values('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message').order_by('-timestamp')[:7]
+        ).select_related('sender').values('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
 
         friend_request = FriendRequest.objects.filter(
             Q(sender=user, receiver=request.user) | Q(sender=request.user, receiver=user)
@@ -123,7 +123,10 @@ class ProfileView(View):
 
         user_likes = Like.objects.filter(user=request.user, post=OuterRef('pk'))
 
-        posts_for_user = user.posts.annotate(like_count=Count('likes'), user_liked=Exists(user_likes)).prefetch_related('tags', 'comments').all().order_by('-created_at')
+        # Prefetch comments ordered by created_at DESC (latest first)
+        comments_prefetch = Prefetch('comments', queryset=Comment.objects.select_related('user').order_by('-created_at'))
+
+        posts_for_user = user.posts.annotate(like_count=Count('likes'), user_liked=Exists(user_likes)).prefetch_related('tags', comments_prefetch).all().order_by('-created_at')
 
         cache_key = f'tags'
         tags = cache.get(cache_key)

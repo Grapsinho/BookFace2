@@ -40,6 +40,34 @@
     left: 50%;
     transform: translate(-50%, 0);
   }
+
+  .comment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .comment p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .comment strong {
+    color: #007bff;
+  }
+
+  .posts-area-mainpage-profilepage .add-comment .save-comment-edit-btn:hover,
+  .posts-area-mainpage-profilepage
+    .add-comment
+    .save-comment-edit-btn-cancel:hover {
+    background-color: #165ecf !important;
+  }
 </style>
 {% endblock css %}
 <!-- Page Content -->
@@ -408,11 +436,13 @@
           <article class="post feed-posts">
             <div class="post-header justify-content-between">
               <div class="d-flex">
-                <img
-                  src="/static/media/{{user.avatar}}"
-                  loading="lazy"
-                  alt="User Avatar"
-                />
+                <a href="{% url 'profile' post.user.email %}">
+                  <img
+                    src="/static/media/{{user.avatar}}"
+                    loading="lazy"
+                    alt="User Avatar"
+                  />
+                </a>
                 <div class="post-user-info" style="align-self: flex-end">
                   <h4>{{user.first_name}} {{user.last_name}}</h4>
                   <p>Posted {{ post.created_at|timesince }} ago</p>
@@ -510,47 +540,106 @@
 
               <div>
                 <div class="add-comment">
-                  <input type="text" placeholder="Write a comment..." />
-                  <button>Post</button>
+                  <input
+                    type="text"
+                    class="comment_input"
+                    placeholder="Write a comment..."
+                  />
+                  <button class="addCommentOnPost" data-post_id="{{post.pk}}">
+                    Post
+                  </button>
 
                   <div class="comments">
+                    {% for comment in post.comments.all %}
+
+                    <!--  -->
+
+                    {% if comment.text %}
+
+                    <div
+                      class="comment"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                      "
+                    >
+                      <div style="margin: 0">
+                        <strong
+                          >{{comment.user.first_name}}
+                          {{comment.user.last_name}}:</strong
+                        >
+                        <span class="comment_text">{{comment.text}}</span>
+
+                        <div
+                          class="align-items-center div-for-update-btn gap-2"
+                          style="display: none"
+                        >
+                          <input
+                            type="text"
+                            class="form-control edit-comment-input"
+                            value="{{comment.text}}"
+                            style="margin-top: 5px"
+                          />
+
+                          <button
+                            class="btn save-comment-edit-btn"
+                            style="background-color: #f9f9f900"
+                            data-commentId="{{comment.id}}"
+                          >
+                            ✔️
+                          </button>
+
+                          <button
+                            class="btn save-comment-edit-btn-cancel"
+                            style="background-color: #f9f9f900"
+                          >
+                            ❌
+                          </button>
+                        </div>
+                      </div>
+                      {% if request.user == comment.user %}
+                      <div class="three_dot_for_comment_edit_delete dropstart">
+                        <button
+                          class="dropdown-toggle"
+                          style="
+                            color: rgb(0, 0, 0);
+                            font-size: 1.4rem;
+                            background: none;
+                            border: none;
+                            padding: 0 0.5rem 0 0;
+                            margin: 0;
+                          "
+                          type="button"
+                          data-bs-toggle="dropdown"
+                        >
+                          ⋮
+                        </button>
+
+                        <ul class="dropdown-menu">
+                          <li
+                            class="dropdown-item delete_comment--btn"
+                            data-commentId="{{comment.id}}"
+                            style="cursor: pointer"
+                          >
+                            🗑️ Delete
+                          </li>
+                          <li
+                            class="dropdown-item edit_comment--btn"
+                            data-commentId="{{comment.id}}"
+                            style="cursor: pointer"
+                          >
+                            ✏️ Edit
+                          </li>
+                        </ul>
+                      </div>
+                      {% else %}
+                      <!--  -->
+                      {% endif %}
+                    </div>
+                    {% else %}
                     <p class="noCommentPWashaleMere">No Comments For Now.</p>
-
-                    <!-- <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div>
-
-                    <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div>
-
-                    <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div>
-
-                    <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div>
-
-                    <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div>
-
-                    <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div>
-
-                    <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div>
-
-                    <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div>
-
-                    <div class="comment">
-                      <p><strong>Friend:</strong> Nice post!</p>
-                    </div> -->
+                    {% endif %} {% endfor %}
                   </div>
                 </div>
               </div>
@@ -953,5 +1042,5 @@
 
 <script type="module" src="{% static 'js/crud_post1.js' %}"></script>
 
-<script type="module" src="{% static 'js/likeandcomment.js' %}"></script>
+<script type="module" src="{% static 'js/likeandcomment1.js' %}"></script>
 {% endblock scripts %}

@@ -174,7 +174,7 @@
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
-              <div style="display: flex; flex-direction: column">
+              <div style="display: flex; flex-direction: column; width: 80%">
                 <span style="color: black"
                   >{{i.sender__first_name}} {{i.sender__last_name}}</span
                 >
@@ -218,7 +218,7 @@
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
-              <div style="display: flex; flex-direction: column">
+              <div style="display: flex; flex-direction: column; width: 80%">
                 <span style="color: black"
                   >{{i.sender__first_name}} {{i.sender__last_name}}</span
                 >
@@ -269,7 +269,7 @@
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
-              <div style="display: flex; flex-direction: column">
+              <div style="display: flex; flex-direction: column; width: 80%">
                 <span style="color: black"
                   >{{i.sender__first_name}} {{i.sender__last_name}}</span
                 >
@@ -286,6 +286,61 @@
                     >View Post</a
                   >
 
+                  <button
+                    class="delete_message_dec"
+                    data-id="{{i.id}}"
+                    style="
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0.2rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-custom-class="custom-tooltip"
+                    data-bs-title="Delete Notification"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {% elif i.notification_type == "post_comment" %}
+            <div
+              class="d-flex align-items-center gap-2 my-3 container_for_like_notification container_For_comments"
+              style="background-color: #fff4e6; border-color: #fd7e14"
+            >
+              <a href="{% url 'profile' i.sender__email %}">
+                <img
+                  src="/static/media/{{i.sender__avatar}}"
+                  loading="lazy"
+                  style="border-radius: 50%; width: 50px; height: 50px"
+                />
+              </a>
+              <div style="display: flex; flex-direction: column; width: 80%">
+                <span style="color: black; font-size: 0.9rem"
+                  >{{i.sender__first_name}} {{i.sender__last_name}}</span
+                >
+                <div>
+                  <span style="font-size: 0.9rem">
+                    Commented on Your Post:
+                    <i> {{i.message|slice:":25"}} </i>
+                  </span>
+                  <a
+                    href="#"
+                    type="button"
+                    data-post_id="{{i.post_Id}}"
+                    data-comment_btn="yes"
+                    data-sender_id="{{i.sender__id}}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop"
+                    class="view_post_notifications"
+                    style="font-size: 0.8rem; color: #007bff"
+                    >View Post</a
+                  >
                   <button
                     class="delete_message_dec"
                     data-id="{{i.id}}"

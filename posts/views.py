@@ -194,7 +194,10 @@ from django.utils import timezone
 from django.utils.timesince import timesince
 def postForNotification(request):
     if request.method == 'POST' and request.user.is_authenticated:
-        post_id = int(json.loads(request.body))
+        data_arara = json.loads(request.body)
+
+        post_id = int(data_arara['post_id'])
+        comment = data_arara['comment']
 
         post = Post.objects.get(id=post_id)
 
@@ -202,6 +205,12 @@ def postForNotification(request):
 
         time_difference = timesince(post.created_at, timezone.now())
 
+        comments_post2 = []
+
+        if comment == 'yes':
+            comments_post = Comment.objects.filter(post=post).select_related('user', 'post').values('text', 'id', 'user__first_name', 'user__last_name', 'user__id')[:10]
+            
+            comments_post2 = list(comments_post)
 
         post_data = {
             'title': post.text,
@@ -213,8 +222,10 @@ def postForNotification(request):
             'author': {
                 'first_name': post.user.first_name,
                 'last_name': post.user.last_name,
-                'avatar': post.user.avatar.url
+                'avatar': post.user.avatar.url,
+                'email': post.user.email,
             },
+            'comments': comments_post2
         }
 
 
@@ -270,6 +281,78 @@ class AddLikes(APIView):
         except AuthenticationRedirectException as e:
             return Response({"detail": str(e)}, status=401)
     
+    def handle_exception(self, exc):
+        # Custom handling for Throttled exception
+        if isinstance(exc, Throttled):
+            custom_response_data = {
+                "message": "You have made too many login attempts. Please try again later.",
+                "available_in": f"{exc.wait} seconds"
+            }
+            return Response(custom_response_data, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+        # Handle other exceptions as usual
+        return super().handle_exception(exc)
+
+class CrudComments(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    throttle_classes = [CommentThrottle]
+
+    def post(self, request, post_id):
+        try:
+            post = get_object_or_404(Post, id=post_id)
+            user = request.user
+
+            text = request.data.get('text')
+
+            if not text or text.strip() == "":
+                return Response(
+                    {"error": "Comment text cannot be empty."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            comment = Comment.objects.create(
+                user=user,
+                post=post,
+                text=text.strip()
+            )
+
+            if post.user != request.user:
+                notification = Notification.objects.create(
+                    recipient=post.user,
+                    sender=request.user,
+                    message=comment.text,
+                    post_Id=post.pk,
+                    notification_type = 'post_comment'
+                )
+            
+            context = {"status": True, 'user': f"{user.first_name} {user.last_name}"}
+
+            return Response(context, status=status.HTTP_200_OK)
+
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)
+    
+    def delete(self, request, comment_id):
+        try:
+            comment = get_object_or_404(Comment, id=comment_id)
+            comment.delete()
+            return Response({"status": True}, status=status.HTTP_200_OK)
+        
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)
+        
+    def patch(self, request, comment_id):
+        try:
+            comment = get_object_or_404(Comment, id=comment_id)
+            comment.text = request.data.get('text').strip()
+            comment.save()
+            return Response({"status": True}, status=status.HTTP_200_OK)
+        
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)
+
     def handle_exception(self, exc):
         # Custom handling for Throttled exception
         if isinstance(exc, Throttled):

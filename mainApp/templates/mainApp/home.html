@@ -40,12 +40,41 @@
     transition: width 0.5s ease;
   }
 
-  .magariAlteri {
+  .magariAlteri,
+  .magariAlteri2 {
     position: fixed;
     top: 10px;
     z-index: -1012312;
     left: 50%;
     transform: translate(-50%, 0);
+  }
+
+  .comment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .comment p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .comment strong {
+    color: #007bff;
+  }
+
+  .posts-area-mainpage-profilepage .add-comment .save-comment-edit-btn:hover,
+  .posts-area-mainpage-profilepage
+    .add-comment
+    .save-comment-edit-btn-cancel:hover {
+    background-color: #165ecf !important;
   }
 </style>
 {% endblock css %}
@@ -116,6 +145,19 @@
   role="alert"
 >
   Video file is too large. Maximum size allowed is 10MB.
+  <button
+    type="button"
+    class="btn-close"
+    data-bs-dismiss="alert"
+    aria-label="Close"
+  ></button>
+</div>
+
+<div
+  class="alert alert-warning alert-dismissible fade hide magariAlteri2"
+  role="alert"
+>
+  <span class="alertText"> </span>
   <button
     type="button"
     class="btn-close"

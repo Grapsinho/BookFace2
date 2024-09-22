@@ -4,6 +4,8 @@ import {
   sendRequest,
 } from "./friends1.js";
 
+import { toggleComment } from "./likeandcomment1.js";
+
 const notificationsMenu = document.querySelector(".notifications_modal_body");
 
 let notification_count_element = document.querySelector(".notification_count");
@@ -245,8 +247,17 @@ if (delete_message_dec) {
         ".container_for_unfriend_notification"
       );
 
+      const notificationcommentContainer = element.closest(
+        ".container_For_comments"
+      );
+
       if (notificationContainer) {
         removeNotification(notificationId, notificationContainer);
+      } else if (notificationcommentContainer) {
+        removeNotification(
+          notificationId,
+          element.parentElement.parentElement.parentElement
+        );
       } else {
         removeNotification(notificationId, element.parentElement);
       }
@@ -481,8 +492,24 @@ const view_post_notifications_buttons = document.querySelectorAll(
 );
 
 view_post_notifications_buttons.forEach((element) => {
-  element.addEventListener("click", () => {
+  element.addEventListener("click", (e) => {
+    e.preventDefault();
     const notificationId = element.getAttribute("data-post_id");
+    const senderId = element.getAttribute("data-sender_id");
+
+    let post_data = {
+      post_id: notificationId,
+      comment: "",
+    };
+
+    if (element.dataset.comment_btn) {
+      post_data.comment = "yes";
+    }
+
+    document.querySelector(".alertText").textContent = "Post Will Open Soon...";
+    document.querySelector(".magariAlteri2").classList.add("show");
+    document.querySelector(".magariAlteri2").classList.remove("hide");
+    document.querySelector(".magariAlteri2").style.zIndex = 123123;
 
     $.ajax({
       type: "POST",
@@ -490,12 +517,10 @@ view_post_notifications_buttons.forEach((element) => {
       headers: {
         "X-CSRFToken": csrftoken,
       },
-      data: JSON.stringify(notificationId),
+      data: JSON.stringify(post_data),
       contentType: "application/json",
       credentials: "include",
       success: function (response) {
-        console.log(response);
-
         if (response.success) {
           const post_cont = document.querySelector(
             ".modal_body_for_post_likeUnliked"
@@ -508,70 +533,127 @@ view_post_notifications_buttons.forEach((element) => {
           const likes_count = post.user_likes;
           const tags = post.tags.map((tag) => `#${tag}`).join(" "); // Convert tags array to string
 
-          // Prepare the HTML by inserting dynamic data
+          // Prepare the comment section
+          const comments = post.comments;
+
+          // Prepare HTML by inserting dynamic data
           post_cont.innerHTML = `
-              <article class="post feed-posts">
-                  <div class="post-header justify-content-between">
-                      <div class="d-flex">
+            <article class="post feed-posts">
+                <div class="post-header justify-content-between">
+                    <div class="d-flex">
+                        <a href="${location.protocol}//${
+            location.host
+          }/profile/${author.email}">
                           <img
-                              src="/static${author.avatar}"
-                              loading="lazy"
-                              alt="User Avatar"
+                            src="/static${author.avatar}"
+                            loading="lazy"
+                            alt="User Avatar"
                           />
-                          <div class="post-user-info" style="align-self: flex-end">
-                              <h4>${author.first_name} ${author.last_name}</h4>
-                              <p>Posted ${post.created_at} ago</p>
-                          </div>
-                      </div>
-                  </div>
-      
-                  <div class="post-content">
-                      <p class="post_text_edit_for">${post.title}</p>
-      
-                      ${
-                        media_type === "video"
-                          ? `
-                          <video controls>
-                              <source src="${media}" loading="lazy" type="video/mp4" class="video_post_source" />
-                              Your browser does not support the video tag.
-                          </video>
-                      `
-                          : media_type === "image"
-                          ? `
-                          <div class="media">
-                              <img src="${media}" alt="Post Image" class="post_media_file" loading="lazy" />
-                          </div>
-                      `
-                          : ""
-                      }
-      
-                      <div class="tags mt-2">
-                          ${tags}
-                      </div>
-                  </div>
-      
-                  <div class="post-actions">
-                      <div class="like-section">
-                          <button class="btn" disabled>👍 Like</button>
-                          <span class="like-count"><span class="like_countNumber">${likes_count}</span> Likes</span>
-                      </div>
-                  </div>
-      
-                  <details>
-                      <summary>View Comments</summary>
-                      <div>
-                          <div class="add-comment">
-                              <input type="text" placeholder="Write a comment..." />
-                              <button>Post</button>
-      
-                              <div class="comments">
-                                  <p class="noCommentPWashaleMere">No Comments For Now.</p>
-                              </div>
-                          </div>
-                      </div>
-                  </details>
-              </article>
+                        </a>
+                        <div class="post-user-info" style="align-self: flex-end">
+                            <h4>${author.first_name} ${author.last_name}</h4>
+                            <p>Posted ${post.created_at} ago</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="post-content">
+                    <p class="post_text_edit_for">${post.title}</p>
+
+                    ${
+                      media_type === "video"
+                        ? `
+                        <video controls>
+                            <source src="${media}" loading="lazy" type="video/mp4" class="video_post_source" />
+                            Your browser does not support the video tag.
+                        </video>
+                    `
+                        : media_type === "image"
+                        ? `
+                        <div class="media">
+                            <img src="${media}" alt="Post Image" class="post_media_file" loading="lazy" />
+                        </div>
+                    `
+                        : ""
+                    }
+
+                    <div class="tags mt-2">
+                        ${tags}
+                    </div>
+                </div>
+
+                <div class="post-actions">
+                    <div class="like-section">
+                        <button class="btn" disabled>👍 Like</button>
+                        <span class="like-count"><span class="like_countNumber">${likes_count}</span> Likes</span>
+                    </div>
+                </div>
+
+                          ${
+                            comments.length > 0
+                              ? `
+                              <details>
+                                  <summary>View Comments</summary>
+                                  <div>
+                                      <div class="add-comment">
+                                          <input type="text" placeholder="Write a comment..." class="comment_input" />
+                                          <button class="addCommentOnPost" data-post_id="${notificationId}">Post</button>
+
+                                          <div class="comments">
+                                              ${comments
+                                                .map(
+                                                  (comment) => `
+                                                  <div class="comment" style="
+                                                      display: flex;
+                                                      align-items: center;
+                                                      justify-content: space-between;
+                                                      background-color: ${
+                                                        comment.user__id ==
+                                                        senderId
+                                                          ? "#bfbdbd"
+                                                          : "#f9f9f9"
+                                                      };
+                                                  ">
+                                                      <p style="margin: 0">
+                                                          <strong>${
+                                                            comment.user__first_name
+                                                          } ${
+                                                    comment.user__last_name
+                                                  }:</strong> ${comment.text}
+                                                      </p>
+                                                  </div>
+                                              `
+                                                )
+                                                .join("")}
+                                          </div>
+                                      </div>
+                                  </div>
+                              </details>
+                              `
+                              : ""
+                          }
+            </article>
           `;
+
+          document.querySelector(".magariAlteri2").classList.remove("show");
+          document.querySelector(".magariAlteri2").classList.add("hide");
+
+          const commentButtons = document.querySelector(".addCommentOnPost");
+
+          commentButtons.addEventListener("click", () => {
+            const parentEl = commentButtons.parentElement;
+            const commentInput = parentEl.querySelector(".comment_input");
+            const comment_cont = parentEl.querySelector(".comments");
+
+            if (sanitizeInput(commentInput.value.trim())) {
+              toggleComment(
+                commentButtons.dataset.post_id,
+                commentButtons,
+                sanitizeInput(commentInput.value.trim()),
+                comment_cont
+              );
+            }
+          });
         }
       },
       error: function (error) {

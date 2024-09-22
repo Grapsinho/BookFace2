@@ -25,7 +25,7 @@ DONE eseigi vamateb posts jerjerobit marto davamatot da profilze gamovachinot
 
 DONE eseigi posti emateba chveulebrivad aseve ematebe user mediashi url
 
-exla ro moval avamushaveb likes da comments
+DONE exla ro moval avamushaveb likes da comments
 
 DONE da uechveli davamateb imas ro fotoebi da videoebi davaoptimiziro ra
 
@@ -33,6 +33,7 @@ DONE postis update
 
 Done eseigi potos validacia da shemdeg ukve davaabdeiteb posts mere davamateb likes da comments
 
+eseigi comentarebi iwereba, notifications mushaobs, ishleba, edit.
 
 
 eseigi saits aklia celery da videos optimizacia

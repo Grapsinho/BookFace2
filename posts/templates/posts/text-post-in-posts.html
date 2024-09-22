@@ -1,11 +1,13 @@
 <article class="post feed-posts">
   <div class="post-header justify-content-between">
     <div class="d-flex">
-      <img
-        src="/static/media/{{post.user.avatar}}"
-        loading="lazy"
-        alt="User Avatar"
-      />
+      <a href="{% url 'profile' post.user.email %}">
+        <img
+          src="/static/media/{{user.avatar}}"
+          loading="lazy"
+          alt="User Avatar"
+        />
+      </a>
       <div class="post-user-info" style="align-self: flex-end">
         <h4>{{post.user.first_name}} {{post.user.last_name}}</h4>
         <p>Posted {{ post.created_at|timesince }} ago</p>
@@ -86,7 +88,7 @@
     <div>
       <div class="add-comment">
         <input type="text" placeholder="Write a comment..." />
-        <button>Post</button>
+        <button class="btn" disabled>Post</button>
 
         <div class="comments">
           <p class="noCommentPWashaleMere">No Comments For Now.</p>
