@@ -34,9 +34,22 @@ class UserInterest(models.Model):
     def __str__(self):
         return f"{self.user}'s interests"
 
+class SharedPost(models.Model):
+    original_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='shared_posts')
+    shared_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shared_posts')
+    created_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.shared_by} shared {self.original_post}"
+
+    class Meta:
+        unique_together = ('shared_by', 'original_post')
+
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    shared_post = models.ForeignKey(SharedPost, on_delete=models.CASCADE, related_name='comments', null=True)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -49,18 +62,8 @@ class Comment(models.Model):
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+    shared_post = models.ForeignKey(SharedPost, on_delete=models.CASCADE, related_name='likes', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user} liked {self.post}"
-    
-class SharedPost(models.Model):
-    original_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='shared_posts')
-    shared_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shared_posts')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.shared_by} shared {self.original_post}"
-
-    class Meta:
-        unique_together = ('shared_by', 'original_post')

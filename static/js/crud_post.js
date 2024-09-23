@@ -195,6 +195,8 @@ function populateModalWithData(response) {
 
   // Set the tags
   document.querySelectorAll(".tag-checkbox").forEach((element) => {
+    element.checked = false;
+
     if (
       response.data.tags.includes(element.dataset.name_tag.toLocaleLowerCase())
     ) {
@@ -230,12 +232,20 @@ function populateModalWithData(response) {
 function validateForm(originalText, originalTags) {
   const editPostText = document.querySelector("#editPostText");
   const tagsWrapper = document.querySelector("#tags-wrapper");
+  let fiveTag = false;
 
   // Get the current state of the text field and tags
   const isTextModified = editPostText.value.trim() !== originalText.trim();
+
   const selectedTags = Array.from(
     tagsWrapper.querySelectorAll(".tag-checkbox:checked")
   ).map((tag) => tag.dataset.name_tag.toLowerCase());
+
+  if (tagsWrapper.querySelectorAll(".tag-checkbox:checked").length > 5) {
+    fiveTag = false;
+  } else {
+    fiveTag = true;
+  }
 
   // Compare selected tags with original tags
   const isTagsModified =
@@ -245,6 +255,10 @@ function validateForm(originalText, originalTags) {
   const saveButton = document.querySelector(".edit_post_save_button_modal");
   if (isTextModified || isTagsModified) {
     saveButton.removeAttribute("disabled");
+
+    if (fiveTag == false) {
+      saveButton.setAttribute("disabled", "true");
+    }
   } else {
     saveButton.setAttribute("disabled", "true");
   }
@@ -382,16 +396,20 @@ function updatePostRequest(data, postId, parentEl) {
         refreshTokenAndRetryInUtility(() =>
           updatePostRequest(data, postId, parentEl)
         );
-      } else if (
-        (response.errors.video =
-          "Video file is too large. Maximum size allowed is 10MB.")
-      ) {
-        document.querySelector(".magariAlteri").classList.add("show");
-        document.querySelector(".magariAlteri").classList.remove("hide");
-        document.querySelector(".magariAlteri").style.zIndex = 123123;
+      }
 
-        let alert234 = document.querySelector(".alert-success");
-        alert234.style.display = "none";
+      if (response.errors) {
+        if (
+          response.errors.video ==
+          "Video file is too large. Maximum size allowed is 10MB."
+        ) {
+          document.querySelector(".magariAlteri").classList.add("show");
+          document.querySelector(".magariAlteri").classList.remove("hide");
+          document.querySelector(".magariAlteri").style.zIndex = 123123;
+
+          let alert234 = document.querySelector(".alert-success");
+          alert234.style.display = "none";
+        }
       }
 
       if (response.success) {
@@ -467,3 +485,209 @@ if (window.location.href != location_window) {
       alert234.style.display = "block";
     });
 }
+
+////////////////////////// share post /////////////////////////////////////
+
+const shareButtons = document.querySelectorAll(".share-btn");
+
+function sanitizeInput(userInput) {
+  // Remove all HTML tags from user input
+  let sanitizedInput = userInput.replace(/(<([^>]+)>)/gi, "");
+  return sanitizedInput;
+}
+
+function getOriginalPostForPreview(post_id) {
+  $.ajax({
+    type: "GET",
+    url: `${location.protocol}//${location.host}/posts/${post_id}/getOriginalPost/`,
+    headers: {
+      "X-CSRFToken": csrftoken,
+    },
+    contentType: "application/json",
+    credentials: "include",
+    success: function (response) {
+      if (response.success) {
+        const post_cont = document.querySelector(".post-preview-for-share");
+
+        const post = response.data;
+        const author = post.author;
+        const media_type = post.media_type;
+        const media = post.media;
+        const tags = post.tags.map((tag) => `#${tag}`).join(" ");
+
+        // Prepare HTML by inserting dynamic data
+        post_cont.innerHTML = `
+          <article class="post feed-posts">
+              <div class="post-header justify-content-between">
+                  <div class="d-flex gap-2">
+                        <img
+                          src="/static${author.avatar}"
+                          loading="lazy"
+                          alt="User Avatar"
+                          style="width: 50px;
+                          height: 50px;
+                          border-radius: 50%;"
+                        />
+                      <div class="post-user-info" style="font-size: .9rem;">
+                          <h4>${author.first_name} ${author.last_name}</h4>
+                          <p style="margin: 0;">Posted ${
+                            post.created_at
+                          } ago</p>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="post-content">
+                  <p class="post_text_edit_for">${post.title}</p>
+
+                  ${
+                    media_type === "video"
+                      ? `
+                      <video controls>
+                          <source src="${media}" loading="lazy" type="video/mp4" class="video_post_source" />
+                          Your browser does not support the video tag.
+                      </video>
+                  `
+                      : media_type === "image"
+                      ? `
+                      <div class="media">
+                          <img src="${media}" alt="Post Image" class="post_media_file" loading="lazy" />
+                      </div>
+                  `
+                      : ""
+                  }
+
+                  <div class="tags mt-2">
+                      ${tags}
+                  </div>
+              </div>
+          </article>
+        `;
+
+        document.querySelector(".magariAlteri2").classList.remove("show");
+        document.querySelector(".magariAlteri2").classList.add("hide");
+
+        const confirm_share = document.querySelector("#confirm-share");
+
+        confirm_share.setAttribute("data-post_id", post.id);
+
+        confirm_share.addEventListener("click", () => {
+          const post_id = confirm_share.getAttribute("data-post_id");
+          const share_message = document.querySelector("#share-message").value;
+
+          document.querySelector(".alertText").textContent = "Please Wait...";
+          document.querySelector(".magariAlteri2").classList.add("show");
+          document.querySelector(".magariAlteri2").classList.remove("hide");
+          document.querySelector(".magariAlteri2").style.zIndex = 123123;
+
+          createSharePost(sanitizeInput(share_message), post_id);
+        });
+      }
+    },
+    error: function (error) {
+      if (
+        error.responseJSON?.detail ===
+        "Authentication credentials were not provided or are invalid."
+      ) {
+        // ვარეფრეშებთ ტოკენს
+        refreshTokenAndRetryInUtility(() => getOriginalPostForPreview(post_id));
+      }
+    },
+  });
+}
+
+function createSharePost(message, post_id) {
+  $.ajax({
+    type: "POST",
+    url: `${location.protocol}//${location.host}/posts/${post_id}/sharePost/`,
+    headers: {
+      "X-CSRFToken": csrftoken,
+    },
+    data: JSON.stringify(message),
+    contentType: "application/json",
+    credentials: "include",
+    success: function (response) {
+      console.log(response);
+      if (response.status) {
+        document.querySelector(".alertText").textContent =
+          "Post Shared You Can See It In Your Profile.";
+      }
+    },
+    error: function (error) {
+      if (
+        error.responseJSON?.detail ===
+        "Authentication credentials were not provided or are invalid."
+      ) {
+        // ვარეფრეშებთ ტოკენს
+        refreshTokenAndRetryInUtility(() => createSharePost(message, post_id));
+      } else {
+        alert(error.responseJSON?.error);
+      }
+    },
+  });
+}
+
+if (shareButtons) {
+  shareButtons.forEach((shareButton) => {
+    shareButton.addEventListener("click", (event) => {
+      const postId = shareButton.dataset.post_id;
+
+      document.querySelector(".alertText").textContent = "Please Wait...";
+      document.querySelector(".magariAlteri2").classList.add("show");
+      document.querySelector(".magariAlteri2").classList.remove("hide");
+      document.querySelector(".magariAlteri2").style.zIndex = 123123;
+
+      getOriginalPostForPreview(postId);
+    });
+  });
+}
+
+///////////////////////////////// delete shared post ////////////////////////////////////
+
+function deleteSharedPostJsFIle(data, parentEl) {
+  sendRequestInUtility(
+    `/posts/${data}/delete/`,
+    "DELETE",
+    data,
+    function (response) {
+      console.log(response);
+
+      if (response.status) {
+        parentEl.remove();
+
+        document.querySelector(".alertText").textContent =
+          "Post Deleted successfully";
+      }
+    },
+    function (xhr) {
+      if (
+        xhr.responseJSON?.detail ===
+        "Authentication credentials were not provided or are invalid."
+      ) {
+        // ვარეფრეშებთ ტოკენს
+        refreshTokenAndRetryInUtility(() =>
+          deleteSharedPostJsFIle(data, parentEl)
+        );
+      }
+    }
+  );
+}
+
+const delete_sharedPost_btn = document.querySelectorAll(
+  ".delete_sharedpost--btn"
+);
+
+delete_sharedPost_btn.forEach((element) => {
+  element.addEventListener("click", () => {
+    const post_id = element.dataset.postid;
+    const parentEl =
+      element.parentElement.parentElement.parentElement.parentElement;
+
+    document.querySelector(".alertText").textContent = "Please Wait...";
+    document.querySelector(".magariAlteri2").classList.add("show");
+    document.querySelector(".magariAlteri2").classList.remove("hide");
+    document.querySelector(".magariAlteri2").style.zIndex = 123123;
+
+    deleteSharedPostJsFIle(post_id, parentEl);
+  });
+});

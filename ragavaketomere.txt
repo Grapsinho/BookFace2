@@ -1,7 +1,3 @@
-post, mesijebi, komentarebi
-
-
-
 DONE login&register password change
 DONE setup profile
 DONE profile features about images
@@ -33,7 +29,13 @@ DONE postis update
 
 Done eseigi potos validacia da shemdeg ukve davaabdeiteb posts mere davamateb likes da comments
 
-eseigi comentarebi iwereba, notifications mushaobs, ishleba, edit.
+DONE eseigi comentarebi iwereba, notifications mushaobs, ishleba, edit.
+
+NEXT shemdegi aris share function
+
+mokled zusti taskebi xvalistvis aris gaziarebuli postis dalaiqeba, komentari da davamateb ro wavshalo komentari an davaedito mashin roca daamata iuzerma egreve
+
+eseni iqneba xvalindeli taskebi da mere daviwyeb shemowmebas yvelaferis sanam gadaval for youze
 
 
 eseigi saits aklia celery da videos optimizacia

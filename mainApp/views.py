@@ -4,9 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from users.models import User
 from friendship.models import FriendRequest, Friendship
-from posts.models import Tag, Like, Comment
+from posts.models import Tag, Like, Comment, SharedPost
 from notifications.models import Notification
-from django.db.models import Q, Case, When, CharField, Count, Exists, OuterRef, Prefetch
+from django.db.models import Q, Case, When, CharField, Count, Prefetch, BooleanField
+from itertools import chain
+from utils.utility import quicksort
+import heapq
 
 from django.core.cache import cache
 
@@ -121,12 +124,41 @@ class ProfileView(View):
             Q(user=request.user, friend=user) | Q(user=user, friend=request.user)
         ).exists()
 
-        user_likes = Like.objects.filter(user=request.user, post=OuterRef('pk'))
+        user_likes = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
 
-        # Prefetch comments ordered by created_at DESC (latest first)
-        comments_prefetch = Prefetch('comments', queryset=Comment.objects.select_related('user').order_by('-created_at'))
+        comments_prefetch = Prefetch(
+            'comments', 
+            queryset=Comment.objects.select_related('user').order_by('-created_at')
+        )
 
-        posts_for_user = user.posts.annotate(like_count=Count('likes'), user_liked=Exists(user_likes)).prefetch_related('tags', comments_prefetch).all().order_by('-created_at')
+        posts_for_user = user.posts.select_related('user').prefetch_related(
+            'tags',  # Prefetch tags to avoid N+1
+            comments_prefetch  # Prefetch comments for each post
+        ).annotate(
+            like_count=Count('likes'),  # Efficient like counting
+            user_liked=Case(
+                When(pk__in=user_likes, then=True), 
+                default=False, 
+                output_field=BooleanField()
+            )
+        ).order_by('-created_at')
+
+        shared_posts_for_user = user.shared_posts.select_related(
+            'shared_by', 'original_post__user'  # Select related fields to avoid N+1
+        ).prefetch_related(
+            'original_post__tags',  # Prefetch tags for the original post
+            comments_prefetch  # Prefetch comments for each shared post
+        ).annotate(
+            like_count=Count('likes'),  # Like count for shared posts
+            user_liked=Case(
+                When(pk__in=user_likes, then=True), 
+                default=False, 
+                output_field=BooleanField()
+            )
+        ).order_by('-created_at')
+
+        combined_posts = list(chain(posts_for_user, shared_posts_for_user))
+        all_posts = quicksort(combined_posts, key=lambda post: post.created_at)
 
         cache_key = f'tags'
         tags = cache.get(cache_key)
@@ -144,8 +176,8 @@ class ProfileView(View):
             'initial_notifications_length': len(notifications),
             'friend_request_received': friend_request_received,
             'user_friends': user_friends,
-            'posts_for_user': posts_for_user,
-            'tags': tags
+            'tags': tags,
+            'all_posts': all_posts
         }
 
         return render(request, 'mainApp/profile.html', context)

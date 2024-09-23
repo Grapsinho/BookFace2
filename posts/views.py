@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from .forms import PostForm
 from users.models import UserMedia
-from .models import Post, Tag, Like, Comment
+from .models import Post, Tag, Like, Comment, SharedPost
 from notifications.models import Notification
 
 from django.views import View
@@ -364,3 +364,67 @@ class CrudComments(APIView):
 
         # Handle other exceptions as usual
         return super().handle_exception(exc)
+
+class SharePost(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, post_id):
+        try:
+            post = get_object_or_404(Post, id=post_id)
+
+            time_difference = timesince(post.created_at, timezone.now())
+
+            post_data = {
+                'id': post.pk,
+                'title': post.text,
+                'tags': [tag.name for tag in post.tags.all()],
+                'created_at': time_difference,
+                'media': post.image.url if post.image else post.video.url if post.video else None,
+                'media_type': 'image' if post.image else 'video' if post.video else None,
+                'author': {
+                    'first_name': post.user.first_name,
+                    'last_name': post.user.last_name,
+                    'avatar': post.user.avatar.url,
+                },
+            }
+
+            return JsonResponse({'success': True, 'data': post_data})
+
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)
+
+    def delete(self, request, sharedPost_id):
+        try:
+            SharedPost2 = get_object_or_404(SharedPost, id=sharedPost_id)
+            SharedPost2.delete()
+            return Response({"status": True}, status=status.HTTP_200_OK)
+        
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)
+
+    def post(self, request, post_id):
+        try:
+            # Get the original post
+            original_post = get_object_or_404(Post, id=post_id)
+            
+            # Get the message from the request body (optional)
+            message = request.data
+
+            # Check if the user already shared this post
+            if SharedPost.objects.filter(original_post=original_post, shared_by=request.user).exists():
+                return JsonResponse({'error': 'You have already shared this post.'}, status=400)
+
+            # Create the shared post
+            shared_post = SharedPost.objects.create(
+                original_post=original_post,
+                shared_by=request.user,
+                message=message
+            )
+            
+            context = {"status": True}
+
+            return Response(context, status=status.HTTP_200_OK)
+
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)

@@ -44,3 +44,12 @@ def create_or_update_media(user, image_field, media_type):
                 media_file_link=media_path,
                 media_type=media_type,
             )
+
+def quicksort(arr, key):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if key(x) > key(pivot)]
+    middle = [x for x in arr if key(x) == key(pivot)]
+    right = [x for x in arr if key(x) < key(pivot)]
+    return quicksort(left, key) + middle + quicksort(right, key)

@@ -1,12 +1,46 @@
-<!-- Shared Post -->
 <article class="post shared-post feed-posts">
-  <div class="post-header">
-    <img src="static/media/{{request.user.avatar}}" alt="User Avatar" />
-    <div class="post-user-info">
-      <h4>Username</h4>
-      <!-- Sharer's name -->
-      <p>Shared 2 hours ago</p>
-      <!-- Time of sharing -->
+  <div class="post-header justify-content-between">
+    <div style="display: flex; align-items: center">
+      <img src="default-boy-avatar.jpg" alt="User Avatar" />
+      <div class="post-user-info">
+        <h4>Username</h4>
+        <!-- Sharer's name -->
+        <p>Shared 2 hours ago</p>
+        <!-- Time of sharing -->
+      </div>
+    </div>
+
+    <div class="three_dot_for_post_edit_delete dropstart">
+      <button
+        class="dropdown-toggle"
+        style="
+          color: rgb(0, 0, 0);
+          font-size: 1.4rem;
+          background: none;
+          border: none;
+        "
+        type="button"
+        data-bs-toggle="dropdown"
+      >
+        ⋮
+      </button>
+
+      <ul class="dropdown-menu">
+        <li
+          class="dropdown-item delete_post--btn"
+          style="cursor: pointer"
+          data-postId="123"
+        >
+          🗑️ Delete
+        </li>
+        <li
+          class="dropdown-item edit_post--btn"
+          style="cursor: pointer"
+          data-postId="123"
+        >
+          ✏️ Edit
+        </li>
+      </ul>
     </div>
   </div>
   <div class="post-content">
@@ -14,36 +48,214 @@
     <!-- Sharer's message -->
     <!-- Original Post -->
     <div class="original-post">
-      <div class="post-header">
-        <img
-          src="static/media/{{request.user.avatar}}"
-          alt="Original User Avatar"
-        />
-        <div class="post-user-info">
-          <h4>Original Username</h4>
-          <!-- Original Poster's name -->
-          <p>Posted 5 hours ago</p>
-          <!-- Time of original post -->
+      <div class="post-header justify-content-between">
+        <div class="d-flex">
+          <a href="/profile/user123@example.com">
+            <img
+              src="/static/media/avatars/default-boy-avatar.jpg"
+              loading="lazy"
+              alt="User Avatar"
+            />
+          </a>
+          <div class="post-user-info" style="align-self: flex-end">
+            <h4>John Doe</h4>
+            <p>Posted 5 hours ago</p>
+          </div>
         </div>
       </div>
+
       <div class="post-content">
-        <div class="post-description">
-          <p>This is the original post content!</p>
-        </div>
+        <p class="post_text_edit_for">
+          This is a sample post text for demonstration purposes.
+        </p>
+
         <div class="media">
           <img
-            src="static/media/{{request.user.avatar}}"
-            alt="Original Post Image"
+            src="/static/media/avatars/default-boy-avatar.jpg"
+            alt="Post Image"
+            class="post_media_file"
+            loading="lazy"
           />
         </div>
+
+        <div class="tags mt-2">
+          <span class="tag">#SampleTag</span>
+          <span class="tag">#AnotherTag</span>
+        </div>
       </div>
+
       <div class="post-actions">
         <div class="like-section">
-          <button>👍 Like</button>
-          <span class="like-count">15 Likes</span>
-          <!-- Number of likes -->
+          <button class="addLikeOnPost" data-post_id="123">👍 Like</button>
+          <span class="like-count">
+            <span class="like_countNumber">20</span> Likes
+          </span>
         </div>
       </div>
     </div>
   </div>
+
+  <details>
+    <summary>View Comments</summary>
+
+    <div>
+      <div class="add-comment">
+        <input
+          type="text"
+          class="comment_input"
+          placeholder="Write a comment..."
+        />
+        <button class="addCommentOnPost" data-post_id="123">Post</button>
+
+        <div class="comments">
+          <div
+            class="comment"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <div style="margin: 0">
+              <strong>Jane Doe:</strong>
+              <span class="comment_text">This is a sample comment.</span>
+            </div>
+
+            <div class="three_dot_for_comment_edit_delete dropstart">
+              <button
+                class="dropdown-toggle"
+                style="
+                  color: rgb(0, 0, 0);
+                  font-size: 1.4rem;
+                  background: none;
+                  border: none;
+                  padding: 0 0.5rem 0 0;
+                  margin: 0;
+                "
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                ⋮
+              </button>
+
+              <ul class="dropdown-menu">
+                <li
+                  class="dropdown-item delete_comment--btn"
+                  data-commentId="456"
+                  style="cursor: pointer"
+                >
+                  🗑️ Delete
+                </li>
+                <li
+                  class="dropdown-item edit_comment--btn"
+                  data-commentId="456"
+                  style="cursor: pointer"
+                >
+                  ✏️ Edit
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            class="comment"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <div style="margin: 0">
+              <strong>Jane Doe:</strong>
+              <span class="comment_text">This is a sample comment.</span>
+            </div>
+
+            <div class="three_dot_for_comment_edit_delete dropstart">
+              <button
+                class="dropdown-toggle"
+                style="
+                  color: rgb(0, 0, 0);
+                  font-size: 1.4rem;
+                  background: none;
+                  border: none;
+                  padding: 0 0.5rem 0 0;
+                  margin: 0;
+                "
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                ⋮
+              </button>
+
+              <ul class="dropdown-menu">
+                <li
+                  class="dropdown-item delete_comment--btn"
+                  data-commentId="456"
+                  style="cursor: pointer"
+                >
+                  🗑️ Delete
+                </li>
+                <li
+                  class="dropdown-item edit_comment--btn"
+                  data-commentId="456"
+                  style="cursor: pointer"
+                >
+                  ✏️ Edit
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            class="comment"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <div style="margin: 0">
+              <strong>Jane Doe:</strong>
+              <span class="comment_text">This is a sample comment.</span>
+            </div>
+
+            <div class="three_dot_for_comment_edit_delete dropstart">
+              <button
+                class="dropdown-toggle"
+                style="
+                  color: rgb(0, 0, 0);
+                  font-size: 1.4rem;
+                  background: none;
+                  border: none;
+                  padding: 0 0.5rem 0 0;
+                  margin: 0;
+                "
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                ⋮
+              </button>
+
+              <ul class="dropdown-menu">
+                <li
+                  class="dropdown-item delete_comment--btn"
+                  data-commentId="456"
+                  style="cursor: pointer"
+                >
+                  🗑️ Delete
+                </li>
+                <li
+                  class="dropdown-item edit_comment--btn"
+                  data-commentId="456"
+                  style="cursor: pointer"
+                >
+                  ✏️ Edit
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
 </article>

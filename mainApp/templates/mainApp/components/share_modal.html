@@ -27,11 +27,14 @@
         ></textarea>
 
         <!-- Preview of the Post being Shared -->
-        <div id="post-preview" class="border p-3 rounded">
+        <div
+          id="post-preview"
+          class="border p-3 rounded post-preview-for-share"
+        >
           <div class="post">
             <div class="post-header d-flex align-items-center">
               <img
-                src="static/media/{{request.user.avatar}}"
+                src="/static/media{{request.user.avatar}}"
                 alt="User Avatar"
                 class="rounded-circle me-2"
                 style="width: 40px; height: 40px"
@@ -44,7 +47,7 @@
             <div class="post-content mt-3">
               <p>This is an example post that you are about to share!</p>
               <img
-                src="static/media/{{request.user.avatar}}"
+                src="/static/media{{request.user.avatar}}"
                 alt="Shared Image"
                 class="img-fluid rounded"
               />
