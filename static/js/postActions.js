@@ -6,12 +6,13 @@ function sanitizeInput(userInput) {
   return sanitizedInput;
 }
 
-function toggleLike(postId, button) {
+function toggleLike(postId, button, sharedOrNot) {
   $.ajax({
     url: `${location.protocol}//${location.host}/posts/${postId}/like/`,
     type: "POST",
     data: {
       "X-CSRFToken": csrftoken,
+      "shared": sharedOrNot,
     },
     success: function (response) {
       console.log(response);
@@ -33,7 +34,7 @@ function toggleLike(postId, button) {
     },
     error: function (xhr) {
       if (
-        xhr.responseJSON.message ==
+        xhr.responseJSON?.message ==
         "You have made too many login attempts. Please try again later."
       ) {
         let message2 =
@@ -50,7 +51,9 @@ function toggleLike(postId, button) {
         "Authentication credentials were not provided or are invalid."
       ) {
         // ვარეფრეშებთ ტოკენს
-        refreshTokenAndRetryInUtility(() => toggleLike(postId, button));
+        refreshTokenAndRetryInUtility(() =>
+          toggleLike(postId, button, sharedOrNot)
+        );
       }
     },
   });
@@ -60,17 +63,22 @@ const likeButtons = document.querySelectorAll(".addLikeOnPost");
 
 likeButtons.forEach((element) => {
   element.addEventListener("click", () => {
-    toggleLike(element.dataset.post_id, element);
+    if (element.dataset.shared_post) {
+      toggleLike(element.dataset.post_id, element, "shared_post");
+    } else {
+      toggleLike(element.dataset.post_id, element, "post_post");
+    }
   });
 });
 
-export function toggleComment(postId, button, text, comment_cont) {
+export function toggleComment(postId, button, text, comment_cont, sharedOrNot) {
   $.ajax({
     url: `${location.protocol}//${location.host}/posts/${postId}/comments/`,
     type: "POST",
     data: {
       "X-CSRFToken": csrftoken,
       "text": text,
+      "shared": sharedOrNot,
     },
     success: function (response) {
       if (comment_cont.querySelector(".noCommentPWashaleMere")) {
@@ -78,14 +86,173 @@ export function toggleComment(postId, button, text, comment_cont) {
       }
 
       $(comment_cont).prepend(`
-        <div class="comment">
-          <p><strong>${response.user}:</strong> ${text}</p>
-        </div>
+        <div
+            class="comment"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <div style="margin: 0">
+              <strong
+                >${response.user}:</strong
+              >
+              <span class="comment_text">${text}</span>
+
+              <div
+                class="align-items-center div-for-update-btn gap-2"
+                style="display: none"
+              >
+                <input
+                  type="text"
+                  class="form-control edit-comment-input"
+                  value="${text}"
+                  style="margin-top: 5px"
+                />
+
+                <button
+                  class="btn save-comment-edit-btn"
+                  style="background-color: #f9f9f900"
+                  data-commentId="${response.comment_id}"
+                >
+                  ✔️
+                </button>
+
+                <button
+                  class="btn save-comment-edit-btn-cancel"
+                  style="background-color: #f9f9f900"
+                >
+                  ❌
+                </button>
+              </div>
+            </div>
+            <div class="three_dot_for_comment_edit_delete dropstart">
+              <button
+                class="dropdown-toggle"
+                style="
+                  color: rgb(0, 0, 0);
+                  font-size: 1.4rem;
+                  background: none;
+                  border: none;
+                  padding: 0 0.5rem 0 0;
+                  margin: 0;
+                "
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                ⋮
+              </button>
+
+              <ul class="dropdown-menu">
+                <li
+                  class="dropdown-item delete_comment--btn"
+                  data-commentId="${response.comment_id}"
+                  style="cursor: pointer"
+                >
+                  🗑️ Delete
+                </li>
+                <li
+                  class="dropdown-item edit_comment--btn"
+                  data-commentId="${response.comment_id}"
+                  style="cursor: pointer"
+                >
+                  ✏️ Edit
+                </li>
+              </ul>
+            </div>
+          </div>
       `);
+
+      const delete_comment_btn = document.querySelectorAll(
+        ".delete_comment--btn"
+      );
+
+      // delete comment
+      delete_comment_btn.forEach((element) => {
+        element.addEventListener("click", () => {
+          const commId = element.dataset.commentid;
+          const parentElementCommentBtnDelete =
+            element.parentElement.parentElement.parentElement;
+          deleteCommentJsFIle(parentElementCommentBtnDelete, commId);
+
+          document.querySelector(".alertText").textContent =
+            "Comment Will Delete Soon...";
+          document.querySelector(".magariAlteri2").classList.add("show");
+          document.querySelector(".magariAlteri2").classList.remove("hide");
+          document.querySelector(".magariAlteri2").style.zIndex = 123123;
+        });
+      });
+
+      const edit_comment_btn = document.querySelectorAll(".edit_comment--btn");
+
+      // open comment edit input
+      edit_comment_btn.forEach((element) => {
+        element.addEventListener("click", () => {
+          const comment_text =
+            (element.parentElement.parentElement.parentElement.querySelector(
+              ".comment_text"
+            ).style.display = "none");
+
+          const div_for_update_btn =
+            (element.parentElement.parentElement.parentElement.querySelector(
+              ".div-for-update-btn"
+            ).style.display = "flex");
+        });
+      });
+
+      const save_comment_edit_btn = document.querySelectorAll(
+        ".save-comment-edit-btn"
+      );
+
+      // edit comment
+      save_comment_edit_btn.forEach((element) => {
+        element.addEventListener("click", () => {
+          const commId = element.dataset.commentid;
+
+          const comment_text =
+            element.parentElement.parentElement.querySelector(".comment_text");
+
+          const div_for_update_btn = element.parentElement;
+
+          const edit_comment_text =
+            element.parentElement.parentElement.parentElement.querySelector(
+              ".edit-comment-input"
+            );
+
+          if (sanitizeInput(edit_comment_text.value)) {
+            toggleEditComment(
+              commId,
+              div_for_update_btn,
+              sanitizeInput(edit_comment_text.value),
+              comment_text
+            );
+          }
+        });
+      });
+
+      const edit_comment_btn_cancel = document.querySelectorAll(
+        ".save-comment-edit-btn-cancel"
+      );
+
+      // close comment edit
+      edit_comment_btn_cancel.forEach((element) => {
+        element.addEventListener("click", () => {
+          const comment_text =
+            (element.parentElement.parentElement.parentElement.querySelector(
+              ".comment_text"
+            ).style.display = "");
+
+          const div_for_update_btn =
+            (element.parentElement.parentElement.parentElement.querySelector(
+              ".div-for-update-btn"
+            ).style.display = "none");
+        });
+      });
     },
     error: function (xhr) {
       if (
-        xhr.responseJSON.message ==
+        xhr.responseJSON?.message ==
         "You have made too many login attempts. Please try again later."
       ) {
         let message2 =
@@ -98,19 +265,12 @@ export function toggleComment(postId, button, text, comment_cont) {
       }
 
       if (
-        xhr.responseJSON.error ==
-        "You have made too many login attempts. Please try again later."
-      ) {
-        alert(xhr.responseJSON.error);
-      }
-
-      if (
         xhr.responseJSON?.detail ===
         "Authentication credentials were not provided or are invalid."
       ) {
         // ვარეფრეშებთ ტოკენს
         refreshTokenAndRetryInUtility(() =>
-          toggleComment(postId, button, text, comment_cont)
+          toggleComment(postId, button, text, comment_cont, sharedOrNot)
         );
       }
     },
@@ -125,12 +285,24 @@ commentButtons.forEach((element) => {
     const commentInput = parentEl.querySelector(".comment_input");
     const comment_cont = parentEl.querySelector(".comments");
 
-    if (sanitizeInput(commentInput.value.trim())) {
+    if (
+      element.dataset.shared_post &&
+      sanitizeInput(commentInput.value.trim())
+    ) {
       toggleComment(
         element.dataset.post_id,
         element,
         sanitizeInput(commentInput.value.trim()),
-        comment_cont
+        comment_cont,
+        "shared_post"
+      );
+    } else if (sanitizeInput(commentInput.value.trim())) {
+      toggleComment(
+        element.dataset.post_id,
+        element,
+        sanitizeInput(commentInput.value.trim()),
+        comment_cont,
+        "post_post"
       );
     }
   });
@@ -147,6 +319,7 @@ function deleteCommentJsFIle(parentEl, comment_id) {
     },
     success: function (response) {
       if (response.status) {
+        console.log(parentEl);
         parentEl.remove();
 
         document.querySelector(".magariAlteri2").classList.remove("show");

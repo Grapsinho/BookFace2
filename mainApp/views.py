@@ -124,12 +124,14 @@ class ProfileView(View):
             Q(user=request.user, friend=user) | Q(user=user, friend=request.user)
         ).exists()
 
-        user_likes = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
-
         comments_prefetch = Prefetch(
             'comments', 
             queryset=Comment.objects.select_related('user').order_by('-created_at')
         )
+
+        user_post_likes = Like.objects.filter(user=request.user, post__isnull=False).values_list('post_id', flat=True)
+
+        user_shared_likes = Like.objects.filter(user=request.user, shared_post__isnull=False).values_list('shared_post_id', flat=True)
 
         posts_for_user = user.posts.select_related('user').prefetch_related(
             'tags',  # Prefetch tags to avoid N+1
@@ -137,7 +139,7 @@ class ProfileView(View):
         ).annotate(
             like_count=Count('likes'),  # Efficient like counting
             user_liked=Case(
-                When(pk__in=user_likes, then=True), 
+                When(pk__in=user_post_likes, then=True), 
                 default=False, 
                 output_field=BooleanField()
             )
@@ -151,7 +153,7 @@ class ProfileView(View):
         ).annotate(
             like_count=Count('likes'),  # Like count for shared posts
             user_liked=Case(
-                When(pk__in=user_likes, then=True), 
+                When(pk__in=user_shared_likes, then=True), 
                 default=False, 
                 output_field=BooleanField()
             )

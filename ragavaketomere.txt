@@ -31,12 +31,17 @@ Done eseigi potos validacia da shemdeg ukve davaabdeiteb posts mere davamateb li
 
 DONE eseigi comentarebi iwereba, notifications mushaobs, ishleba, edit.
 
-NEXT shemdegi aris share function
+DONE shemdegi aris share function
 
-mokled zusti taskebi xvalistvis aris gaziarebuli postis dalaiqeba, komentari da davamateb ro wavshalo komentari an davaedito mashin roca daamata iuzerma egreve
+DONE mokled zusti taskebi xvalistvis aris gaziarebuli postis dalaiqeba, komentari da davamateb ro wavshalo komentari an davaedito mashin roca daamata iuzerma egreve
+
 
 eseni iqneba xvalindeli taskebi da mere daviwyeb shemowmebas yvelaferis sanam gadaval for youze
 
+
+
+
+kide aklia is ro gaziarebul postze movides notificaciebi
 
 eseigi saits aklia celery da videos optimizacia
 

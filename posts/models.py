@@ -48,7 +48,7 @@ class SharedPost(models.Model):
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', null=True)
     shared_post = models.ForeignKey(SharedPost, on_delete=models.CASCADE, related_name='comments', null=True)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -61,7 +61,7 @@ class Comment(models.Model):
 
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes', null=True)
     shared_post = models.ForeignKey(SharedPost, on_delete=models.CASCADE, related_name='likes', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

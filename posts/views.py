@@ -252,30 +252,42 @@ class AddLikes(APIView):
 
     def post(self, request, post_id):
         try:
-            post = get_object_or_404(Post, id=post_id)
-            like, created = Like.objects.get_or_create(user=request.user, post=post)
-
+            isharedOrNot = request.POST.get('shared')
             context = {}
+            if isharedOrNot == 'post_post':
+                post = get_object_or_404(Post, id=post_id)
+                like, created = Like.objects.get_or_create(user=request.user, post=post)
 
-            if not created:
-                like.delete()
-                context['success'] = True
-                context['message_remove'] = 'Like removed'
-                notification = Notification.objects.create(
-                    recipient=post.user,
-                    sender=request.user,
-                    message=int(post.pk),
-                    notification_type = 'post_unlike'
-                )
-            else:
-                context = {"message": "Liked"}
-                notification = Notification.objects.create(
-                    recipient=post.user,
-                    sender=request.user,
-                    message=int(post.pk),
-                    notification_type = 'post_like'
-                )
+                if not created:
+                    like.delete()
+                    context['success'] = True
+                    context['message_remove'] = 'Like removed'
+                    notification = Notification.objects.create(
+                        recipient=post.user,
+                        sender=request.user,
+                        message=int(post.pk),
+                        notification_type = 'post_unlike'
+                    )
+                else:
+                    context = {"message": "Liked"}
+                    notification = Notification.objects.create(
+                        recipient=post.user,
+                        sender=request.user,
+                        message=int(post.pk),
+                        notification_type = 'post_like'
+                    )
+            elif isharedOrNot == 'shared_post':
+                post = get_object_or_404(SharedPost, id=post_id)
+                like, created = Like.objects.get_or_create(user=request.user, shared_post=post)
+
+                if not created:
+                    like.delete()
+                    context['success'] = True
+                    context['message_remove'] = 'Like removed'
+                else:
+                    context = {"message": "Liked"}
             
+
             return Response(context, status=status.HTTP_200_OK)
 
         except AuthenticationRedirectException as e:
@@ -301,8 +313,10 @@ class CrudComments(APIView):
 
     def post(self, request, post_id):
         try:
-            post = get_object_or_404(Post, id=post_id)
             user = request.user
+            isharedOrNot = request.POST.get('shared')
+            post = ''
+            comment = ''
 
             text = request.data.get('text')
 
@@ -312,22 +326,33 @@ class CrudComments(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            comment = Comment.objects.create(
-                user=user,
-                post=post,
-                text=text.strip()
-            )
 
-            if post.user != request.user:
-                notification = Notification.objects.create(
-                    recipient=post.user,
-                    sender=request.user,
-                    message=comment.text,
-                    post_Id=post.pk,
-                    notification_type = 'post_comment'
+            if isharedOrNot == 'post_post':
+                post = get_object_or_404(Post, id=post_id)
+
+                comment = Comment.objects.create(
+                    user=user,
+                    post=post,
+                    text=text.strip()
+                )
+                if post.user != request.user:
+                    notification = Notification.objects.create(
+                        recipient=post.user,
+                        sender=request.user,
+                        message=comment.text,
+                        post_Id=post.pk,
+                        notification_type = 'post_comment'
+                    )
+            elif isharedOrNot == 'shared_post':
+                post = get_object_or_404(SharedPost, id=post_id)
+
+                comment = Comment.objects.create(
+                    user=user,
+                    shared_post=post,
+                    text=text.strip()
                 )
             
-            context = {"status": True, 'user': f"{user.first_name} {user.last_name}"}
+            context = {"status": True, 'user': f"{user.first_name} {user.last_name}", 'comment_id': comment.pk}
 
             return Response(context, status=status.HTTP_200_OK)
 
@@ -428,3 +453,4 @@ class SharePost(APIView):
 
         except AuthenticationRedirectException as e:
             return Response({"detail": str(e)}, status=401)
+       

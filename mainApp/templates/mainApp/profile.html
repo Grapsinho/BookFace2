@@ -541,7 +541,11 @@
                     {% if request.user == post.shared_by %}
                     <button class="btn" disabled>👍 Like</button>
                     {% else %}
-                    <button class="addLikeOnPost" data-post_id="{{post.pk}}">
+                    <button
+                      class="addLikeOnPost"
+                      data-shared_post="true"
+                      data-post_id="{{post.pk}}"
+                    >
                       {% if post.user_liked %}
                       <!--  -->
                       👎 Unlike {% else %}
@@ -571,7 +575,11 @@
                     class="comment_input"
                     placeholder="Write a comment..."
                   />
-                  <button class="addCommentOnPost" data-post_id="{{post.pk}}">
+                  <button
+                    class="addCommentOnPost"
+                    data-shared_post="true"
+                    data-post_id="{{post.pk}}"
+                  >
                     Post
                   </button>
 
@@ -1297,5 +1305,5 @@
 
 <script type="module" src="{% static 'js/crud_post.js' %}"></script>
 
-<script type="module" src="{% static 'js/likeandcomment1.js' %}"></script>
+<script type="module" src="{% static 'js/postActions.js' %}"></script>
 {% endblock scripts %}
