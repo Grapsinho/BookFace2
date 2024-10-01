@@ -6,7 +6,7 @@ function sanitizeInput(userInput) {
   return sanitizedInput;
 }
 
-function toggleLike(postId, button, sharedOrNot) {
+export function toggleLike(postId, button, sharedOrNot) {
   $.ajax({
     url: `${location.protocol}//${location.host}/posts/${postId}/like/`,
     type: "POST",
@@ -310,7 +310,7 @@ commentButtons.forEach((element) => {
 
 const delete_comment_btn = document.querySelectorAll(".delete_comment--btn");
 
-function deleteCommentJsFIle(parentEl, comment_id) {
+export function deleteCommentJsFIle(parentEl, comment_id) {
   $.ajax({
     url: `${location.protocol}//${location.host}/posts/${comment_id}/comments/delete/`,
     type: "DELETE",
@@ -391,7 +391,7 @@ edit_comment_btn.forEach((element) => {
   });
 });
 
-function toggleEditComment(commentId, edit_cont, text, comment_text) {
+export function toggleEditComment(commentId, edit_cont, text, comment_text) {
   $.ajax({
     url: `${location.protocol}//${location.host}/posts/${commentId}/comments/edit/`,
     type: "PATCH",

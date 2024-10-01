@@ -13,4 +13,5 @@ urlpatterns = [
     path('<int:post_id>/sharePost/', SharePost.as_view(), name='share_post'),
     path('<int:post_id>/getOriginalPost/', SharePost.as_view(), name='share_post_get'),
     path('<int:sharedPost_id>/delete/', SharePost.as_view(), name='share_post_delete'),
+    path('<str:email>/fetch_posts_for_user/', FetchPostsForScroll.as_view(), name='FetchPostsForScroll'),
 ]

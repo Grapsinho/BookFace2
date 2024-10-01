@@ -1,24 +1,38 @@
+# Django Imports
 from django.shortcuts import render, redirect
 from django.views import View
-from .forms import ProfileSetupForm, ProfilePicturesUpdateForm
-from users.models import UserMedia, User
-from rest_framework.views import APIView
-from users.authentication import JWTAuthentication
-from rest_framework.response import Response
-from users.exceptions import AuthenticationRedirectException
-from rest_framework import status
-import json
-from core import settings
 from django.db.models import Count, F, Value
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
+
+# Model Imports
+from users.models import UserMedia, User
+
+# Form Imports
+from .forms import ProfileSetupForm, ProfilePicturesUpdateForm
+
+# REST Framework Imports
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+# Authentication Imports
+from users.authentication import JWTAuthentication
+
+# Exception Imports
+from users.exceptions import AuthenticationRedirectException
+
+# Other Imports
+import json
 import os
+from core import settings
 
 from posts.models import Tag, UserInterest
 
 from rest_framework.permissions import IsAuthenticated
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.http import JsonResponse
 
 def create_or_update_media(user, image_field, media_type):
     if image_field:
@@ -130,13 +144,13 @@ class DeleteImages(APIView):
         data = json.loads(request.body)
 
         try:
-            # Fetch the media object
             media_obj = UserMedia.objects.get(id=data)
 
-            # Get the file path
+            if media_obj.user != request.user:
+                return Response({"detail": "You Don't Have Permission To Do That"}, status=status.HTTP_403_FORBIDDEN)
+
             media_link = media_obj.media_file_link
 
-            # Delete the media object from the database
             media_obj.delete()
 
             if media_obj.media_file_link == request.user.background_image.url and media_obj.media_type == 'background':
@@ -152,8 +166,10 @@ class DeleteImages(APIView):
                 else:
                     request.user.avatar = 'avatars/default-girl-avatar.jpg'
             else:
-                # Delete the media file from the server
-                os.remove('static' + media_link)
+                try:
+                    os.remove('static' + media_link)
+                except FileNotFoundError:
+                    raise ValidationError("File not found on server.")
 
             request.user.save()
 
@@ -161,8 +177,12 @@ class DeleteImages(APIView):
             
             return Response(context, status=status.HTTP_200_OK)
 
+        except UserMedia.DoesNotExist:
+            return Response({"detail": "Media object not found"}, status=status.HTTP_404_NOT_FOUND)
+        except ValidationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except AuthenticationRedirectException as e:
-            return Response({"detail": str(e)}, status=401)
+            return Response({"detail": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
         
 class SetCoverOrProfile(APIView):
     authentication_classes = [JWTAuthentication]
@@ -231,7 +251,25 @@ class AddFriendsAndInterests(View):
             user_interest.save()
 
             context = {"message": "Tags Added"}
-            return Response(context, status=status.HTTP_200_OK)
+            return JsonResponse(context, status=status.HTTP_200_OK)
 
         except AuthenticationRedirectException as e:
-            return Response({"detail": str(e)}, status=401)
+            return JsonResponse({"detail": str(e)}, status=401)
+        
+    def patch(self, request):
+        data = json.loads(request.body)
+
+        user_interests_tags = data
+
+        try:
+            user_interest, created = UserInterest.objects.get_or_create(user=request.user)
+            user_interest.tags.clear()
+            tags = Tag.objects.filter(name__in=user_interests_tags)
+            user_interest.tags.add(*tags)
+            user_interest.save()
+
+            context = {"message": "Tags Added"}
+            return JsonResponse(context, status=status.HTTP_200_OK)
+
+        except AuthenticationRedirectException as e:
+            return JsonResponse({"detail": str(e)}, status=401)

@@ -10,7 +10,7 @@
 
 <link
   rel="stylesheet"
-  href="{% static 'css/saerto_styles1.css' %}"
+  href="{% static 'css/saerto_styles.css' %}"
   type="text/css"
   media="screen"
 />
@@ -169,8 +169,8 @@
   <button
     type="button"
     class="btn-close"
-    data-bs-dismiss="alert"
     aria-label="Close"
+    onclick="hideAlert()"
   ></button>
 </div>
 {% endblock content %}
@@ -178,7 +178,16 @@
 <!--  -->
 {% block scripts %}
 
-<script src="{% static 'js/home1.js' %}"></script>
-<script type="module" src="{% static 'js/crud_post1.js' %}"></script>
+<script>
+  function hideAlert() {
+    // Just hide the alert instead of removing it from the DOM
+    const alertDiv = document.querySelector(".magariAlteri2");
+    alertDiv.classList.remove("show"); // Remove the 'show' class to hide the alert
+    alertDiv.classList.add("hide"); // Optionally, you can add 'hide' to keep it hidden
+  }
+</script>
+
+<script src="{% static 'js/home.js' %}"></script>
+<script type="module" src="{% static 'js/crud_post.js' %}"></script>
 <script src="{% static 'js/search.js' %}"></script>
 {% endblock scripts %}

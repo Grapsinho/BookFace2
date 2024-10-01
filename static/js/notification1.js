@@ -4,7 +4,7 @@ import {
   sendRequest,
 } from "./friends1.js";
 
-import { toggleComment } from "./postActions.js";
+import { toggleComment } from "./postActions1.js";
 
 const notificationsMenu = document.querySelector(".notifications_modal_body");
 

@@ -1,25 +1,47 @@
+# Django Imports
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .forms import PostForm
-from users.models import UserMedia
-from .models import Post, Tag, Like, Comment, SharedPost
-from notifications.models import Notification
-
 from django.views import View
 from django.shortcuts import get_object_or_404
-import bleach
+from django.db.models import Prefetch, Count, Case, When, BooleanField
+from utils.utility import quicksort
+from users.models import User
+from itertools import chain
 
-import mimetypes
+# Model Imports
+from .models import Post, Tag, Like, Comment, SharedPost
+from users.models import UserMedia
+from notifications.models import Notification
 
+# Form Imports
+from .forms import PostForm
+
+# Utility Imports
 from utils.utility import optimize_image, create_or_update_media
 
+# Authentication and Permissions Imports
 from users.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+
+# REST Framework Imports
 from rest_framework.views import APIView
-import json
-from users.exceptions import AuthenticationRedirectException
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.exceptions import Throttled
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import LimitOffsetPagination
+
+# Exception Imports
+from users.exceptions import AuthenticationRedirectException
+
+# Other Imports
+import bleach
+import mimetypes
+import json
+from django.utils import timezone
+from django.utils.timesince import timesince
+
 
 def sanitize_input(user_input):
     cleaned_input = bleach.clean(user_input, tags=['p', 'strong', 'em'], attributes={'*': ['class']})
@@ -190,8 +212,6 @@ class EditPost(APIView):
         except Exception as e:
             return Response({"detail": str(e)}, status=401)
  
-from django.utils import timezone
-from django.utils.timesince import timesince
 def postForNotification(request):
     if request.method == 'POST' and request.user.is_authenticated:
         data_arara = json.loads(request.body)
@@ -233,8 +253,6 @@ def postForNotification(request):
     
     return JsonResponse({'success': False, 'message': 'User not authenticated or method not allowed'})
 
-from rest_framework.throttling import UserRateThrottle
-from rest_framework.exceptions import Throttled
 
 class LikeThrottle(UserRateThrottle):
     scope = 'like'
@@ -453,4 +471,76 @@ class SharePost(APIView):
 
         except AuthenticationRedirectException as e:
             return Response({"detail": str(e)}, status=401)
-       
+
+
+class PostPagination(LimitOffsetPagination):
+    default_limit = 4 # Number of posts to load per request
+    max_limit = 50  # Max limit that can be set via the API request
+
+class FetchPostsForScroll(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = PostPagination
+
+    def get(self, request, email, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, email=email)
+
+            offset = int(request.GET.get('offset', 0))  # Start at 0
+            limit = int(request.GET.get('limit', 2))
+
+            comments_prefetch = Prefetch(
+                'comments', 
+                queryset=Comment.objects.select_related('user').order_by('-created_at')
+            )
+
+            user_post_likes = Like.objects.filter(user=request.user, post__isnull=False).values_list('post_id', flat=True)
+
+            user_shared_likes = Like.objects.filter(user=request.user, shared_post__isnull=False).values_list('shared_post_id', flat=True)
+
+            posts_for_user = user.posts.select_related('user').prefetch_related(
+                'tags',
+                comments_prefetch
+            ).annotate(
+                like_count=Count('likes'),
+                user_liked=Case(
+                    When(pk__in=user_post_likes, then=True), 
+                    default=False, 
+                    output_field=BooleanField()
+                )
+            ).order_by('-created_at')[offset:offset + limit]
+
+            shared_posts_for_user = user.shared_posts.select_related(
+                'shared_by', 'original_post__user'
+            ).prefetch_related(
+                'original_post__tags',
+                comments_prefetch
+            ).annotate(
+                like_count=Count('likes'),
+                user_liked=Case(
+                    When(pk__in=user_shared_likes, then=True), 
+                    default=False, 
+                    output_field=BooleanField()
+                )
+            ).order_by('-created_at')[offset:offset + limit]
+
+            combined_posts = list(chain(posts_for_user, shared_posts_for_user))
+            all_posts = quicksort(combined_posts, key=lambda post: post.created_at)
+
+            # Check if there are any posts to return
+            if not all_posts:
+                return Response({'posts': []}, status=200)
+
+            # Render HTML for the posts
+            posts_html = []
+            for post in all_posts:
+                if isinstance(post, Post):  # Casual Post
+                    post_html = render_to_string('posts/casual-post-post.html', {'post': post, 'request': request})
+                elif isinstance(post, SharedPost):  # Shared Post
+                    post_html = render_to_string('posts/shared-post-posts.html', {'post': post, 'request': request})
+                posts_html.append(post_html)
+
+            return Response({'posts': posts_html}, status=200)
+        
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)

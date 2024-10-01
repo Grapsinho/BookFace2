@@ -35,18 +35,32 @@ DONE shemdegi aris share function
 
 DONE mokled zusti taskebi xvalistvis aris gaziarebuli postis dalaiqeba, komentari da davamateb ro wavshalo komentari an davaedito mashin roca daamata iuzerma egreve
 
+DONE sheedzlos users tavisi tagebis shecvla
 
-eseni iqneba xvalindeli taskebi da mere daviwyeb shemowmebas yvelaferis sanam gadaval for youze
+DONE eseni iqneba xvalindeli taskebi da mere daviwyeb shemowmebas yvelaferis sanam gadaval for youze
+
+KARGIA core
+KARGIA users
+KARGIA user_profile
+KARGIA posts
+KARGIA notifications
+KARGIA friendship
+KARGIA mainApp
+
+DONE eseigi main apshi unda gavaketo profileshi scroll based pagination postebistvis
+
+DONE eseigi xvalistvis aris ro anu pirvel rigshi roca vsqrolavt profileze postze unda davamatot share da like unda gavasworot!!!!!!!
 
 
+gavakete tegebi mere movifiqreb ra damrcha
 
 
+///////////////////////////////////////////////////////////////////////////
 kide aklia is ro gaziarebul postze movides notificaciebi
-
 eseigi saits aklia celery da videos optimizacia
-
 mokled mere saits davumateb celery notificationebistvis!!!!!!!!!!!!!
-
+rodesac user shlis posts romelic sxvas aqvs gaziarebuli minda ro magaze notificatia miuvides!!
+///////////////////////////////////////////////////////////////////////////
 
 
 

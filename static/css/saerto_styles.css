@@ -394,19 +394,22 @@ h4 {
 }
 
 /* Tag buttons container */
-#tags-wrapper {
+#tags-wrapper,
+#tags-wrapper2 {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
 /* Tag checkboxes styled as buttons */
-input[type="checkbox"].tag-checkbox {
+input[type="checkbox"].tag-checkbox,
+input[type="checkbox"].tag-checkbox2 {
   display: none; /* Hide default checkbox */
 }
 
 /* Default tag label styling (unselected) */
-#tags-wrapper label {
+#tags-wrapper label,
+#tags-wrapper2 label {
   cursor: pointer;
   padding: 0.5rem 1rem;
   background-color: #f3f3f3;
@@ -417,12 +420,14 @@ input[type="checkbox"].tag-checkbox {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-#tags-wrapper label:hover {
+#tags-wrapper label:hover,
+#tags-wrapper2 label:hover {
   background-color: #e0e0e0;
 }
 
 /* Selected tag style */
-input[type="checkbox"].tag-checkbox:checked + label {
+input[type="checkbox"].tag-checkbox:checked + label,
+input[type="checkbox"].tag-checkbox2:checked + label {
   background-color: #007bff !important;
   color: white !important;
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.5) !important;
@@ -430,11 +435,13 @@ input[type="checkbox"].tag-checkbox:checked + label {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
-  #tags-wrapper {
+  #tags-wrapper,
+  #tags-wrapper2 {
     gap: 5px;
   }
 
-  #tags-wrapper label {
+  #tags-wrapper label,
+  #tags-wrapper2 label {
     padding: 0.3rem 0.8rem;
   }
 }

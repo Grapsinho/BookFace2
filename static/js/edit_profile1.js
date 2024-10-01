@@ -1,4 +1,7 @@
-import { sendRequestInUtility } from "./utility.js";
+import {
+  sendRequestInUtility,
+  refreshTokenAndRetryInUtility,
+} from "./utility.js";
 
 // Function to preview the profile picture
 document
@@ -202,3 +205,95 @@ setProfile__btns.forEach((element) => {
 });
 
 ////////////////////////// set cover or profile pictures DONE /////////////////////////
+
+///////////////////////// change tags ///////////////////////////////
+
+const done_button = document.querySelector(".change_tags_save");
+const interests_tag = [];
+const tags_names = JSON.parse(
+  document.getElementById("tags_names").textContent
+);
+
+const tagCheckboxes = document.querySelectorAll(".tag-checkbox2");
+
+tagCheckboxes.forEach((checkbox) => {
+  checkbox.addEventListener("change", function () {
+    validateForm(tags_names);
+  });
+});
+
+function sendRequestToSaveTags(data) {
+  sendRequestInUtility(
+    "/profile/setup/done/",
+    "PATCH",
+    data,
+    function (response) {
+      console.log(response);
+
+      if (response.message == "Tags Added") {
+        document.querySelector(".alertText").textContent = "Tags Changed!";
+        document.querySelector(".magariAlteri2").classList.add("show");
+        document.querySelector(".magariAlteri2").classList.remove("hide");
+        document.querySelector(".magariAlteri2").style.zIndex = 123123;
+      }
+    },
+    function (xhr) {
+      if (
+        xhr.responseJSON?.detail ===
+        "Authentication credentials were not provided or are invalid."
+      ) {
+        // ვარეფრეშებთ ტოკენს
+        refreshTokenAndRetryInUtility(() => sendRequestToSaveTags(data)); // Retry after refreshing token
+      }
+    }
+  );
+}
+
+done_button.addEventListener("click", () => {
+  const selectedItems = document.querySelectorAll(".tag-checkbox2:checked");
+
+  selectedItems.forEach((element) => {
+    interests_tag.push(element.dataset.name_tag);
+  });
+
+  sendRequestToSaveTags(interests_tag);
+});
+
+function validateForm(originalTags) {
+  const tagsWrapper = document.querySelector("#tags-wrapper2");
+  let fiveTag = false;
+
+  const selectedTags = Array.from(
+    tagsWrapper.querySelectorAll(".tag-checkbox2:checked")
+  ).map((tag) => tag.dataset.name_tag.toLowerCase());
+
+  if (tagsWrapper.querySelectorAll(".tag-checkbox2:checked").length > 5) {
+    fiveTag = false;
+  } else {
+    fiveTag = true;
+  }
+
+  // Compare selected tags with original tags
+  const isTagsModified =
+    selectedTags.sort().join(",") !== originalTags.sort().join(",");
+
+  if (isTagsModified) {
+    if (fiveTag == false) {
+      done_button.setAttribute("disabled", "true");
+
+      document.querySelector(".alertText").textContent =
+        "Please select only 5 tags";
+      document.querySelector(".magariAlteri2").classList.add("show");
+      document.querySelector(".magariAlteri2").classList.remove("hide");
+      document.querySelector(".magariAlteri2").style.zIndex = 123123;
+    } else if (selectedTags.length < 1) {
+      done_button.setAttribute("disabled", "true");
+    } else {
+      done_button.removeAttribute("disabled");
+    }
+  } else {
+    done_button.setAttribute("disabled", "true");
+  }
+}
+
+/////////////////////// done //////////////////////////

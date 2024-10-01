@@ -30,8 +30,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     # Create method to handle the creation of a new user
     def create(self, validated_data):
-        password = validated_data.pop("password")  # Extract the password from validated data
-        user = super().create(validated_data)  # Create a new user instance
+        user = User.objects.create(**validated_data)
+
+        if user.gender == 'female':
+            user.avatar = 'avatars/default-girl-avatar.jpg'
+        
+        password = validated_data.pop("password")
+
         user.set_password(password)  # Set the user's password using set_password for encryption
 
         user.save()  # Save the user instance with the updated password

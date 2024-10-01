@@ -6,10 +6,9 @@ from users.models import User
 from friendship.models import FriendRequest, Friendship
 from posts.models import Tag, Like, Comment, SharedPost
 from notifications.models import Notification
-from django.db.models import Q, Case, When, CharField, Count, Prefetch, BooleanField
+from django.db.models import Q, Case, When, CharField, Count, Prefetch, BooleanField, F
 from itertools import chain
 from utils.utility import quicksort
-import heapq
 
 from django.core.cache import cache
 
@@ -18,7 +17,7 @@ def home(request):
 
     notifications = Notification.objects.filter(
         recipient=request.user
-    ).values('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
+    ).only('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
 
     tags = Tag.objects.all()
 
@@ -26,36 +25,26 @@ def home(request):
     user_friends = cache.get(cache_key)
 
     if not user_friends:
-        user_friends = list(
-            Friendship.objects.filter(Q(user=request.user) | Q(friend=request.user))
-            .select_related('user', 'friend')
-            .annotate(
-                # Identify the friend (i.e., the other person in the friendship)
-                friend_first_name=Case(
-                    When(user=request.user, then='friend__first_name'),
-                    When(friend=request.user, then='user__first_name'),
-                    output_field=CharField(),
-                ),
-                friend_last_name=Case(
-                    When(user=request.user, then='friend__last_name'),
-                    When(friend=request.user, then='user__last_name'),
-                    output_field=CharField(),
-                ),
-                friend_email=Case(
-                    When(user=request.user, then='friend__email'),
-                    When(friend=request.user, then='user__email'),
-                    output_field=CharField(),
-                ),
-                friend_avatar=Case(
-                    When(user=request.user, then='friend__avatar'),
-                    When(friend=request.user, then='user__avatar'),
-                    output_field=CharField(),
-                )
-            )
-            .values(
-                'friend_first_name', 'friend_last_name', 'friend_email', 'friend_avatar'
-            )[:10]
-        )
+        # Fetch friends where the user is the 'user' in the Friendship model
+        user_is_user_friends = Friendship.objects.filter(user=request.user).select_related('friend').values(
+            friend_first_name=F('friend__first_name'),
+            friend_last_name=F('friend__last_name'),
+            friend_email=F('friend__email'),
+            friend_avatar=F('friend__avatar')
+        )[:10]
+
+        # Fetch friends where the user is the 'friend' in the Friendship model
+        user_is_friend_friends = Friendship.objects.filter(friend=request.user).select_related('user').values(
+            friend_first_name=F('user__first_name'),
+            friend_last_name=F('user__last_name'),
+            friend_email=F('user__email'),
+            friend_avatar=F('user__avatar')
+        )[:10]
+
+        # Combine both querysets using UNION
+        user_friends = list(user_is_user_friends.union(user_is_friend_friends))
+
+        # Cache the result for a week
         cache.set(cache_key, user_friends, timeout=604800)
 
     context = {
@@ -77,40 +66,31 @@ class ProfileView(View):
         user_friends = cache.get(cache_key)
 
         if not user_friends:
-            user_friends = list(
-                Friendship.objects.filter(Q(user=user) | Q(friend=user))
-                .select_related('user', 'friend')
-                .annotate(
-                    friend_first_name=Case(
-                        When(user=user, then='friend__first_name'),
-                        When(friend=user, then='user__first_name'),
-                        output_field=CharField(),
-                    ),
-                    friend_last_name=Case(
-                        When(user=user, then='friend__last_name'),
-                        When(friend=user, then='user__last_name'),
-                        output_field=CharField(),
-                    ),
-                    friend_email=Case(
-                        When(user=user, then='friend__email'),
-                        When(friend=user, then='user__email'),
-                        output_field=CharField(),
-                    ),
-                    friend_avatar=Case(
-                        When(user=user, then='friend__avatar'),
-                        When(friend=user, then='user__avatar'),
-                        output_field=CharField(),
-                    )
-                )
-                .values(
-                    'friend_first_name', 'friend_last_name', 'friend_email', 'friend_avatar'
-                )[:10]
-            )
+            # Fetch friends where the user is the 'user' in the Friendship model
+            user_is_user_friends = Friendship.objects.filter(user=user).select_related('friend').values(
+                friend_first_name=F('friend__first_name'),
+                friend_last_name=F('friend__last_name'),
+                friend_email=F('friend__email'),
+                friend_avatar=F('friend__avatar')
+            )[:10]
+
+            # Fetch friends where the user is the 'friend' in the Friendship model
+            user_is_friend_friends = Friendship.objects.filter(friend=user).select_related('user').values(
+                friend_first_name=F('user__first_name'),
+                friend_last_name=F('user__last_name'),
+                friend_email=F('user__email'),
+                friend_avatar=F('user__avatar')
+            )[:10]
+
+            # Combine both querysets using UNION
+            user_friends = list(user_is_user_friends.union(user_is_friend_friends))
+
+            # Cache the result for a week
             cache.set(cache_key, user_friends, timeout=604800)
 
         notifications = Notification.objects.filter(
             recipient=request.user
-        ).select_related('sender').values('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
+        ).select_related('sender').only('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
 
         friend_request = FriendRequest.objects.filter(
             Q(sender=user, receiver=request.user) | Q(sender=request.user, receiver=user)
@@ -143,7 +123,7 @@ class ProfileView(View):
                 default=False, 
                 output_field=BooleanField()
             )
-        ).order_by('-created_at')
+        ).order_by('-created_at')[:4]
 
         shared_posts_for_user = user.shared_posts.select_related(
             'shared_by', 'original_post__user'  # Select related fields to avoid N+1
@@ -157,7 +137,7 @@ class ProfileView(View):
                 default=False, 
                 output_field=BooleanField()
             )
-        ).order_by('-created_at')
+        ).order_by('-created_at')[:4]
 
         combined_posts = list(chain(posts_for_user, shared_posts_for_user))
         all_posts = quicksort(combined_posts, key=lambda post: post.created_at)
@@ -169,6 +149,8 @@ class ProfileView(View):
             tags = Tag.objects.all()
             cache.set(cache_key, tags, timeout=604800)
 
+        user_tag_names = user.interests.tags.values_list('name', flat=True)
+
         context = {
             'user_media': user_media,
             'user': user,
@@ -179,7 +161,10 @@ class ProfileView(View):
             'friend_request_received': friend_request_received,
             'user_friends': user_friends,
             'tags': tags,
-            'all_posts': all_posts
+            'all_posts': all_posts,
+            'all_posts_length': len(all_posts),
+            'user_tag_names': user_tag_names,
+            'serialized_tags': [tag.name for tag in tags]
         }
 
         return render(request, 'mainApp/profile.html', context)

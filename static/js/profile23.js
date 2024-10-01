@@ -212,24 +212,64 @@ $(document).ready(function () {
 
 /////////////////////////////// delete media ///////////////////////////
 
+function showModalWithError(message) {
+  // Update the message in the modal
+  document.querySelector(".alertText").textContent = message;
+
+  // Show the modal
+  document.querySelector(".magariAlteri2").classList.add("show");
+  document.querySelector(".magariAlteri2").classList.remove("hide");
+  document.querySelector(".magariAlteri2").style.zIndex = 123123;
+}
+
 function deleteImages(mediaId) {
   sendRequest(
-    "/profile/Delete_Images/", // Your API endpoint
-    "POST", // მეთოდი
-    mediaId, // რას ვაგზავნით
+    "/profile/Delete_Images/",
+    "POST",
+    mediaId,
     function (response) {
-      window.location.href = "/";
+      window.location.reload();
     },
     function (xhr) {
-      // ერრორის დროს რა მოხდება
       console.error(xhr);
-      if (
-        xhr.responseJSON?.detail ===
-        "Authentication credentials were not provided or are invalid."
-      ) {
-        // ვარეფრეშებთ ტოკენს
-        refreshTokenAndRetry(() => deleteImages(mediaId)); // Retry after refreshing token
+      let errorMessage = "";
+
+      if (xhr.status === 400) {
+        errorMessage = "File not found on the server.";
+
+        const timestamp = new Date().getTime();
+
+        const postImages = document.querySelectorAll(".post-image_aiauiaadas");
+        postImages.forEach((img) => {
+          const src = img.src.split("?")[0]; // Remove any existing query string
+          img.src = `${src}?ts=${timestamp}`; // Add cache-busting query string
+        });
+      } else if (xhr.status === 404) {
+        // Media object not found
+        errorMessage = "The image you are trying to delete does not exist.";
+      } else if (xhr.status === 403) {
+        // Authentication issue
+        if (
+          xhr.responseJSON?.detail ===
+          "Authentication credentials were not provided or are invalid."
+        ) {
+          // Refresh token and retry the request
+          refreshTokenAndRetry(() => deleteImages(mediaId));
+          return; // Stop execution since we'll retry the request
+        } else {
+          errorMessage = "You are not authorized to delete this image.";
+        }
+      } else if (xhr.status === 500) {
+        // Server error (unexpected errors)
+        errorMessage =
+          "Something went wrong on the server. Please try again later.";
+      } else {
+        // Catch-all for other errors
+        errorMessage = "An unknown error occurred. Please try again.";
       }
+
+      // Show the modal with the error message
+      showModalWithError(errorMessage);
     }
   );
 }

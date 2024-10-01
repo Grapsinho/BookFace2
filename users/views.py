@@ -56,10 +56,6 @@ class SignUpView(generics.GenericAPIView):
 
         if serializer.is_valid():
             user = serializer.save()
-            if user.gender == 'female':
-                user.avatar = 'avatars/default-girl-avatar.jpg'
-                user.save()
-
             response = {"message": "User Created", "data": serializer.data}
 
             return Response(data=response, status=status.HTTP_201_CREATED)

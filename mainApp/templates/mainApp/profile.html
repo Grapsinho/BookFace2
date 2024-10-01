@@ -10,7 +10,7 @@
 
 <link
   rel="stylesheet"
-  href="{% static 'css/saerto_styles1.css' %}"
+  href="{% static 'css/saerto_styles.css' %}"
   type="text/css"
   media="screen"
 />
@@ -68,6 +68,12 @@
     .save-comment-edit-btn-cancel:hover {
     background-color: #165ecf !important;
   }
+
+  #loading {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #666;
+  }
 </style>
 {% endblock css %}
 <!-- Page Content -->
@@ -98,87 +104,103 @@
       loading="lazy"
       alt="Cover Photo"
       style="bottom: -90px; position: absolute; height: 400px"
+      class="post-image_aiauiaadas"
     />
   </div>
 
-  <div class="profile-info container">
-    <img
-      src="/static/media/{{user.avatar}}"
-      loading="lazy"
-      alt="User Avatar"
-      class="profile-avatar"
-      style="object-fit: cover"
-    />
-    <div class="profile-details">
-      <h2>{{ user.first_name }} {{ user.last_name }}</h2>
-      <p>@{{ user.new_username }}</p>
-      <p class="bio">
-        Bio: <span class="bio-txt">{{ user.bio }}</span>
+  <div class="profile-info container justify-content-between">
+    <div class="profile-info">
+      <img
+        src="/static/media/{{user.avatar}}"
+        loading="lazy"
+        alt="User Avatar"
+        class="profile-avatar post-image_aiauiaadas"
+        style="object-fit: cover"
+      />
+      <div class="profile-details">
+        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+        <p>@{{ user.new_username }}</p>
+        <p class="bio">
+          Bio: <span class="bio-txt">{{ user.bio }}</span>
 
-        {% if user == request.user %}
-        <span
-          class="update_profile_info__bio"
-          style="
-            background-color: rgb(83, 83, 83);
-            cursor: pointer;
-            padding: 3px;
-          "
-          >✏️</span
-        >
-      </p>
-      <div class="input-and-add-button-bio d-none">
-        <input
-          type="text"
-          name="bio"
-          id="bio"
-          class="bio-input"
-          placeholder="Update Bio"
-        />
+          {% if user == request.user %}
+          <span
+            class="update_profile_info__bio"
+            style="
+              background-color: rgb(83, 83, 83);
+              cursor: pointer;
+              padding: 3px;
+            "
+            >✏️</span
+          >
+        </p>
+        <div class="input-and-add-button-bio d-none">
+          <input
+            type="text"
+            name="bio"
+            id="bio"
+            class="bio-input"
+            placeholder="Update Bio"
+          />
 
-        <button
-          class="btn btn-success add-bio-submit"
-          style="font-size: 0.8rem"
-        >
-          Add
-        </button>
-      </div>
-      {% else %}
-      <!--  -->
-      {% endif %} {% if request.user == user %}
-
-      <button
-        class="edit-profile-btn"
-        data-bs-toggle="modal"
-        data-bs-target="#editProfileModal"
-        data-title="Edit Profile"
-      >
-        Edit Profile
-      </button>
-      {% else %}
-
-      <div class="profile-buttons">
-        {% if are_friends %}
-        <button
-          type="button"
-          class="delete_from_friends"
-          data-unfriend_user_id="{{user.id}}"
-        >
-          Unfriend
-        </button>
-        {% elif friend_request_sent %}
-        <p>Friend request already sent.</p>
-        {% elif friend_request_received %}
-        <p>Friend request already received.</p>
+          <button
+            class="btn btn-success add-bio-submit"
+            style="font-size: 0.8rem"
+          >
+            Add
+          </button>
+        </div>
         {% else %}
-        <button class="add_friend_btn_profile" data-receiver_id="{{user.id}}">
-          Add Friend
-        </button>
-        {% endif %}
+        <!--  -->
+        {% endif %} {% if request.user == user %}
 
-        <button class="friend" data-name="Friend 1">Message</button>
+        <button
+          class="edit-profile-btn"
+          data-bs-toggle="modal"
+          data-bs-target="#editProfileModal"
+          data-title="Edit Profile"
+        >
+          Edit Profile
+        </button>
+        {% else %}
+
+        <div class="profile-buttons">
+          {% if are_friends %}
+          <button
+            type="button"
+            class="delete_from_friends"
+            data-unfriend_user_id="{{user.id}}"
+          >
+            Unfriend
+          </button>
+          {% elif friend_request_sent %}
+          <p>Friend request already sent.</p>
+          {% elif friend_request_received %}
+          <p>Friend request already received.</p>
+          {% else %}
+          <button class="add_friend_btn_profile" data-receiver_id="{{user.id}}">
+            Add Friend
+          </button>
+          {% endif %}
+
+          <button class="friend" data-name="Friend 1">Message</button>
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
     </div>
+
+    {% if user == request.user %}
+    <div>
+      <button
+        class="btn"
+        style="font-size: 1.5rem; background-color: tomato; padding: 6px 10px"
+        data-bs-toggle="modal"
+        data-bs-target="#changeTagsModal"
+      >
+        🏷️
+      </button>
+    </div>
+    {% endif %}
   </div>
 </header>
 
@@ -431,483 +453,500 @@
         </aside>
 
         <!-- Right Column: User Posts -->
-        <main id="profile-posts" class="posts-area-mainpage-profilepage">
-          {% for post in all_posts %}
-          <!--  -->
-          {% if post|instanceof:"SharedPost" %}
-          <article class="post shared-post feed-posts">
-            <div class="post-header justify-content-between">
-              <div style="display: flex; align-items: center">
-                <a href="{% url 'profile' post.shared_by.email %}">
-                  <img
-                    src="/static/media/{{user.avatar}}"
-                    loading="lazy"
-                    alt="User Avatar"
-                  />
-                </a>
-                <div class="post-user-info">
-                  <h4>{{user.first_name}} {{user.last_name}}</h4>
-                  <p>Posted {{ post.created_at|timesince }} ago</p>
+        <div style="width: 60%">
+          <main
+            id="profile-posts"
+            class="posts-area-mainpage-profilepage"
+            style="width: 100%"
+          >
+            {% for post in all_posts %}
+            <!--  -->
+            {% if post|instanceof:"SharedPost" %}
+            <article class="post shared-post feed-posts">
+              <div class="post-header justify-content-between">
+                <div style="display: flex; align-items: center">
+                  <a href="{% url 'profile' post.shared_by.email %}">
+                    <img
+                      src="/static/media/{{user.avatar}}"
+                      loading="lazy"
+                      alt="User Avatar"
+                    />
+                  </a>
+                  <div class="post-user-info">
+                    <h4>{{user.first_name}} {{user.last_name}}</h4>
+                    <p>Posted {{ post.created_at|timesince }} ago</p>
+                  </div>
+                </div>
+
+                <div class="three_dot_for_post_edit_delete dropstart">
+                  <button
+                    class="dropdown-toggle"
+                    style="
+                      color: rgb(0, 0, 0);
+                      font-size: 1.4rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="dropdown"
+                  >
+                    ⋮
+                  </button>
+
+                  <ul class="dropdown-menu">
+                    <li
+                      class="dropdown-item delete_sharedpost--btn"
+                      style="cursor: pointer"
+                      data-postId="{{post.id}}"
+                    >
+                      🗑️ Delete
+                    </li>
+                  </ul>
                 </div>
               </div>
+              <div class="post-content">
+                <p>{{post.message}}</p>
+                <!-- Sharer's message -->
+                <!-- Original Post -->
+                <div class="original-post">
+                  <div class="post-header justify-content-between">
+                    <div class="d-flex">
+                      <a
+                        href="{% url 'profile' post.original_post.user.email %}"
+                      >
+                        <img
+                          src="/static/media/{{post.original_post.user.avatar}}"
+                          loading="lazy"
+                          alt="User Avatar"
+                        />
+                      </a>
+                      <div class="post-user-info" style="align-self: flex-end">
+                        <h4>
+                          {{post.original_post.user.first_name}}
+                          {{post.original_post.user.last_name}}
+                        </h4>
+                        <p>
+                          Posted {{ post.original_post.created_at|timesince }}
+                          ago
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-              <div class="three_dot_for_post_edit_delete dropstart">
-                <button
-                  class="dropdown-toggle"
-                  style="
-                    color: rgb(0, 0, 0);
-                    font-size: 1.4rem;
-                    background: none;
-                    border: none;
-                  "
-                  type="button"
-                  data-bs-toggle="dropdown"
-                >
-                  ⋮
-                </button>
+                  <div class="post-content">
+                    <p class="post_text_edit_for">
+                      {{post.original_post.text}}
+                    </p>
 
-                <ul class="dropdown-menu">
-                  <li
-                    class="dropdown-item delete_sharedpost--btn"
-                    style="cursor: pointer"
-                    data-postId="{{post.id}}"
-                  >
-                    🗑️ Delete
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="post-content">
-              <p>{{post.message}}</p>
-              <!-- Sharer's message -->
-              <!-- Original Post -->
-              <div class="original-post">
-                <div class="post-header justify-content-between">
-                  <div class="d-flex">
-                    <a href="{% url 'profile' post.original_post.user.email %}">
-                      <img
-                        src="/static/media/{{post.original_post.user.avatar}}"
+                    {% if post.original_post.video %}
+                    <video controls>
+                      <source
+                        src="/static/media/{{post.original_post.video}}"
                         loading="lazy"
-                        alt="User Avatar"
+                        type="video/mp4"
+                        class="video_post_source"
                       />
-                    </a>
-                    <div class="post-user-info" style="align-self: flex-end">
-                      <h4>
-                        {{post.original_post.user.first_name}}
-                        {{post.original_post.user.last_name}}
-                      </h4>
-                      <p>
-                        Posted {{ post.original_post.created_at|timesince }} ago
-                      </p>
+                      Your browser does not support the video tag.
+                    </video>
+                    {% elif post.original_post.image %}
+
+                    <div class="media">
+                      <img
+                        src="/static/media/{{post.original_post.image}}"
+                        alt="Post Image"
+                        class="post_media_file post-image_aiauiaadas"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    {% endif %}
+
+                    <div class="tags mt-2">
+                      {% for tag in post.original_post.tags.all %}
+                      <span class="tag">#{{tag.name}}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  <div class="post-actions">
+                    <div class="like-section">
+                      {% if request.user == post.shared_by %}
+                      <button class="btn" disabled>👍 Like</button>
+                      {% else %}
+                      <button
+                        class="addLikeOnPost"
+                        data-shared_post="true"
+                        data-post_id="{{post.pk}}"
+                      >
+                        {% if post.user_liked %}
+                        <!--  -->
+                        👎 Unlike {% else %}
+                        <!--  -->
+                        👍 Like {% endif %}
+                      </button>
+                      {% endif %}
+
+                      <span class="like-count"
+                        ><span class="like_countNumber"
+                          >{{ post.like_count }}</span
+                        >
+                        Likes</span
+                      >
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div class="post-content">
-                  <p class="post_text_edit_for">{{post.original_post.text}}</p>
+              <details>
+                <summary>View Comments</summary>
 
-                  {% if post.original_post.video %}
-                  <video controls>
-                    <source
-                      src="/static/media/{{post.original_post.video}}"
-                      loading="lazy"
-                      type="video/mp4"
-                      class="video_post_source"
+                <div>
+                  <div class="add-comment">
+                    <input
+                      type="text"
+                      class="comment_input"
+                      placeholder="Write a comment..."
                     />
-                    Your browser does not support the video tag.
-                  </video>
-                  {% elif post.original_post.image %}
-
-                  <div class="media">
-                    <img
-                      src="/static/media/{{post.original_post.image}}"
-                      alt="Post Image"
-                      class="post_media_file"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  {% endif %}
-
-                  <div class="tags mt-2">
-                    {% for tag in post.original_post.tags.all %}
-                    <span class="tag">#{{tag.name}}</span>
-                    {% endfor %}
-                  </div>
-                </div>
-
-                <div class="post-actions">
-                  <div class="like-section">
-                    {% if request.user == post.shared_by %}
-                    <button class="btn" disabled>👍 Like</button>
-                    {% else %}
                     <button
-                      class="addLikeOnPost"
+                      class="addCommentOnPost"
                       data-shared_post="true"
                       data-post_id="{{post.pk}}"
                     >
-                      {% if post.user_liked %}
-                      <!--  -->
-                      👎 Unlike {% else %}
-                      <!--  -->
-                      👍 Like {% endif %}
+                      Post
                     </button>
-                    {% endif %}
 
-                    <span class="like-count"
-                      ><span class="like_countNumber"
-                        >{{ post.like_count }}</span
+                    <div class="comments">
+                      {% for comment in post.comments.all %}
+
+                      <!--  -->
+
+                      {% if comment.text %}
+
+                      <div
+                        class="comment"
+                        style="
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                        "
                       >
-                      Likes</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <details>
-              <summary>View Comments</summary>
-
-              <div>
-                <div class="add-comment">
-                  <input
-                    type="text"
-                    class="comment_input"
-                    placeholder="Write a comment..."
-                  />
-                  <button
-                    class="addCommentOnPost"
-                    data-shared_post="true"
-                    data-post_id="{{post.pk}}"
-                  >
-                    Post
-                  </button>
-
-                  <div class="comments">
-                    {% for comment in post.comments.all %}
-
-                    <!--  -->
-
-                    {% if comment.text %}
-
-                    <div
-                      class="comment"
-                      style="
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                      "
-                    >
-                      <div style="margin: 0">
-                        <strong
-                          >{{comment.user.first_name}}
-                          {{comment.user.last_name}}:</strong
-                        >
-                        <span class="comment_text">{{comment.text}}</span>
-
-                        <div
-                          class="align-items-center div-for-update-btn gap-2"
-                          style="display: none"
-                        >
-                          <input
-                            type="text"
-                            class="form-control edit-comment-input"
-                            value="{{comment.text}}"
-                            style="margin-top: 5px"
-                          />
-
-                          <button
-                            class="btn save-comment-edit-btn"
-                            style="background-color: #f9f9f900"
-                            data-commentId="{{comment.id}}"
+                        <div style="margin: 0">
+                          <strong
+                            >{{comment.user.first_name}}
+                            {{comment.user.last_name}}:</strong
                           >
-                            ✔️
-                          </button>
+                          <span class="comment_text">{{comment.text}}</span>
 
-                          <button
-                            class="btn save-comment-edit-btn-cancel"
-                            style="background-color: #f9f9f900"
+                          <div
+                            class="align-items-center div-for-update-btn gap-2"
+                            style="display: none"
                           >
-                            ❌
-                          </button>
+                            <input
+                              type="text"
+                              class="form-control edit-comment-input"
+                              value="{{comment.text}}"
+                              style="margin-top: 5px"
+                            />
+
+                            <button
+                              class="btn save-comment-edit-btn"
+                              style="background-color: #f9f9f900"
+                              data-commentId="{{comment.id}}"
+                            >
+                              ✔️
+                            </button>
+
+                            <button
+                              class="btn save-comment-edit-btn-cancel"
+                              style="background-color: #f9f9f900"
+                            >
+                              ❌
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      {% if request.user == comment.user %}
-                      <div class="three_dot_for_comment_edit_delete dropstart">
-                        <button
-                          class="dropdown-toggle"
-                          style="
-                            color: rgb(0, 0, 0);
-                            font-size: 1.4rem;
-                            background: none;
-                            border: none;
-                            padding: 0 0.5rem 0 0;
-                            margin: 0;
-                          "
-                          type="button"
-                          data-bs-toggle="dropdown"
+                        {% if request.user == comment.user %}
+                        <div
+                          class="three_dot_for_comment_edit_delete dropstart"
                         >
-                          ⋮
-                        </button>
+                          <button
+                            class="dropdown-toggle"
+                            style="
+                              color: rgb(0, 0, 0);
+                              font-size: 1.4rem;
+                              background: none;
+                              border: none;
+                              padding: 0 0.5rem 0 0;
+                              margin: 0;
+                            "
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
+                            ⋮
+                          </button>
 
-                        <ul class="dropdown-menu">
-                          <li
-                            class="dropdown-item delete_comment--btn"
-                            data-commentId="{{comment.id}}"
-                            style="cursor: pointer"
-                          >
-                            🗑️ Delete
-                          </li>
-                          <li
-                            class="dropdown-item edit_comment--btn"
-                            data-commentId="{{comment.id}}"
-                            style="cursor: pointer"
-                          >
-                            ✏️ Edit
-                          </li>
-                        </ul>
+                          <ul class="dropdown-menu">
+                            <li
+                              class="dropdown-item delete_comment--btn"
+                              data-commentId="{{comment.id}}"
+                              style="cursor: pointer"
+                            >
+                              🗑️ Delete
+                            </li>
+                            <li
+                              class="dropdown-item edit_comment--btn"
+                              data-commentId="{{comment.id}}"
+                              style="cursor: pointer"
+                            >
+                              ✏️ Edit
+                            </li>
+                          </ul>
+                        </div>
+                        {% else %}
+                        <!--  -->
+                        {% endif %}
                       </div>
                       {% else %}
-                      <!--  -->
-                      {% endif %}
+                      <p class="noCommentPWashaleMere">No Comments For Now.</p>
+                      {% endif %} {% endfor %}
                     </div>
-                    {% else %}
-                    <p class="noCommentPWashaleMere">No Comments For Now.</p>
-                    {% endif %} {% endfor %}
                   </div>
                 </div>
-              </div>
-            </details>
-          </article>
-          {% else %}
-          <article class="post feed-posts">
-            <div class="post-header justify-content-between">
-              <div class="d-flex">
-                <a href="{% url 'profile' post.user.email %}">
-                  <img
-                    src="/static/media/{{user.avatar}}"
-                    loading="lazy"
-                    alt="User Avatar"
-                  />
-                </a>
-                <div class="post-user-info" style="align-self: flex-end">
-                  <h4>{{user.first_name}} {{user.last_name}}</h4>
-                  <p>Posted {{ post.created_at|timesince }} ago</p>
+              </details>
+            </article>
+            {% else %}
+            <article class="post feed-posts">
+              <div class="post-header justify-content-between">
+                <div class="d-flex">
+                  <a href="{% url 'profile' post.user.email %}">
+                    <img
+                      src="/static/media/{{user.avatar}}"
+                      loading="lazy"
+                      alt="User Avatar"
+                    />
+                  </a>
+                  <div class="post-user-info" style="align-self: flex-end">
+                    <h4>{{user.first_name}} {{user.last_name}}</h4>
+                    <p>Posted {{ post.created_at|timesince }} ago</p>
+                  </div>
                 </div>
-              </div>
 
-              {% if post.user == request.user %}
-              <div class="three_dot_for_post_edit_delete dropstart">
-                <button
-                  class="dropdown-toggle"
-                  style="
-                    color: rgb(0, 0, 0);
-                    font-size: 1.4rem;
-                    background: none;
-                    border: none;
-                  "
-                  type="button"
-                  data-bs-toggle="dropdown"
-                >
-                  ⋮
-                </button>
-
-                <ul class="dropdown-menu">
-                  <li
-                    class="dropdown-item delete_post--btn"
-                    data-postId="{{post.id}}"
+                {% if post.user == request.user %}
+                <div class="three_dot_for_post_edit_delete dropstart">
+                  <button
+                    class="dropdown-toggle"
+                    style="
+                      color: rgb(0, 0, 0);
+                      font-size: 1.4rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="dropdown"
                   >
-                    🗑️ Delete
-                  </li>
-                  <li
-                    class="dropdown-item edit_post--btn"
-                    data-postId="{{post.id}}"
-                  >
-                    ✏️ Edit
-                  </li>
-                </ul>
+                    ⋮
+                  </button>
+
+                  <ul class="dropdown-menu">
+                    <li
+                      class="dropdown-item delete_post--btn"
+                      data-postId="{{post.id}}"
+                    >
+                      🗑️ Delete
+                    </li>
+                    <li
+                      class="dropdown-item edit_post--btn"
+                      data-postId="{{post.id}}"
+                    >
+                      ✏️ Edit
+                    </li>
+                  </ul>
+                </div>
+                {% endif %}
               </div>
-              {% endif %}
-            </div>
-            <div class="post-content">
-              <p class="post_text_edit_for">{{post.text}}</p>
+              <div class="post-content">
+                <p class="post_text_edit_for">{{post.text}}</p>
 
-              {% if post.video %}
-              <video controls>
-                <source
-                  src="/static/media/{{post.video}}"
-                  loading="lazy"
-                  type="video/mp4"
-                  class="video_post_source"
-                />
-                Your browser does not support the video tag.
-              </video>
-              {% elif post.image %}
+                {% if post.video %}
+                <video controls>
+                  <source
+                    src="/static/media/{{post.video}}"
+                    loading="lazy"
+                    type="video/mp4"
+                    class="video_post_source"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+                {% elif post.image %}
 
-              <div class="media">
-                <img
-                  src="/static/media/{{post.image}}"
-                  alt="Post Image"
-                  class="post_media_file"
-                  loading="lazy"
-                />
-              </div>
+                <div class="media">
+                  <img
+                    src="/static/media/{{post.image}}"
+                    alt="Post Image"
+                    class="post_media_file post-image_aiauiaadas"
+                    loading="lazy"
+                  />
+                </div>
 
-              {% endif %}
-
-              <div class="tags mt-2">
-                {% for tag in post.tags.all %}
-                <span class="tag">#{{tag.name}}</span>
-                {% endfor %}
-              </div>
-            </div>
-            <div class="post-actions">
-              <div class="like-section">
-                {% if request.user == post.user %}
-                <button class="btn" disabled>👍 Like</button>
-                {% else %}
-                <button class="addLikeOnPost" data-post_id="{{post.pk}}">
-                  {% if post.user_liked %}
-                  <!--  -->
-                  👎 Unlike {% else %}
-                  <!--  -->
-                  👍 Like {% endif %}
-                </button>
                 {% endif %}
 
-                <span class="like-count"
-                  ><span class="like_countNumber">{{ post.like_count }}</span>
-                  Likes</span
-                >
-              </div>
-
-              {% if request.user != post.user %}
-              <button
-                class="share-btn"
-                data-bs-toggle="modal"
-                data-bs-target="#shareModal"
-                data-title="Share"
-                data-post_id="{{post.pk}}"
-              >
-                ↪️ Share
-              </button>
-              {% endif %}
-            </div>
-            <!-- Hidden Comment Section -->
-            <details>
-              <summary>View Comments</summary>
-
-              <div>
-                <div class="add-comment">
-                  <input
-                    type="text"
-                    class="comment_input"
-                    placeholder="Write a comment..."
-                  />
-                  <button class="addCommentOnPost" data-post_id="{{post.pk}}">
-                    Post
-                  </button>
-
-                  <div class="comments">
-                    {% for comment in post.comments.all %}
-
-                    <!--  -->
-
-                    {% if comment.text %}
-
-                    <div
-                      class="comment"
-                      style="
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                      "
-                    >
-                      <div style="margin: 0">
-                        <strong
-                          >{{comment.user.first_name}}
-                          {{comment.user.last_name}}:</strong
-                        >
-                        <span class="comment_text">{{comment.text}}</span>
-
-                        <div
-                          class="align-items-center div-for-update-btn gap-2"
-                          style="display: none"
-                        >
-                          <input
-                            type="text"
-                            class="form-control edit-comment-input"
-                            value="{{comment.text}}"
-                            style="margin-top: 5px"
-                          />
-
-                          <button
-                            class="btn save-comment-edit-btn"
-                            style="background-color: #f9f9f900"
-                            data-commentId="{{comment.id}}"
-                          >
-                            ✔️
-                          </button>
-
-                          <button
-                            class="btn save-comment-edit-btn-cancel"
-                            style="background-color: #f9f9f900"
-                          >
-                            ❌
-                          </button>
-                        </div>
-                      </div>
-                      {% if request.user == comment.user %}
-                      <div class="three_dot_for_comment_edit_delete dropstart">
-                        <button
-                          class="dropdown-toggle"
-                          style="
-                            color: rgb(0, 0, 0);
-                            font-size: 1.4rem;
-                            background: none;
-                            border: none;
-                            padding: 0 0.5rem 0 0;
-                            margin: 0;
-                          "
-                          type="button"
-                          data-bs-toggle="dropdown"
-                        >
-                          ⋮
-                        </button>
-
-                        <ul class="dropdown-menu">
-                          <li
-                            class="dropdown-item delete_comment--btn"
-                            data-commentId="{{comment.id}}"
-                            style="cursor: pointer"
-                          >
-                            🗑️ Delete
-                          </li>
-                          <li
-                            class="dropdown-item edit_comment--btn"
-                            data-commentId="{{comment.id}}"
-                            style="cursor: pointer"
-                          >
-                            ✏️ Edit
-                          </li>
-                        </ul>
-                      </div>
-                      {% else %}
-                      <!--  -->
-                      {% endif %}
-                    </div>
-                    {% else %}
-                    <p class="noCommentPWashaleMere">No Comments For Now.</p>
-                    {% endif %} {% endfor %}
-                  </div>
+                <div class="tags mt-2">
+                  {% for tag in post.tags.all %}
+                  <span class="tag">#{{tag.name}}</span>
+                  {% endfor %}
                 </div>
               </div>
-            </details>
-          </article>
-          {% endif %}
-          <!--  -->
-          {% endfor %}
-        </main>
+              <div class="post-actions">
+                <div class="like-section">
+                  {% if request.user == post.user %}
+                  <button class="btn" disabled>👍 Like</button>
+                  {% else %}
+                  <button class="addLikeOnPost" data-post_id="{{post.pk}}">
+                    {% if post.user_liked %}
+                    <!--  -->
+                    👎 Unlike {% else %}
+                    <!--  -->
+                    👍 Like {% endif %}
+                  </button>
+                  {% endif %}
+
+                  <span class="like-count"
+                    ><span class="like_countNumber">{{ post.like_count }}</span>
+                    Likes</span
+                  >
+                </div>
+
+                {% if request.user != post.user %}
+                <button
+                  class="share-btn"
+                  data-bs-toggle="modal"
+                  data-bs-target="#shareModal"
+                  data-title="Share"
+                  data-post_id="{{post.pk}}"
+                >
+                  ↪️ Share
+                </button>
+                {% endif %}
+              </div>
+              <!-- Hidden Comment Section -->
+              <details>
+                <summary>View Comments</summary>
+
+                <div>
+                  <div class="add-comment">
+                    <input
+                      type="text"
+                      class="comment_input"
+                      placeholder="Write a comment..."
+                    />
+                    <button class="addCommentOnPost" data-post_id="{{post.pk}}">
+                      Post
+                    </button>
+
+                    <div class="comments">
+                      {% for comment in post.comments.all %}
+
+                      <!--  -->
+
+                      {% if comment.text %}
+
+                      <div
+                        class="comment"
+                        style="
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                        "
+                      >
+                        <div style="margin: 0">
+                          <strong
+                            >{{comment.user.first_name}}
+                            {{comment.user.last_name}}:</strong
+                          >
+                          <span class="comment_text">{{comment.text}}</span>
+
+                          <div
+                            class="align-items-center div-for-update-btn gap-2"
+                            style="display: none"
+                          >
+                            <input
+                              type="text"
+                              class="form-control edit-comment-input"
+                              value="{{comment.text}}"
+                              style="margin-top: 5px"
+                            />
+
+                            <button
+                              class="btn save-comment-edit-btn"
+                              style="background-color: #f9f9f900"
+                              data-commentId="{{comment.id}}"
+                            >
+                              ✔️
+                            </button>
+
+                            <button
+                              class="btn save-comment-edit-btn-cancel"
+                              style="background-color: #f9f9f900"
+                            >
+                              ❌
+                            </button>
+                          </div>
+                        </div>
+                        {% if request.user == comment.user %}
+                        <div
+                          class="three_dot_for_comment_edit_delete dropstart"
+                        >
+                          <button
+                            class="dropdown-toggle"
+                            style="
+                              color: rgb(0, 0, 0);
+                              font-size: 1.4rem;
+                              background: none;
+                              border: none;
+                              padding: 0 0.5rem 0 0;
+                              margin: 0;
+                            "
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
+                            ⋮
+                          </button>
+
+                          <ul class="dropdown-menu">
+                            <li
+                              class="dropdown-item delete_comment--btn"
+                              data-commentId="{{comment.id}}"
+                              style="cursor: pointer"
+                            >
+                              🗑️ Delete
+                            </li>
+                            <li
+                              class="dropdown-item edit_comment--btn"
+                              data-commentId="{{comment.id}}"
+                              style="cursor: pointer"
+                            >
+                              ✏️ Edit
+                            </li>
+                          </ul>
+                        </div>
+                        {% else %}
+                        <!--  -->
+                        {% endif %}
+                      </div>
+                      {% else %}
+                      <p class="noCommentPWashaleMere">No Comments For Now.</p>
+                      {% endif %} {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </article>
+            {% endif %}
+            <!--  -->
+            {% endfor %}
+          </main>
+
+          <div id="loading" style="display: none">Loading more posts...</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1266,6 +1305,70 @@
   </div>
 </div>
 
+<!-- change tags modal -->
+
+<div
+  class="modal fade"
+  id="changeTagsModal"
+  tabindex="-1"
+  aria-labelledby="changeTagsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="changeTagsModalLabel">Change Tags</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="tags-section mb-3">
+          <div id="tags-wrapper2">
+            {% for tag in tags %}
+            <!--  -->
+            {% if tag.name in user_tag_names %}
+            <input
+              type="checkbox"
+              name="tags"
+              value="{{ tag.name }}"
+              id="tag2-{{ tag.id }}"
+              data-name_tag="{{ tag.name }}"
+              class="tag-checkbox2"
+              checked
+            />
+            <label for="tag2-{{ tag.id }}">{{ tag.name }}</label>
+            {% else %}
+            <input
+              type="checkbox"
+              name="tags"
+              value="{{ tag.name }}"
+              id="tag2-{{ tag.id }}"
+              data-name_tag="{{ tag.name }}"
+              class="tag-checkbox2"
+            />
+            <label for="tag2-{{ tag.id }}">{{ tag.name }}</label>
+            {% endif %}
+            <!--  -->
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary change_tags_save" disabled>
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div
   class="alert alert-warning alert-dismissible fade hide magariAlteri"
   role="alert"
@@ -1287,11 +1390,14 @@
   <button
     type="button"
     class="btn-close"
-    data-bs-dismiss="alert"
     aria-label="Close"
+    onclick="hideAlert()"
   ></button>
 </div>
 
+<input type="hidden" value="{{all_posts_length}}" id="all_postLen" />
+{{serialized_tags|json_script:'tags_names'}}
+<!--  -->
 {% include 'mainApp/components/share_modal.html' %}
 
 <!--  -->
@@ -1299,11 +1405,27 @@
 
 <!--  -->
 {% block scripts %}
-<script type="module" src="{% static 'js/edit_profile.js' %}"></script>
-<script src="{% static 'js/profile.js' %}"></script>
+
+<script>
+  function hideAlert() {
+    // Just hide the alert instead of removing it from the DOM
+    const alertDiv = document.querySelector(".magariAlteri2");
+    console.log(alertDiv);
+    alertDiv.classList.remove("show"); // Remove the 'show' class to hide the alert
+    alertDiv.classList.add("hide"); // Optionally, you can add 'hide' to keep it hidden
+  }
+</script>
+
+<script type="module" src="{% static 'js/edit_profile1.js' %}"></script>
+<script src="{% static 'js/profile23.js' %}"></script>
 <script type="module" src="{% static 'js/friends1.js' %}"></script>
 
 <script type="module" src="{% static 'js/crud_post.js' %}"></script>
 
-<script type="module" src="{% static 'js/postActions.js' %}"></script>
+<script type="module" src="{% static 'js/postActions1.js' %}"></script>
+
+<script
+  type="module"
+  src="{% static 'js/fetch_posts_forProfiles.js' %}"
+></script>
 {% endblock scripts %}

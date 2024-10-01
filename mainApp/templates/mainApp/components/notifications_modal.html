@@ -71,22 +71,22 @@
             <!--  -->
             {% if i.notification_type == "friend_request" %}
             <div class="d-flex align-items-center gap-2 my-3">
-              <a href="{% url 'profile' i.sender__email %}">
+              <a href="{% url 'profile' i.sender.email %}">
                 <img
-                  src="/static/media/{{i.sender__avatar}}"
+                  src="/static/media/{{i.sender.avatar}}"
                   loading="lazy"
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
               <div style="display: flex; flex-direction: column">
                 <span style="color: black"
-                  >{{i.sender__first_name}} {{i.sender__last_name}}
+                  >{{i.sender.first_name}} {{i.sender.last_name}}
                   <span style="font-size: 0.9rem">Sent You Friend Request</span>
                 </span>
                 <div class="d-flex gap-2">
                   <button
                     class="btn btn-success add_friend_appr"
-                    data-id="{{i.sender__id}}"
+                    data-id="{{i.sender.id}}"
                     data-notificationId="{{i.id}}"
                     style="padding: 2px 0; width: 100px"
                   >
@@ -94,7 +94,7 @@
                   </button>
                   <button
                     class="btn btn-danger decline_friend_request"
-                    data-id="{{i.sender__id}}"
+                    data-id="{{i.sender.id}}"
                     data-notificationId="{{i.id}}"
                     style="padding: 2px 0; width: 100px"
                   >
@@ -142,7 +142,7 @@
                 margin-block: 0.5rem;
               "
             >
-              {{i.sender__first_name}} {{i.sender__last_name}} has rejected your
+              {{i.sender.first_name}} {{i.sender.last_name}} has rejected your
               friend request
               <button
                 class="delete_message_dec"
@@ -167,16 +167,16 @@
             <div
               class="d-flex align-items-center gap-2 my-3 container_for_unfriend_notification"
             >
-              <a href="{% url 'profile' i.sender__email %}">
+              <a href="{% url 'profile' i.sender.email %}">
                 <img
-                  src="/static/media/{{i.sender__avatar}}"
+                  src="/static/media/{{i.sender.avatar}}"
                   loading="lazy"
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
               <div style="display: flex; flex-direction: column; width: 80%">
                 <span style="color: black"
-                  >{{i.sender__first_name}} {{i.sender__last_name}}</span
+                  >{{i.sender.first_name}} {{i.sender.last_name}}</span
                 >
 
                 <div>
@@ -211,16 +211,16 @@
             <div
               class="d-flex align-items-center gap-2 my-3 container_for_like_notification container_for_unfriend_notification"
             >
-              <a href="{% url 'profile' i.sender__email %}">
+              <a href="{% url 'profile' i.sender.email %}">
                 <img
-                  src="/static/media/{{i.sender__avatar}}"
+                  src="/static/media/{{i.sender.avatar}}"
                   loading="lazy"
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
               <div style="display: flex; flex-direction: column; width: 80%">
                 <span style="color: black"
-                  >{{i.sender__first_name}} {{i.sender__last_name}}</span
+                  >{{i.sender.first_name}} {{i.sender.last_name}}</span
                 >
                 <div>
                   <span style="font-size: 0.9rem"> Liked your post </span>
@@ -262,16 +262,16 @@
             <div
               class="d-flex align-items-center gap-2 my-3 container_for_unlike_notification container_for_unfriend_notification"
             >
-              <a href="{% url 'profile' i.sender__email %}">
+              <a href="{% url 'profile' i.sender.email %}">
                 <img
-                  src="/static/media/{{i.sender__avatar}}"
+                  src="/static/media/{{i.sender.avatar}}"
                   loading="lazy"
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
               <div style="display: flex; flex-direction: column; width: 80%">
                 <span style="color: black"
-                  >{{i.sender__first_name}} {{i.sender__last_name}}</span
+                  >{{i.sender.first_name}} {{i.sender.last_name}}</span
                 >
                 <div>
                   <span style="font-size: 0.9rem"> Unliked your post </span>
@@ -313,16 +313,16 @@
               class="d-flex align-items-center gap-2 my-3 container_for_like_notification container_For_comments"
               style="background-color: #fff4e6; border-color: #fd7e14"
             >
-              <a href="{% url 'profile' i.sender__email %}">
+              <a href="{% url 'profile' i.sender.email %}">
                 <img
-                  src="/static/media/{{i.sender__avatar}}"
+                  src="/static/media/{{i.sender.avatar}}"
                   loading="lazy"
                   style="border-radius: 50%; width: 50px; height: 50px"
                 />
               </a>
               <div style="display: flex; flex-direction: column; width: 80%">
                 <span style="color: black; font-size: 0.9rem"
-                  >{{i.sender__first_name}} {{i.sender__last_name}}</span
+                  >{{i.sender.first_name}} {{i.sender.last_name}}</span
                 >
                 <div>
                   <span style="font-size: 0.9rem">
@@ -334,7 +334,7 @@
                     type="button"
                     data-post_id="{{i.post_Id}}"
                     data-comment_btn="yes"
-                    data-sender_id="{{i.sender__id}}"
+                    data-sender_id="{{i.sender.id}}"
                     data-bs-toggle="modal"
                     data-bs-target="#staticBackdrop"
                     class="view_post_notifications"
@@ -464,4 +464,4 @@
   </div>
 </div>
 
-<script type="module" src="{% static 'js/notification.js' %}"></script>
+<script type="module" src="{% static 'js/notification1.js' %}"></script>

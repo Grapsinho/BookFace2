@@ -132,6 +132,14 @@ document
     this.style.display = "none"; // Hide the remove button
   });
 
+const create_post_btn = document.getElementById("create_post--btn");
+
+if (create_post_btn) {
+  create_post_btn.addEventListener("click", function () {
+    selectedTags = 0;
+  });
+}
+
 function isMobileDevice() {
   return window.innerWidth <= 768; // Mobile is typically considered to be 768px or less
 }

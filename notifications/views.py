@@ -4,16 +4,18 @@ from rest_framework.generics import ListAPIView
 from .models import Notification
 from .serializers import NotificationSerializer
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 class UserNotificationsView(ListAPIView):
     serializer_class = NotificationSerializer
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
         Return notifications for the authenticated user, applying limit and offset for loading more.
         """
-        limit = int(self.request.query_params.get('limit', 7))  # Default limit is 10
+        limit = int(self.request.query_params.get('limit', 7))  # Default limit is 7
         offset = int(self.request.query_params.get('offset', 0))  # Default offset is 0
 
         return Notification.objects.filter(
