@@ -1,0 +1,132 @@
+[
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 71,
+      "user": 2,
+      "text": "Hiking through the mountains, feeling the connection with nature and staying fit.",
+      "image": "posts/images/hiking_trip.jpg",
+      "video": null,
+      "created_at": "2024-10-02T09:00:00Z",
+      "updated_at": "2024-10-02T09:00:00Z",
+      "tags": [12, 14, 3]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 72,
+      "user": 3,
+      "text": "Healthy eating tips and sharing recipes with friends.",
+      "image": "posts/images/healthy_food.jpg",
+      "video": null,
+      "created_at": "2024-10-02T10:00:00Z",
+      "updated_at": "2024-10-02T10:00:00Z",
+      "tags": [2, 10, 5]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 73,
+      "user": 1,
+      "text": "Fashion trends meet technology at the latest runway show.",
+      "image": "posts/images/fashion_show.jpg",
+      "video": null,
+      "created_at": "2024-10-02T11:00:00Z",
+      "updated_at": "2024-10-02T11:00:00Z",
+      "tags": [11, 8, 6, 15]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 74,
+      "user": 4,
+      "text": "Taking time for self-care and enjoying the beauty of nature.",
+      "image": "posts/images/self_care.jpg",
+      "video": null,
+      "created_at": "2024-10-02T12:00:00Z",
+      "updated_at": "2024-10-02T12:00:00Z",
+      "tags": [12, 10, 3, 14]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 75,
+      "user": 5,
+      "text": "Balancing work and play—it's all about finding that perfect harmony.",
+      "image": "posts/images/work_life_balance.jpg",
+      "video": null,
+      "created_at": "2024-10-02T13:00:00Z",
+      "updated_at": "2024-10-02T13:00:00Z",
+      "tags": [9, 10, 6]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 76,
+      "user": 1,
+      "text": "Diving into technology and education to learn something new every day.",
+      "image": null,
+      "video": "posts/videos/tech_education.mp4",
+      "created_at": "2024-10-02T14:00:00Z",
+      "updated_at": "2024-10-02T14:00:00Z",
+      "tags": [8, 13, 7]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 77,
+      "user": 2,
+      "text": "A picnic with friends, good food, and plenty of fun!",
+      "image": "posts/images/picnic_with_friends.jpg",
+      "video": null,
+      "created_at": "2024-10-02T15:00:00Z",
+      "updated_at": "2024-10-02T15:00:00Z",
+      "tags": [5, 2, 6, 4]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 78,
+      "user": 5,
+      "text": "Sharing insights on how to stay fit and healthy with a balanced lifestyle.",
+      "image": "posts/images/fit_and_healthy.jpg",
+      "video": null,
+      "created_at": "2024-10-02T16:00:00Z",
+      "updated_at": "2024-10-02T16:00:00Z",
+      "tags": [3, 10, 14]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 79,
+      "user": 4,
+      "text": "Stunning art pieces that reflect the beauty of nature.",
+      "image": "posts/images/nature_art.jpg",
+      "video": null,
+      "created_at": "2024-10-02T17:00:00Z",
+      "updated_at": "2024-10-02T17:00:00Z",
+      "tags": [15, 12, 14]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 80,
+      "user": 1,
+      "text": "Animals are such amazing companions—time to spread awareness about wildlife.",
+      "image": "posts/images/wildlife_awareness.jpg",
+      "video": null,
+      "created_at": "2024-10-02T18:00:00Z",
+      "updated_at": "2024-10-02T18:00:00Z",
+      "tags": [16, 12, 10]
+    }
+  }
+]

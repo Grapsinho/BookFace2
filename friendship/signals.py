@@ -123,8 +123,20 @@ def invalidate_user_friends_cache(sender, instance, **kwargs):
     cache.delete(f'user_friends_{instance.user.pk}')
     cache.delete(f'user_friends_{instance.friend.pk}')
 
+    cache.delete(f'user_tags_{instance.user.pk}')
+    cache.delete(f'user_tags_{instance.friend.pk}')
+
+    cache.delete(f'friends_ids_{instance.user.pk}')
+    cache.delete(f'friends_ids_{instance.friend.pk}')
+
 @receiver(post_delete, sender=Friendship)
 def invalidate_user_friends_cache(sender, instance, **kwargs):
     # Invalidate the cache for both users in the friendship
     cache.delete(f'user_friends_{instance.user.pk}')
     cache.delete(f'user_friends_{instance.friend.pk}')
+
+    cache.delete(f'user_tags_{instance.user.pk}')
+    cache.delete(f'user_tags_{instance.friend.pk}')
+
+    cache.delete(f'friends_ids_{instance.user.pk}')
+    cache.delete(f'friends_ids_{instance.friend.pk}')

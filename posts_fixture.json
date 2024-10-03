@@ -1,0 +1,132 @@
+[
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 61,
+      "user": 1,
+      "text": "Exploring the beautiful landscapes of nature!",
+      "image": "posts/images/nature_trip.jpg",
+      "video": null,
+      "created_at": "2024-10-01T09:00:00Z",
+      "updated_at": "2024-10-01T09:00:00Z",
+      "tags": [12, 14]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 62,
+      "user": 3,
+      "text": "Trying out a new workout routine, fitness is key!",
+      "image": "posts/images/fitness_session.jpg",
+      "video": null,
+      "created_at": "2024-10-01T10:00:00Z",
+      "updated_at": "2024-10-01T10:00:00Z",
+      "tags": [3, 10]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 63,
+      "user": 2,
+      "text": "A great day spent with family and friends.",
+      "image": "posts/images/family_friends.jpg",
+      "video": null,
+      "created_at": "2024-10-01T11:00:00Z",
+      "updated_at": "2024-10-01T11:00:00Z",
+      "tags": [4, 5]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 64,
+      "user": 4,
+      "text": "Capturing the beauty of modern art installations.",
+      "image": "posts/images/art_gallery.jpg",
+      "video": null,
+      "created_at": "2024-10-01T12:00:00Z",
+      "updated_at": "2024-10-01T12:00:00Z",
+      "tags": [15, 8]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 65,
+      "user": 2,
+      "text": "A fun day with the dogs in the park!",
+      "image": "posts/images/fun_with_dogs.jpg",
+      "video": null,
+      "created_at": "2024-10-01T13:00:00Z",
+      "updated_at": "2024-10-01T13:00:00Z",
+      "tags": [6, 16]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 66,
+      "user": 1,
+      "text": "Delicious food from last night's party.",
+      "image": "posts/images/party_food.jpg",
+      "video": null,
+      "created_at": "2024-10-01T14:00:00Z",
+      "updated_at": "2024-10-01T14:00:00Z",
+      "tags": [2, 5]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 67,
+      "user": 5,
+      "text": "Innovative music tech showcased at the festival.",
+      "image": null,
+      "video": "posts/videos/music_festival.mp4",
+      "created_at": "2024-10-01T15:00:00Z",
+      "updated_at": "2024-10-01T15:00:00Z",
+      "tags": [7, 8]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 68,
+      "user": 4,
+      "text": "Amazing animals at the local wildlife sanctuary.",
+      "image": "posts/images/wildlife_sanctuary.jpg",
+      "video": null,
+      "created_at": "2024-10-01T16:00:00Z",
+      "updated_at": "2024-10-01T16:00:00Z",
+      "tags": [16, 12]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 69,
+      "user": 3,
+      "text": "Trying out new fashion trends for the season.",
+      "image": "posts/images/fashion_trends.jpg",
+      "video": null,
+      "created_at": "2024-10-01T17:00:00Z",
+      "updated_at": "2024-10-01T17:00:00Z",
+      "tags": [11, 6]
+    }
+  },
+  {
+    "model": "posts.post",
+    "fields": {
+      "id": 70,
+      "user": 2,
+      "text": "Work-life balance is everything. Stay productive!",
+      "image": "posts/images/work_life.jpg",
+      "video": null,
+      "created_at": "2024-10-01T18:00:00Z",
+      "updated_at": "2024-10-01T18:00:00Z",
+      "tags": [9, 10]
+    }
+  }
+]

@@ -52,7 +52,18 @@ DONE eseigi main apshi unda gavaketo profileshi scroll based pagination postebis
 DONE eseigi xvalistvis aris ro anu pirvel rigshi roca vsqrolavt profileze postze unda davamatot share da like unda gavasworot!!!!!!!
 
 
-gavakete tegebi mere movifiqreb ra damrcha
+NEXT gavaketo for you.
+
+DONE eseigi profilze shevcvale is ro userma posti washalos da edit anu roca axlebi emateba mashin!!!!
+
+DONE da for you dawyebulia, dasamatebelia is comment da like, mere davamatot gaziarebuli postebi
+
+DONE for youze postis redaqtireba washla shegidzlia
+
+DONE eseigi shared postebi aris, like comment aris, share aris.
+DONE roca iuzeri posts aziarebs midis mesiji postis patrons
+
+anu yvela pontshi xval kidev davtestav queriebs da tu sheidzleba ro davaoptimizo kide ertxel
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -60,6 +71,7 @@ kide aklia is ro gaziarebul postze movides notificaciebi
 eseigi saits aklia celery da videos optimizacia
 mokled mere saits davumateb celery notificationebistvis!!!!!!!!!!!!!
 rodesac user shlis posts romelic sxvas aqvs gaziarebuli minda ro magaze notificatia miuvides!!
+roca user aziarebs posts magdrosac vgzavni notifications da egec unda gadavitano celerishi
 ///////////////////////////////////////////////////////////////////////////
 
 

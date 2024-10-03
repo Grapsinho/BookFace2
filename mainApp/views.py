@@ -4,11 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from users.models import User
 from friendship.models import FriendRequest, Friendship
-from posts.models import Tag, Like, Comment, SharedPost
+from posts.models import Tag, Like, Comment
 from notifications.models import Notification
-from django.db.models import Q, Case, When, CharField, Count, Prefetch, BooleanField, F
+from django.db.models import Q, Case, When, Count, Prefetch, BooleanField, F
 from itertools import chain
-from utils.utility import quicksort
+from utils.utility import quicksort, get_user_feed
 
 from django.core.cache import cache
 
@@ -17,9 +17,14 @@ def home(request):
 
     notifications = Notification.objects.filter(
         recipient=request.user
-    ).only('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
+    ).select_related('sender').only('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
 
-    tags = Tag.objects.all()
+    cache_key = f'tags'
+    tags = cache.get(cache_key)
+
+    if not tags:
+        tags = Tag.objects.all()
+        cache.set(cache_key, tags, timeout=604800)
 
     cache_key = f'user_friends_{request.user.pk}'
     user_friends = cache.get(cache_key)
@@ -47,11 +52,14 @@ def home(request):
         # Cache the result for a week
         cache.set(cache_key, user_friends, timeout=604800)
 
+    posts = get_user_feed(request.user)
+
     context = {
         'initial_notifications': notifications,
         'initial_notifications_length': len(notifications),
         'tags': tags,
-        'user_friends': user_friends
+        'user_friends': user_friends,
+        'posts': posts
     }
 
     return render(request, 'mainApp/home.html', context)
@@ -117,7 +125,7 @@ class ProfileView(View):
             'tags',  # Prefetch tags to avoid N+1
             comments_prefetch  # Prefetch comments for each post
         ).annotate(
-            like_count=Count('likes'),  # Efficient like counting
+            like_count=Count('likes'),
             user_liked=Case(
                 When(pk__in=user_post_likes, then=True), 
                 default=False, 
@@ -131,7 +139,7 @@ class ProfileView(View):
             'original_post__tags',  # Prefetch tags for the original post
             comments_prefetch  # Prefetch comments for each shared post
         ).annotate(
-            like_count=Count('likes'),  # Like count for shared posts
+            like_count=Count('likes'),
             user_liked=Case(
                 When(pk__in=user_shared_likes, then=True), 
                 default=False, 
@@ -149,7 +157,12 @@ class ProfileView(View):
             tags = Tag.objects.all()
             cache.set(cache_key, tags, timeout=604800)
 
-        user_tag_names = user.interests.tags.values_list('name', flat=True)
+        user_tag_names = ''
+        if request.user == user:
+            if hasattr(user, 'interests') and user.interests.tags.exists():
+                user_tag_names = user.interests.tags.values_list('name', flat=True)
+            else:
+                user_tag_names = []
 
         context = {
             'user_media': user_media,

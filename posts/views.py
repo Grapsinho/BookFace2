@@ -451,7 +451,7 @@ class SharePost(APIView):
             # Get the original post
             original_post = get_object_or_404(Post, id=post_id)
             
-            # Get the message from the request body (optional)
+            # Text From user who shared a post
             message = request.data
 
             # Check if the user already shared this post
@@ -463,6 +463,14 @@ class SharePost(APIView):
                 original_post=original_post,
                 shared_by=request.user,
                 message=message
+            )
+
+            notification = Notification.objects.create(
+                recipient=original_post.user,
+                sender=request.user,
+                message= "shared your post",
+                post_Id=original_post.pk,
+                notification_type = 'post_shared'
             )
             
             context = {"status": True}

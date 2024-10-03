@@ -268,6 +268,8 @@ class AddFriendsAndInterests(View):
             user_interest.tags.add(*tags)
             user_interest.save()
 
+            cache.delete(f'user_tags_{request.user.pk}')
+
             context = {"message": "Tags Added"}
             return JsonResponse(context, status=status.HTTP_200_OK)
 

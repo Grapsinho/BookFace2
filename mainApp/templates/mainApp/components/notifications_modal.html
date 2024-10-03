@@ -112,7 +112,7 @@
                 margin-block: 0.5rem;
               "
             >
-              {{i.sender__first_name}} {{i.sender__last_name}} has accepted your
+              {{i.sender.first_name}} {{i.sender.last_name}} has accepted your
               friend request
               <button
                 class="delete_message_dec"
@@ -329,6 +329,59 @@
                     Commented on Your Post:
                     <i> {{i.message|slice:":25"}} </i>
                   </span>
+                  <a
+                    href="#"
+                    type="button"
+                    data-post_id="{{i.post_Id}}"
+                    data-comment_btn="yes"
+                    data-sender_id="{{i.sender.id}}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop"
+                    class="view_post_notifications"
+                    style="font-size: 0.8rem; color: #007bff"
+                    >View Post</a
+                  >
+                  <button
+                    class="delete_message_dec"
+                    data-id="{{i.id}}"
+                    style="
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0.2rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-custom-class="custom-tooltip"
+                    data-bs-title="Delete Notification"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {% elif i.notification_type == "post_shared" %}
+
+            <div
+              class="d-flex align-items-center gap-2 my-3 container_for_like_notification"
+              style="background-color: #cadfff"
+            >
+              <a href="{% url 'profile' i.sender.email %}">
+                <img
+                  src="/static/media/{{i.sender.avatar}}"
+                  loading="lazy"
+                  style="border-radius: 50%; width: 50px; height: 50px"
+                />
+              </a>
+              <div style="display: flex; flex-direction: column">
+                <span style="color: black"
+                  >{{i.sender.first_name}} {{i.sender.last_name}}</span
+                >
+                <div>
+                  <span style="font-size: 0.9rem"> Shared Your Post </span>
                   <a
                     href="#"
                     type="button"

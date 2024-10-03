@@ -10,7 +10,7 @@
 
 <link
   rel="stylesheet"
-  href="{% static 'css/saerto_styles.css' %}"
+  href="{% static 'css/home&profile_styles.css' %}"
   type="text/css"
   media="screen"
 />
@@ -539,7 +539,7 @@
                     </p>
 
                     {% if post.original_post.video %}
-                    <video controls>
+                    <video controls style="max-height: 600px">
                       <source
                         src="/static/media/{{post.original_post.video}}"
                         loading="lazy"
@@ -767,7 +767,7 @@
                 <p class="post_text_edit_for">{{post.text}}</p>
 
                 {% if post.video %}
-                <video controls>
+                <video controls style="max-height: 600px">
                   <source
                     src="/static/media/{{post.video}}"
                     loading="lazy"
@@ -1284,7 +1284,9 @@
                   data-name_tag="{{ tag.name }}"
                   class="tag-checkbox"
                 />
-                <label for="tag-{{ tag.id }}">{{ tag.name }}</label>
+                <label for="tag-{{ tag.id }}" class="tag_names_tag"
+                  >{{ tag.name }}</label
+                >
                 {% endfor %}
               </div>
             </div>
@@ -1420,12 +1422,12 @@
 <script src="{% static 'js/profile23.js' %}"></script>
 <script type="module" src="{% static 'js/friends1.js' %}"></script>
 
-<script type="module" src="{% static 'js/crud_post.js' %}"></script>
+<script type="module" src="{% static 'js/crud_posts1.js' %}"></script>
 
 <script type="module" src="{% static 'js/postActions1.js' %}"></script>
 
 <script
   type="module"
-  src="{% static 'js/fetch_posts_forProfiles.js' %}"
+  src="{% static 'js/fetch_posts_forProfiles1.js' %}"
 ></script>
 {% endblock scripts %}

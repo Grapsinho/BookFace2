@@ -1,4 +1,4 @@
-{% extends 'mainApp/main.html' %} {% load static %}
+{% extends 'mainApp/main.html' %} {% load static %} {% load custom_filters %}
 <!--  -->
 {% block css %}
 <link
@@ -10,7 +10,7 @@
 
 <link
   rel="stylesheet"
-  href="{% static 'css/saerto_styles.css' %}"
+  href="{% static 'css/home&profile_styles.css' %}"
   type="text/css"
   media="screen"
 />
@@ -84,6 +84,18 @@
   .dropstart .dropdown-toggle::before {
     display: none;
   }
+
+  @media screen and (max-width: 1020px) {
+    .fixed-nav-container {
+      width: 200px !important;
+    }
+  }
+
+  @media screen and (max-width: 1000px) {
+    .sxvafirend {
+      width: 220px !important;
+    }
+  }
 </style>
 {% endblock css %}
 <!-- Page Content -->
@@ -115,19 +127,17 @@
 
     <!-- News Feed -->
     <section id="news-feed">
-      <!-- shared post -->
+      {% for post in posts %}
+      <!--  -->
+      {% if post|instanceof:"SharedPost" %}
+      <!--  -->
       {% include 'mainApp/components/shared-post.html' %}
-
-      <!-- text post -->
-      {% include 'mainApp/components/text-post.html' %}
-
-      <!-- photo post -->
-      {% include 'mainApp/components/photo-post.html' %}
-
-      <!-- video post -->
-      {% include 'mainApp/components/video-post.html' %}
-
-      <!-- Additional posts can be added similarly -->
+      <!--  -->
+      {% else %}
+      <!--  -->
+      {% include 'mainApp/components/casual-post.html' %} {% endif %}
+      <!--  -->
+      {% endfor %}
     </section>
   </div>
 
@@ -147,6 +157,91 @@
 <!-- Share Modal (Bootstrap) -->
 {% include 'mainApp/components/share_modal.html' %}
 <!--  -->
+
+<!-- Edit Post Modal -->
+<div
+  class="modal fade"
+  id="editPostModal"
+  tabindex="-1"
+  aria-labelledby="editPostModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editPostModalLabel">Edit Post</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- The post structure, but editable -->
+        <form id="editPostForm" method="patch" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="post-content">
+            <!-- Editable Post Text -->
+            <div class="mb-3">
+              <label for="editPostText" class="form-label">Post Text</label>
+              <textarea
+                class="form-control"
+                id="editPostText"
+                rows="3"
+                name="text"
+              ></textarea>
+            </div>
+
+            <!-- Editable Media (Image or Video) -->
+            <div class="mb-3">
+              <label for="editPostMedia" class="form-label"
+                >Post Media (Optional)</label
+              >
+              <div id="currentMedia"></div>
+              <input
+                type="file"
+                class="form-control"
+                name="media"
+                id="editPostMedia"
+              />
+            </div>
+
+            <!-- Editable Tags -->
+            <div class="tags-section mb-3">
+              <label for="tags">Select up to 5 tags: </label>
+              <div id="tags-wrapper23">
+                {% for tag in tags %}
+                <input
+                  type="checkbox"
+                  name="tags"
+                  value="{{ tag.name }}"
+                  id="tag3-{{ tag.id }}"
+                  data-name_tag="{{ tag.name }}"
+                  class="tag-checkbox23"
+                />
+                <label for="tag3-{{ tag.id }}" class="tag_names_tag"
+                  >{{ tag.name }}</label
+                >
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Post ID (Hidden) -->
+            <input type="hidden" id="editPostId" name="postId" />
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary edit_post_save_button_modal"
+          >
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div
   class="alert alert-warning alert-dismissible fade hide magariAlteri"
@@ -188,6 +283,6 @@
 </script>
 
 <script src="{% static 'js/home.js' %}"></script>
-<script type="module" src="{% static 'js/crud_post.js' %}"></script>
+<script type="module" src="{% static 'js/crud_posts1.js' %}"></script>
 <script src="{% static 'js/search.js' %}"></script>
 {% endblock scripts %}
