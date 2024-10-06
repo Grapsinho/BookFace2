@@ -17,7 +17,7 @@ from notifications.models import Notification
 from .forms import PostForm
 
 # Utility Imports
-from utils.utility import optimize_image, create_or_update_media
+from utils.utility import optimize_image, create_or_update_media, get_user_feed
 
 # Authentication and Permissions Imports
 from users.authentication import JWTAuthentication
@@ -247,7 +247,6 @@ def postForNotification(request):
             },
             'comments': comments_post2
         }
-
 
         return JsonResponse({'success': True, 'data': post_data})
     
@@ -546,6 +545,38 @@ class FetchPostsForScroll(ListAPIView):
                     post_html = render_to_string('posts/casual-post-post.html', {'post': post, 'request': request})
                 elif isinstance(post, SharedPost):  # Shared Post
                     post_html = render_to_string('posts/shared-post-posts.html', {'post': post, 'request': request})
+                posts_html.append(post_html)
+
+            return Response({'posts': posts_html}, status=200)
+        
+        except AuthenticationRedirectException as e:
+            return Response({"detail": str(e)}, status=401)
+        
+class FetchPostsForScrollFeed(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = PostPagination
+
+    def get(self, request, email, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, email=email)
+
+            offset = int(request.GET.get('offset', 8))
+            limit = int(request.GET.get('limit', 8))
+
+            all_posts = get_user_feed(request, user, offset, limit)
+
+            # Check if there are any posts to return
+            if not all_posts:
+                return Response({'posts': []}, status=200)
+
+            # Render HTML for the posts
+            posts_html = []
+            for post in all_posts:
+                if isinstance(post, Post):  # Casual Post
+                    post_html = render_to_string('mainApp/components/casual-post.html', {'post': post, 'request': request})
+                elif isinstance(post, SharedPost):  # Shared Post
+                    post_html = render_to_string('mainApp/components/shared-post.html', {'post': post, 'request': request})
                 posts_html.append(post_html)
 
             return Response({'posts': posts_html}, status=200)

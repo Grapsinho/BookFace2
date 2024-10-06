@@ -96,6 +96,16 @@
       width: 220px !important;
     }
   }
+
+  @media (max-width: 768px) {
+    .fixed-nav-container {
+      width: 100% !important;
+    }
+
+    .posts-area-mainpage-profilepage {
+      margin-bottom: 4rem;
+    }
+  }
 </style>
 {% endblock css %}
 <!-- Page Content -->
@@ -139,6 +149,10 @@
       <!--  -->
       {% endfor %}
     </section>
+
+    <div id="loading" style="display: block; text-align: center">
+      Loading more posts...
+    </div>
   </div>
 
   <!-- Right Sidebar for Friends List -->
@@ -268,6 +282,8 @@
     onclick="hideAlert()"
   ></button>
 </div>
+
+<input type="hidden" id="user_email123" value="{{request.user.email}}" />
 {% endblock content %}
 
 <!--  -->
@@ -280,9 +296,17 @@
     alertDiv.classList.remove("show"); // Remove the 'show' class to hide the alert
     alertDiv.classList.add("hide"); // Optionally, you can add 'hide' to keep it hidden
   }
+
+  document
+    .querySelector(".open_notifications_modal_andretrieve_notifications")
+    .addEventListener("click", (e) => {
+      e.preventDefault();
+    });
 </script>
 
 <script src="{% static 'js/home.js' %}"></script>
-<script type="module" src="{% static 'js/crud_posts1.js' %}"></script>
+<script type="module" src="{% static 'js/crud_posts.js' %}"></script>
 <script src="{% static 'js/search.js' %}"></script>
+<script type="module" src="{% static 'js/fetch_posts_for_feed.js' %}"></script>
+<script type="module" src="{% static 'js/postActions.js' %}"></script>
 {% endblock scripts %}

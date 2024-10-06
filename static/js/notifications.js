@@ -4,9 +4,15 @@ import {
   sendRequest,
 } from "./friends1.js";
 
-import { toggleComment } from "./postActions1.js";
+import { toggleComment } from "./postActions.js";
 
 const notificationsMenu = document.querySelector(".notifications_modal_body");
+
+function sanitizeInput(userInput) {
+  // Remove all HTML tags from user input
+  let sanitizedInput = userInput.replace(/(<([^>]+)>)/gi, "");
+  return sanitizedInput;
+}
 
 let notification_count_element = document.querySelector(".notification_count");
 let notification_count = notification_count_element
@@ -107,6 +113,197 @@ function htmlForRejectOrAcceptNotifications(
           </p>
 
       `;
+}
+
+function htmlForLikeCommentUnfriend(
+  sender_email,
+  sender_avatar,
+  sender_first_name,
+  sender_last_name,
+  post_id,
+  notification_id,
+  img_url_saidan,
+  unlikeorlike,
+  text,
+  type123,
+  sender_id,
+  nagdiPostId
+) {
+  let img_url = "";
+
+  if (img_url_saidan == "shecvale linki") {
+    img_url = `/static/media/${sender_avatar}`;
+  } else {
+    img_url = `/static${sender_avatar}`;
+  }
+
+  if (type123 == "comment") {
+    return `
+    
+            <div
+              class="d-flex align-items-center gap-2 my-3 container_for_like_notification container_For_comments container_for_unfriend_notification"
+              style="background-color: #fff4e6; border-color: #fd7e14"
+            >
+              <a href="${location.protocol}//${
+      location.host
+    }/profile/${sender_email}">
+                <img
+                  src="${img_url}"
+                  loading="lazy"
+                  style="border-radius: 50%; width: 50px; height: 50px"
+                />
+              </a>
+              <div style="display: flex; flex-direction: column; width: 80%">
+                <span style="color: black; font-size: 0.9rem"
+                  >${sender_first_name} ${sender_last_name}</span
+                >
+                <div>
+                  <span style="font-size: 0.9rem">
+                    Commented on Your Post:
+                    <i> ${post_id.slice(0, 25)} </i>
+                  </span>
+                  <a
+                    href="#"
+                    type="button"
+                    data-post_id="${nagdiPostId}"
+                    data-comment_btn="yes"
+                    data-sender_id="${sender_id}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop"
+                    class="view_post_notifications"
+                    style="font-size: 0.8rem; color: #007bff"
+                    >View Post</a
+                  >
+                  <button
+                    class="delete_message_dec"
+                    data-id="${notification_id}"
+                    style="
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0.2rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-custom-class="custom-tooltip"
+                    data-bs-title="Delete Notification"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+    
+    `;
+  } else if (type123 == "shared_post") {
+    return `
+            <div
+              class="d-flex align-items-center gap-2 my-3 container_for_like_notification container_for_unfriend_notification"
+              style="background-color: #cadfff"
+            >
+              <a href="${location.protocol}//${location.host}/profile/${sender_email}">
+                <img
+                  src="${img_url}"
+                  loading="lazy"
+                  style="border-radius: 50%; width: 50px; height: 50px"
+                />
+              </a>
+              <div style="display: flex; flex-direction: column">
+                <span style="color: black"
+                  >${sender_first_name} ${sender_last_name}</span
+                >
+                <div>
+                  <span style="font-size: 0.9rem"> ${text} </span>
+                  <a
+                    href="#"
+                    type="button"
+                    data-post_id="${nagdiPostId}"
+                    data-comment_btn="yes"
+                    data-sender_id="${sender_id}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop"
+                    class="view_post_notifications"
+                    style="font-size: 0.8rem; color: #007bff"
+                    >View Post</a
+                  >
+                  <button
+                    class="delete_message_dec"
+                    data-id="${notification_id}"
+                    style="
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0.2rem;
+                      background: none;
+                      border: none;
+                    "
+                    type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-custom-class="custom-tooltip"
+                    data-bs-title="Delete Notification"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+    `;
+  } else {
+    return `
+  
+    <div
+        class="d-flex align-items-center gap-2 my-3 ${unlikeorlike} container_for_unfriend_notification"
+      >
+        <a href="${location.protocol}//${location.host}/profile/${sender_email}">
+          <img
+            src="${img_url}"
+            loading="lazy"
+            style="border-radius: 50%; width: 50px; height: 50px"
+          />
+        </a>
+        <div style="display: flex; flex-direction: column; width: 80%">
+          <span style="color: black"
+            >${sender_first_name} ${sender_last_name}</span
+          >
+          <div>
+            <span style="font-size: 0.9rem"> ${text} </span>
+            <a
+              href="#"
+              type="button"
+              data-post_id="${post_id}"
+              data-bs-toggle="modal"
+              data-bs-target="#staticBackdrop"
+              class="view_post_notifications"
+              style="font-size: 0.8rem; color: #007bff"
+              >View Post</a
+            >
+
+            <button
+              class="delete_message_dec"
+              data-id="${notification_id}"
+              style="
+                font-size: 1.2rem;
+                cursor: pointer;
+                padding: 0.2rem;
+                background: none;
+                border: none;
+              "
+              type="button"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              data-bs-custom-class="custom-tooltip"
+              data-bs-title="Delete Notification"
+            >
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+
+    `;
+  }
 }
 
 // Function to remove a notification
@@ -339,6 +536,8 @@ function loadNotifications() {
         const notifications = data.notifications;
         const totalCount = data.total_count;
 
+        console.log(notifications);
+
         // Append the fetched notifications to the DOM
         appendNotificationsToDOM(notifications);
 
@@ -427,6 +626,72 @@ function appendNotificationsToDOM(notifications) {
           notification.id,
           "has rejected your friend request."
         );
+    } else if (notification.notification_type == "post_like") {
+      notificationsMenu.innerHTML =
+        notificationsMenu.innerHTML +
+        htmlForLikeCommentUnfriend(
+          notification.sender_email,
+          notification.sender_avatar,
+          notification.sender_first_name,
+          notification.sender_last_name,
+          parseInt(notification.message),
+          notification.id,
+          "shecvale linki",
+          "container_for_like_notification",
+          "Liked your post",
+          "no",
+          "araris aq post id"
+        );
+    } else if (notification.notification_type == "post_unlike") {
+      notificationsMenu.innerHTML =
+        notificationsMenu.innerHTML +
+        htmlForLikeCommentUnfriend(
+          notification.sender_email,
+          notification.sender_avatar,
+          notification.sender_first_name,
+          notification.sender_last_name,
+          parseInt(notification.message),
+          notification.id,
+          "shecvale linki",
+          "container_for_unlike_notification",
+          "UnLiked your post",
+          "no",
+          "araris aq post id"
+        );
+    } else if (notification.notification_type == "post_comment") {
+      notificationsMenu.innerHTML =
+        notificationsMenu.innerHTML +
+        htmlForLikeCommentUnfriend(
+          notification.sender_email,
+          notification.sender_avatar,
+          notification.sender_first_name,
+          notification.sender_last_name,
+          notification.message,
+          notification.id,
+          "shecvale linki",
+          "container_for_unlike_notification",
+          "Commented on your post",
+          "comment",
+          notification.sender_id,
+          notification.post_Id
+        );
+    } else if (notification.notification_type == "post_shared") {
+      notificationsMenu.innerHTML =
+        notificationsMenu.innerHTML +
+        htmlForLikeCommentUnfriend(
+          notification.sender_email,
+          notification.sender_avatar,
+          notification.sender_first_name,
+          notification.sender_last_name,
+          notification.message,
+          notification.id,
+          "shecvale linki",
+          "container_for_unlike_notification",
+          "Shared your post",
+          "shared_post",
+          notification.sender_id,
+          notification.post_Id
+        );
     }
   });
 
@@ -487,13 +752,20 @@ modalBody.addEventListener("scroll", () => {
   }
 });
 
-const view_post_notifications_buttons = document.querySelectorAll(
-  ".view_post_notifications"
+const notifications_modal_body = document.getElementById(
+  "notifications_modal_body_ID"
 );
 
-view_post_notifications_buttons.forEach((element) => {
-  element.addEventListener("click", (e) => {
-    e.preventDefault();
+const addCommentsnotificationPostModalBody = document.querySelector(
+  ".modal-body-for-post-notifications"
+);
+
+notifications_modal_body.addEventListener("click", function (event) {
+  if (event.target.classList.contains("view_post_notifications")) {
+    const element = event.target;
+
+    event.preventDefault();
+
     const notificationId = element.getAttribute("data-post_id");
     const senderId = element.getAttribute("data-sender_id");
 
@@ -638,27 +910,36 @@ view_post_notifications_buttons.forEach((element) => {
           document.querySelector(".magariAlteri2").classList.remove("show");
           document.querySelector(".magariAlteri2").classList.add("hide");
 
-          const commentButtons = document.querySelector(".addCommentOnPost");
+          console.log(addCommentsnotificationPostModalBody);
 
-          commentButtons.addEventListener("click", () => {
-            const parentEl = commentButtons.parentElement;
-            const commentInput = parentEl.querySelector(".comment_input");
-            const comment_cont = parentEl.querySelector(".comments");
+          addCommentsnotificationPostModalBody.addEventListener(
+            "click",
+            (event) => {
+              if (event.target.classList.contains("addCommentOnPost")) {
+                const element = event.target;
 
-            if (sanitizeInput(commentInput.value.trim())) {
-              toggleComment(
-                commentButtons.dataset.post_id,
-                commentButtons,
-                sanitizeInput(commentInput.value.trim()),
-                comment_cont
-              );
+                console.log(element);
+                const parentEl = element.parentElement;
+                const commentInput = parentEl.querySelector(".comment_input");
+                const comment_cont = parentEl.querySelector(".comments");
+
+                if (sanitizeInput(commentInput.value.trim())) {
+                  toggleComment(
+                    element.dataset.post_id,
+                    element,
+                    sanitizeInput(commentInput.value.trim()),
+                    comment_cont,
+                    "post_post"
+                  );
+                }
+              }
             }
-          });
+          );
         }
       },
       error: function (error) {
         console.log(error);
       },
     });
-  });
+  }
 });

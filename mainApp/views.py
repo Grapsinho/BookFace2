@@ -52,7 +52,7 @@ def home(request):
         # Cache the result for a week
         cache.set(cache_key, user_friends, timeout=604800)
 
-    posts = get_user_feed(request.user)
+    posts = get_user_feed(request, request.user)
 
     context = {
         'initial_notifications': notifications,

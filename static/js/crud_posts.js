@@ -652,20 +652,20 @@ function createSharePost(message, post_id) {
   });
 }
 
-if (shareButtons) {
-  shareButtons.forEach((shareButton) => {
-    shareButton.addEventListener("click", (event) => {
-      const postId = shareButton.dataset.post_id;
+parentElementPostsForClick.addEventListener("click", function (event) {
+  if (event.target.classList.contains("share-btn")) {
+    const element = event.target;
 
-      document.querySelector(".alertText").textContent = "Please Wait...";
-      document.querySelector(".magariAlteri2").classList.add("show");
-      document.querySelector(".magariAlteri2").classList.remove("hide");
-      document.querySelector(".magariAlteri2").style.zIndex = 123123;
+    const postId = element.dataset.post_id;
 
-      getOriginalPostForPreview(postId);
-    });
-  });
-}
+    document.querySelector(".alertText").textContent = "Please Wait...";
+    document.querySelector(".magariAlteri2").classList.add("show");
+    document.querySelector(".magariAlteri2").classList.remove("hide");
+    document.querySelector(".magariAlteri2").style.zIndex = 123123;
+
+    getOriginalPostForPreview(postId);
+  }
+});
 
 ///////////////////////////////// delete shared post ////////////////////////////////////
 

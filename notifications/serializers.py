@@ -13,7 +13,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ['id', 'notification_type', 'sender_first_name', 'sender_last_name', 'recipient_first_name', 'recipient_last_name', 'sender_email', 'sender_avatar', 'sender_id']
+        fields = ['id', 'notification_type', 'sender_first_name', 'sender_last_name', 'recipient_first_name', 'recipient_last_name', 'sender_email', 'sender_avatar', 'sender_id', 'post_Id', 'message']
 
     def get_sender_first_name(self, obj):
         return obj['sender__first_name']

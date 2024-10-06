@@ -6,6 +6,10 @@ function sanitizeInput(userInput) {
   return sanitizedInput;
 }
 
+const parentElementPostsForClick =
+  document.getElementById("profile-posts") ??
+  document.getElementById("news-feed");
+
 export function toggleLike(postId, button, sharedOrNot) {
   $.ajax({
     url: `${location.protocol}//${location.host}/posts/${postId}/like/`,
@@ -59,16 +63,16 @@ export function toggleLike(postId, button, sharedOrNot) {
   });
 }
 
-const likeButtons = document.querySelectorAll(".addLikeOnPost");
+parentElementPostsForClick.addEventListener("click", function (event) {
+  if (event.target.classList.contains("addLikeOnPost")) {
+    const element = event.target;
 
-likeButtons.forEach((element) => {
-  element.addEventListener("click", () => {
     if (element.dataset.shared_post) {
       toggleLike(element.dataset.post_id, element, "shared_post");
     } else {
       toggleLike(element.dataset.post_id, element, "post_post");
     }
-  });
+  }
 });
 
 export function toggleComment(postId, button, text, comment_cont, sharedOrNot) {
@@ -277,10 +281,10 @@ export function toggleComment(postId, button, text, comment_cont, sharedOrNot) {
   });
 }
 
-const commentButtons = document.querySelectorAll(".addCommentOnPost");
+parentElementPostsForClick.addEventListener("click", function (event) {
+  if (event.target.classList.contains("addCommentOnPost")) {
+    const element = event.target;
 
-commentButtons.forEach((element) => {
-  element.addEventListener("click", () => {
     const parentEl = element.parentElement;
     const commentInput = parentEl.querySelector(".comment_input");
     const comment_cont = parentEl.querySelector(".comments");
@@ -305,10 +309,8 @@ commentButtons.forEach((element) => {
         "post_post"
       );
     }
-  });
+  }
 });
-
-const delete_comment_btn = document.querySelectorAll(".delete_comment--btn");
 
 export function deleteCommentJsFIle(parentEl, comment_id) {
   $.ajax({
@@ -360,8 +362,10 @@ export function deleteCommentJsFIle(parentEl, comment_id) {
   });
 }
 
-delete_comment_btn.forEach((element) => {
-  element.addEventListener("click", () => {
+parentElementPostsForClick.addEventListener("click", function (event) {
+  if (event.target.classList.contains("delete_comment--btn")) {
+    const element = event.target;
+
     const commId = element.dataset.commentid;
     const parentElementCommentBtnDelete =
       element.parentElement.parentElement.parentElement;
@@ -372,13 +376,13 @@ delete_comment_btn.forEach((element) => {
     document.querySelector(".magariAlteri2").classList.add("show");
     document.querySelector(".magariAlteri2").classList.remove("hide");
     document.querySelector(".magariAlteri2").style.zIndex = 123123;
-  });
+  }
 });
 
-const edit_comment_btn = document.querySelectorAll(".edit_comment--btn");
+parentElementPostsForClick.addEventListener("click", function (event) {
+  if (event.target.classList.contains("edit_comment--btn")) {
+    const element = event.target;
 
-edit_comment_btn.forEach((element) => {
-  element.addEventListener("click", () => {
     const comment_text =
       (element.parentElement.parentElement.parentElement.querySelector(
         ".comment_text"
@@ -388,7 +392,7 @@ edit_comment_btn.forEach((element) => {
       (element.parentElement.parentElement.parentElement.querySelector(
         ".div-for-update-btn"
       ).style.display = "flex");
-  });
+  }
 });
 
 export function toggleEditComment(commentId, edit_cont, text, comment_text) {
@@ -441,12 +445,10 @@ export function toggleEditComment(commentId, edit_cont, text, comment_text) {
   });
 }
 
-const save_comment_edit_btn = document.querySelectorAll(
-  ".save-comment-edit-btn"
-);
+parentElementPostsForClick.addEventListener("click", function (event) {
+  if (event.target.classList.contains("save-comment-edit-btn")) {
+    const element = event.target;
 
-save_comment_edit_btn.forEach((element) => {
-  element.addEventListener("click", () => {
     const commId = element.dataset.commentid;
 
     const comment_text =
@@ -467,15 +469,13 @@ save_comment_edit_btn.forEach((element) => {
         comment_text
       );
     }
-  });
+  }
 });
 
-const edit_comment_btn_cancel = document.querySelectorAll(
-  ".save-comment-edit-btn-cancel"
-);
+parentElementPostsForClick.addEventListener("click", function (event) {
+  if (event.target.classList.contains("save-comment-edit-btn-cancel")) {
+    const element = event.target;
 
-edit_comment_btn_cancel.forEach((element) => {
-  element.addEventListener("click", () => {
     const comment_text =
       (element.parentElement.parentElement.parentElement.querySelector(
         ".comment_text"
@@ -485,5 +485,5 @@ edit_comment_btn_cancel.forEach((element) => {
       (element.parentElement.parentElement.parentElement.querySelector(
         ".div-for-update-btn"
       ).style.display = "none");
-  });
+  }
 });

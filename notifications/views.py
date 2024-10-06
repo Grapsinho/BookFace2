@@ -20,7 +20,7 @@ class UserNotificationsView(ListAPIView):
 
         return Notification.objects.filter(
             recipient=self.request.user
-        ).values('id', 'sender__first_name', 'sender__last_name', 'notification_type', 'recipient__first_name', 'recipient__last_name', 'sender__email', 'sender__avatar', 'sender__id').order_by('-timestamp')[offset:offset + limit]
+        ).values('id', 'sender__first_name', 'sender__last_name', 'notification_type', 'recipient__first_name', 'recipient__last_name', 'sender__email', 'sender__avatar', 'sender__id', 'post_Id', 'message').order_by('-timestamp')[offset:offset + limit]
 
     def list(self, request, *args, **kwargs):
         """

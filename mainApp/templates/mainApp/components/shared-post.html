@@ -14,6 +14,8 @@
       </div>
     </div>
 
+    {% if request.user == post.shared_by %}
+
     <div class="three_dot_for_post_edit_delete dropstart">
       <button
         class="dropdown-toggle"
@@ -39,6 +41,8 @@
         </li>
       </ul>
     </div>
+
+    {% endif %}
   </div>
   <div class="post-content">
     <p>{{post.message}}</p>

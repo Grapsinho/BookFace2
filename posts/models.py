@@ -25,7 +25,7 @@ class Post(models.Model):
         return f"Post by {self.user} on {self.created_at}"
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['created_at']
 
 class UserInterest(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='interests')
@@ -45,6 +45,7 @@ class SharedPost(models.Model):
 
     class Meta:
         unique_together = ('shared_by', 'original_post')
+        ordering = ['-created_at']
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
