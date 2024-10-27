@@ -1,31 +1,3 @@
-function scrollToBottom() {
-  const chatContainer = document.querySelector(".chat-body");
-  chatContainer.scrollTop =
-    chatContainer.scrollHeight - chatContainer.clientHeight;
-}
-
-// Open the chat window when a friend is clicked
-document.querySelectorAll(".friend").forEach((friend) => {
-  friend.addEventListener("click", function () {
-    const chatWindow = document.getElementById("chat-window");
-    const chatFriendName = document.getElementById("chat-friend-name");
-    const friendName = friend
-      .querySelector(".friend_name")
-      .getAttribute("data-name");
-    chatFriendName.textContent = `Chat with ${friendName}`;
-
-    chatWindow.classList.remove("chat-hidden");
-
-    scrollToBottom();
-  });
-});
-
-// Close the chat window
-document.getElementById("close-chat").addEventListener("click", function () {
-  const chatWindow = document.getElementById("chat-window");
-  chatWindow.classList.add("chat-hidden");
-});
-
 // these are for the create post
 
 let show_create_post = document.querySelector("#create-post");

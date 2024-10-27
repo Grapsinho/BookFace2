@@ -272,10 +272,44 @@ h4 {
   font-size: 0.8rem;
 }
 
+.message-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.message-header {
+  font-size: 0.7rem;
+  color: #000;
+}
+
+.message-options {
+  display: flex;
+  align-items: center;
+}
+
+.message-options button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #999;
+}
+
+.message-options .dropdown-menu {
+  font-size: 0.8rem;
+}
+
 .message {
   padding: 10px;
   border-radius: 10px;
-  max-width: 70%;
+  max-width: 80%;
+}
+
+.message-wrapper .d-flex {
+  display: flex;
+  align-items: center;
 }
 
 .received {

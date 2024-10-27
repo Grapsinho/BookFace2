@@ -25,6 +25,9 @@ urlpatterns = [
     # post creation urls
     path('posts/', include('posts.urls')),
 
+    # post creation urls
+    path('chat/', include('chatAndMessages.urls')),
+
     #for development
     path("__debug__/", include(debug_toolbar.urls)),
 ]

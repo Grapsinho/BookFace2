@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'search.apps.SearchConfig',
     'posts.apps.PostsConfig',
+    'chatAndMessages.apps.ChatandmessagesConfig',
 
     #api
     'rest_framework',
@@ -56,12 +57,14 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'users.User'
 
+STATIC_VERSION = '2.0'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 }
 

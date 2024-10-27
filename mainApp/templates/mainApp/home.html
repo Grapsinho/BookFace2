@@ -105,6 +105,10 @@
     .posts-area-mainpage-profilepage {
       margin-bottom: 4rem;
     }
+
+    .sxvafirend {
+      width: 100% !important;
+    }
   }
 </style>
 {% endblock css %}
@@ -304,9 +308,10 @@
     });
 </script>
 
-<script src="{% static 'js/home.js' %}"></script>
+<script src="{% static 'js/home.js' %}?v=2.0"></script>
 <script type="module" src="{% static 'js/crud_posts.js' %}"></script>
 <script src="{% static 'js/search.js' %}"></script>
 <script type="module" src="{% static 'js/fetch_posts_for_feed.js' %}"></script>
 <script type="module" src="{% static 'js/postActions.js' %}"></script>
+<script src="{% static 'js/messages.js' %}?v=3.0"></script>
 {% endblock scripts %}

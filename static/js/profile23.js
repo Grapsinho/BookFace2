@@ -29,33 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ends here
-
-  // Open the chat window when a friend is clicked
-  document.querySelectorAll(".friend").forEach((friend) => {
-    friend.addEventListener("click", function () {
-      const chatWindow = document.getElementById("chat-window");
-      const chatFriendName = document.getElementById("chat-friend-name");
-      const friendName = friend.getAttribute("data-name");
-      chatFriendName.textContent = `Chat with ${friendName}`;
-
-      chatWindow.classList.remove("chat-hidden");
-
-      scrollToBottom();
-    });
-  });
-
-  // Close the chat window
-  document.getElementById("close-chat").addEventListener("click", function () {
-    const chatWindow = document.getElementById("chat-window");
-    chatWindow.classList.add("chat-hidden");
-  });
 });
-
-function scrollToBottom() {
-  const chatContainer = document.querySelector(".chat-body");
-  chatContainer.scrollTop =
-    chatContainer.scrollHeight - chatContainer.clientHeight;
-}
 
 // ends here
 

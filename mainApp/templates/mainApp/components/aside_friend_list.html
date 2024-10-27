@@ -17,7 +17,13 @@
 
       <ul style="padding-left: 0">
         {% for i in user_friends %}
-        <li class="friend" style="cursor: pointer">
+        <li
+          class="friend"
+          style="cursor: pointer"
+          data-useremail="{{i.friend_email}}"
+          data-userphoto="static/media/{{i.friend_avatar}}"
+          data-requestuseremail="{{request.user.email}}"
+        >
           <img src="static/media/{{i.friend_avatar}}" alt="Friend Avatar" />
           <p
             class="friend_name"

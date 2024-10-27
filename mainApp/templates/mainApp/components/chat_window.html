@@ -1,18 +1,23 @@
 <!-- Chat Window -->
 <div id="chat-window" class="chat-hidden">
   <div class="chat-header">
-    <h4 id="chat-friend-name">Chat with Friend</h4>
+    <div
+      class="nameandphotoMessagesWindow"
+      style="display: flex; gap: 0.5rem; align-items: center"
+    >
+      <img
+        src="/static/media/avatars/default-boy-avatar.jpg"
+        alt=""
+        style="width: 40px; border-radius: 50%"
+        class="chat-friend-photo"
+      />
+      <h4 id="chat-friend-name" style="color: #fff">Friend</h4>
+    </div>
     <button id="close-chat">✖</button>
   </div>
 
-  <div class="chat-body">
-    <!-- Messages will go here -->
-    <div class="message received">
-      <p>Hey, how are you?</p>
-    </div>
-    <div class="message sent">
-      <p>I'm good, how about you?</p>
-    </div>
+  <div class="chat-body" style="max-height: 400px">
+    <p class="startCon" style="text-align: center">Please Wait...</p>
   </div>
 
   <div class="chat-input">
@@ -20,7 +25,14 @@
       type="text"
       placeholder="Type a message..."
       style="font-size: 0.8rem"
+      class="messageInputChatr"
     />
-    <button style="font-size: 0.8rem">Send</button>
+    <button
+      class="btn btn-primary send_messages--btn"
+      style="font-size: 0.8rem"
+      disabled
+    >
+      Send
+    </button>
   </div>
 </div>

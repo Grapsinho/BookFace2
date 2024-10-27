@@ -183,7 +183,15 @@
           </button>
           {% endif %}
 
-          <button class="friend" data-name="Friend 1">Message</button>
+          <button
+            class="friend"
+            data-name="{{ user.first_name }} {{ user.last_name }}"
+            data-useremail="{{user.email}}"
+            data-userphoto="/static/media/{{user.avatar}}"
+            data-requestuseremail="{{request.user.email}}"
+          >
+            Message
+          </button>
         </div>
         {% endif %}
       </div>
@@ -1430,4 +1438,5 @@
   type="module"
   src="{% static 'js/fetch_posts_forProfiles.js' %}"
 ></script>
+<script src="{% static 'js/messages.js' %}?v=3.0"></script>
 {% endblock scripts %}

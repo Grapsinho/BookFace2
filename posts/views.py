@@ -4,7 +4,6 @@ from django.template.loader import render_to_string
 from django.views import View
 from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch, Count, Case, When, BooleanField
-from utils.utility import quicksort
 from users.models import User
 from itertools import chain
 
@@ -17,7 +16,7 @@ from notifications.models import Notification
 from .forms import PostForm
 
 # Utility Imports
-from utils.utility import optimize_image, create_or_update_media, get_user_feed
+from utils.utility import optimize_image, create_or_update_media, get_user_feed, quicksort
 
 # Authentication and Permissions Imports
 from users.authentication import JWTAuthentication
