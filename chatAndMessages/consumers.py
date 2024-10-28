@@ -2,7 +2,14 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from .models import Chat, Message
 from users.models import User
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
+from channels.layers import get_channel_layer
+import bleach
+from utils.utility import returnTimeString
+
+def sanitize_input(user_input):
+    cleaned_input = bleach.clean(user_input, tags=['p', 'strong', 'em'], attributes={'*': ['class']})
+    return cleaned_input
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -49,7 +56,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     }
                 )
             else:
-                content = data['content']
+                content = sanitize_input(data['content'])
                 receiver_email = data['receiver']
                 receiver = await sync_to_async(User.objects.get)(email=receiver_email)
                 chat = await sync_to_async(Chat.create_conversation)(sender, receiver)
@@ -65,6 +72,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'message': content,
                         'sender_email': sender.email,
                         'message_id': message.pk
+                    }
+                )
+
+                # Send notification to WebSocket
+                await self.channel_layer.group_send(
+                    f"notifications_{receiver.id}",
+                    {
+                        'type': 'send_notification',
+                        'notification': {
+                            'notification_type': "message",
+                            "content": content,
+                            'chatId': chat.pk,
+                            "time": returnTimeString(message.timestamp),
+                            "receiver_email": receiver.email
+                        }
                     }
                 )
 

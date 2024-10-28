@@ -52,7 +52,7 @@ DONE eseigi main apshi unda gavaketo profileshi scroll based pagination postebis
 DONE eseigi xvalistvis aris ro anu pirvel rigshi roca vsqrolavt profileze postze unda davamatot share da like unda gavasworot!!!!!!!
 
 
-NEXT gavaketo for you.
+DONE gavaketo for you.
 
 DONE eseigi profilze shevcvale is ro userma posti washalos da edit anu roca axlebi emateba mashin!!!!
 
@@ -70,7 +70,7 @@ DONE moval pagination da egaa.
 DONE eseigi profilze ro sqrolavs da orjer ro laikdeba posti magas gavasworeb, davamateb imas ro kontainerze daklikebit DONE mivigo elementi ra rogorc sxvebia ise postActions gavasworeb mere aireva ragacebi wesit mara egenic unda gavasworo
 
 
-NEXT messages
+DONE messages
 
 
 DONE eseigi roca davaklikebt users unda gavgzavnot request chatistvis, avigebt current users da imas visac unda
@@ -78,9 +78,7 @@ ro miweros, mere shevamowmeb tu aris chati avigeb mesijebs tu arada gavgzavni uk
 
 DONE eseigi shemdegi aris ro gavgzavnot ukve mesiji, da amis mere ucbad mivamateb imasac ro mesiji waishalos da errorebs 
 
-NEXT notification meijebze
-
-
+DONE notification meijebze
 
 ///////////////////////////////////////////////////////////////////////////
 kide aklia is ro gaziarebul postze movides notificaciebi

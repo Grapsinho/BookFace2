@@ -6,9 +6,10 @@ from users.models import User
 from friendship.models import FriendRequest, Friendship
 from posts.models import Tag, Like, Comment
 from notifications.models import Notification
-from django.db.models import Q, Case, When, Count, Prefetch, BooleanField, F
+from django.db.models import Q, Case, When, Count, Prefetch, BooleanField, F, OuterRef, Subquery
 from itertools import chain
 from utils.utility import quicksort, get_user_feed
+from chatAndMessages.models import Chat, Message
 
 from django.core.cache import cache
 
@@ -54,12 +55,34 @@ def home(request):
 
     posts = get_user_feed(request, request.user)
 
+    last_message_subquery = Message.objects.filter(
+        chat=OuterRef('pk')
+    ).order_by('-timestamp')
+
+    
+    chats = Chat.objects.filter(
+        Q(con_starter=request.user) | Q(con_receiver=request.user)
+    ).annotate(
+        last_message_id=Subquery(last_message_subquery.values('id')[:1]),
+        last_message_content=Subquery(last_message_subquery.values('content')[:1]),
+        last_message_sender_id=Subquery(last_message_subquery.values('sender')[:1]),
+        last_message_receiver_id=Subquery(last_message_subquery.values('receiver')[:1]),
+        last_message_timestamp=Subquery(last_message_subquery.values('timestamp')[:1])
+    ).select_related(
+        'con_starter', 'con_receiver'
+    )
+    
+    message_ids = [chat.last_message_id for chat in chats if chat.last_message_id]
+    last_messages = Message.objects.filter(id__in=message_ids).select_related('sender', 'receiver')
+
+
     context = {
         'initial_notifications': notifications,
         'initial_notifications_length': len(notifications),
         'tags': tags,
         'user_friends': user_friends,
-        'posts': posts
+        'posts': posts,
+        'chats': last_messages
     }
 
     return render(request, 'mainApp/home.html', context)
@@ -164,6 +187,27 @@ class ProfileView(View):
             else:
                 user_tag_names = []
 
+        last_message_subquery = Message.objects.filter(
+            chat=OuterRef('pk')
+        ).order_by('-timestamp')
+
+        # Annotate each Chat with its last message's content, sender, receiver, and timestamp
+        chats = Chat.objects.filter(
+            Q(con_starter=request.user) | Q(con_receiver=request.user)
+        ).annotate(
+            last_message_id=Subquery(last_message_subquery.values('id')[:1]),
+            last_message_content=Subquery(last_message_subquery.values('content')[:1]),
+            last_message_sender_id=Subquery(last_message_subquery.values('sender')[:1]),
+            last_message_receiver_id=Subquery(last_message_subquery.values('receiver')[:1]),
+            last_message_timestamp=Subquery(last_message_subquery.values('timestamp')[:1])
+        ).select_related(
+            'con_starter', 'con_receiver'
+        )
+
+        # Gather the last messages by retrieving Message instances from annotated IDs
+        message_ids = [chat.last_message_id for chat in chats if chat.last_message_id]
+        last_messages = Message.objects.filter(id__in=message_ids).select_related('sender', 'receiver')
+
         context = {
             'user_media': user_media,
             'user': user,
@@ -177,7 +221,8 @@ class ProfileView(View):
             'all_posts': all_posts,
             'all_posts_length': len(all_posts),
             'user_tag_names': user_tag_names,
-            'serialized_tags': [tag.name for tag in tags]
+            'serialized_tags': [tag.name for tag in tags],
+            "chats": last_messages
         }
 
         return render(request, 'mainApp/profile.html', context)

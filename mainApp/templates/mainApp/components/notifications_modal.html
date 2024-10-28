@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %} {% load custom_filters %}
 
 <!-- Modal for notifications -->
 <div
@@ -47,8 +47,25 @@
             role="tab"
             aria-controls="messages"
             aria-selected="false"
+            style="position: relative"
           >
             Messages
+
+            <div
+              class="message_count_chat"
+              style="
+                position: absolute;
+                top: 0;
+                right: -10px;
+                background: red;
+                color: #fff;
+                border-radius: 50%;
+                width: 22px;
+                height: 22px;
+              "
+            >
+              10
+            </div>
           </button>
         </li>
       </ul>
@@ -435,39 +452,61 @@
           aria-labelledby="messages-tab"
         >
           <div class="modal-body">
-            <div class="message-preview notification_message_cont">
+            {% for chat in chats %}
+            <!--  -->
+            {% if chat.sender == request.user %}
+            <div
+              class="message-preview notification_message_cont friend"
+              data-useremail="{{ chat.receiver.email }}"
+              data-userphoto="/static/media/{{ chat.receiver.avatar }}"
+              data-requestuseremail="{{ request.user.email }}"
+              data-name="{{ chat.receiver.first_name }} {{ chat.receiver.last_name }}"
+              data-chatid="{{chat.chat.id}}-send"
+              data-bs-dismiss="modal"
+            >
               <div class="user-image">
                 <img
-                  src="/static/media/{{request.user.avatar}}"
+                  src="/static/media/{{ chat.receiver.avatar }}"
                   loading="lazy"
                   alt="User 1"
                 />
               </div>
               <div class="message-details">
-                <div class="username">Dalaca</div>
+                <div class="username">{{ chat.receiver.first_name }}</div>
                 <div class="message-text">
-                  You: Hey, how are you doing today?...
+                  You: {{ chat.content|first_n_items:20 }}
                 </div>
               </div>
-              <div class="message-time">2h</div>
+              <div class="message-time">{{ chat.timestamp|time_since }}</div>
             </div>
-
-            <div class="message-preview notification_message_cont">
+            {% else %}
+            <div
+              class="message-preview notification_message_cont friend received_message_messageTab"
+              data-useremail="{{ chat.sender.email }}"
+              data-userphoto="/static/media/{{ chat.sender.avatar }}"
+              data-requestuseremail="{{ request.user.email }}"
+              data-name="{{ chat.sender.first_name }} {{ chat.sender.last_name }}"
+              data-bs-dismiss="modal"
+              data-chatid="{{chat.chat.id}}-received"
+            >
               <div class="user-image">
                 <img
-                  src="/static/media/{{request.user.avatar}}"
+                  src="/static/media/{{ chat.sender.avatar }}"
                   loading="lazy"
                   alt="User 1"
                 />
               </div>
               <div class="message-details">
-                <div class="username">Dalaca2</div>
+                <div class="username">{{ chat.sender.first_name }}</div>
                 <div class="message-text" style="color: #fff">
-                  Hey, how are you doing today?...
+                  {{ chat.content|first_n_items:20 }}
                 </div>
               </div>
-              <div class="message-time">2h</div>
+              <div class="message-time">{{ chat.timestamp|time_since }}</div>
             </div>
+            {% endif %}
+            <!--  -->
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -521,4 +560,4 @@
   </div>
 </div>
 
-<script type="module" src="{% static 'js/notifications.js' %}"></script>
+<script type="module" src="{% static 'js/notifications.js' %}?v=1.0"></script>

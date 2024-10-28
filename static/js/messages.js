@@ -172,6 +172,7 @@ messageInputChat.addEventListener("input", () => {
 
   if (sanitizeInput(messageInput)) {
     send_messages__btn.removeAttribute("disabled");
+    send_messages__btn.textContent = "Send";
   } else {
     send_messages__btn.setAttribute("disabled", "true");
   }
@@ -229,6 +230,8 @@ function initializeWebSocket(chatId) {
 
       scrollToBottom2();
 
+      send_messages__btn.textContent = "Sent";
+
       const delete_message_chat = document.querySelectorAll(
         ".delete_message_chat"
       );
@@ -258,6 +261,8 @@ function initializeWebSocket(chatId) {
 send_messages__btn.addEventListener("click", () => {
   const messageInput = sanitizeInput(messageInputChat.value.trim());
   const receiverEmail = send_messages__btn.getAttribute("data-receiver_email");
+
+  send_messages__btn.textContent = "Wait...";
 
   if (messageInput != "") {
     sendMessage(messageInput, receiverEmail, false);
@@ -300,10 +305,7 @@ function deleteMessage(messageId, delete_messageTR = true) {
 }
 
 function deleteMessageUi(message_id) {
-  console.log(message_id);
   let messageDiv = document.querySelector(`[data-deltemes2="${message_id}"]`);
-
-  console.log(messageDiv);
 
   messageDiv.textContent = "Message Deleted";
 

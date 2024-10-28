@@ -8,6 +8,8 @@ from itertools import chain
 from friendship.models import Friendship
 from posts.models import Post, SharedPost, Like, Comment
 from django.core.cache import cache
+from django.utils import timezone
+from datetime import timedelta
 
 def optimize_image(image):
     # Open the uploaded image
@@ -59,6 +61,29 @@ def quicksort(arr, key):
     right = [x for x in arr if key(x) < key(pivot)]
     return quicksort(left, key) + middle + quicksort(right, key)
 
+
+def returnTimeString(timestamp):
+    """
+    this function returns time in string like 30s, 1h, 3d and etc.
+    """
+    if not timestamp:
+        return ""
+    now = timezone.now()
+    diff = now - timestamp
+
+    if diff < timedelta(minutes=1):
+        return f"{int(diff.total_seconds())}s"
+    elif diff < timedelta(hours=1):
+        return f"{int(diff.total_seconds() // 60)}m"
+    elif diff < timedelta(days=1):
+        return f"{int(diff.total_seconds() // 3600)}h"
+    elif diff < timedelta(days=7):
+        return f"{diff.days}d"
+    else:
+        weeks = diff.days // 7
+        return f"{weeks}w" if weeks < 5 else timestamp.strftime("%Y-%m-%d")
+
+########################## all these for user feed ##################################
 def get_user_tags(user):
     user_tags_cache_key = f'user_tags_{user.pk}'
     user_tags = cache.get(user_tags_cache_key)
@@ -71,7 +96,6 @@ def get_user_tags(user):
         cache.set(user_tags_cache_key, user_tags, timeout=604800)
     
     return user_tags
-
 
 def get_friends_ids(user):
     friends_ids_cache_key = f'friends_ids_{user.pk}'
@@ -183,7 +207,6 @@ def get_popular_posts(fetched_post_ids, user_post_likes, limit):
 
 
 
-
 def get_user_feed(request, user, offset=0, limit=7):
 
     is_ajax_request = request.headers.get('x-requested-with') == 'XMLHttpRequest'
@@ -221,3 +244,5 @@ def get_user_feed(request, user, offset=0, limit=7):
     request.session['fetched_shared_post_ids'] = list(fetched_shared_post_ids)
 
     return posts_combined
+
+########################## all these for user feed ##################################

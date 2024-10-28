@@ -7,6 +7,10 @@ import {
 import { toggleComment } from "./postActions.js";
 
 const notificationsMenu = document.querySelector(".notifications_modal_body");
+const notificationSound_message = new Audio(
+  "/static/sounds/new-message-31-183617.mp3"
+);
+let soundPlayCount = 0;
 
 function sanitizeInput(userInput) {
   // Remove all HTML tags from user input
@@ -417,6 +421,61 @@ ws.onmessage = function (e) {
           notification.notification_id,
           "has rejected your friend request."
         ) + notificationsMenu.innerHTML;
+    } else if (notification.notification_type == "message") {
+      let message_notification_div;
+
+      if (
+        document.querySelector(
+          `[data-chatid="${notification.chatId}-send"][data-requestuseremail="${notification.receiver_email}"]`
+        )
+      ) {
+        message_notification_div = document.querySelector(
+          `[data-chatid="${notification.chatId}-send"][data-requestuseremail="${notification.receiver_email}"]`
+        );
+
+        message_notification_div.setAttribute(
+          "data-chatid",
+          `${notification.chatId}-received`
+        );
+
+        message_notification_div.classList.add("received_message_messageTab");
+
+        const contentText =
+          message_notification_div.querySelector(".message-text");
+
+        const message_time =
+          message_notification_div.querySelector(".message-time");
+
+        contentText.textContent = `${notification.content}`;
+        contentText.style.color = "#fff";
+
+        message_time.textContent = `${notification.time}`;
+      } else if (
+        document.querySelector(
+          `[data-chatid="${notification.chatId}-received"][data-requestuseremail="${notification.receiver_email}"]`
+        )
+      ) {
+        message_notification_div = document.querySelector(
+          `[data-chatid="${notification.chatId}-received"][data-requestuseremail="${notification.receiver_email}"]`
+        );
+
+        const contentText =
+          message_notification_div.querySelector(".message-text");
+
+        const message_time =
+          message_notification_div.querySelector(".message-time");
+
+        contentText.textContent = `${notification.content}`;
+
+        message_time.textContent = `${notification.time}`;
+      }
+
+      if (soundPlayCount < 2) {
+        notificationSound_message.play().catch((error) => {
+          console.error("Error playing sound:", error);
+        });
+        soundPlayCount++;
+      }
     }
 
     const delete_message_dec = document.querySelectorAll(".delete_message_dec");
