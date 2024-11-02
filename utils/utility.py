@@ -84,130 +84,115 @@ def returnTimeString(timestamp):
         return f"{weeks}w" if weeks < 5 else timestamp.strftime("%Y-%m-%d")
 
 ########################## all these for user feed ##################################
-def get_user_tags(user):
-    user_tags_cache_key = f'user_tags_{user.pk}'
-    user_tags = cache.get(user_tags_cache_key)
+
+def get_user_likes(user):
+
+    """
+    retrieves all shared and casual posts that the user has
+    liked to annotate these posts in the feed. 
+    """
+
+    user_likes = Like.objects.filter(user=user).values('post_id', 'shared_post_id')
+
+    # storing these likes ids in set for fast lookups
+    user_post_likes = {like['post_id'] for like in user_likes if like['post_id']}
+    user_shared_likes = {like['shared_post_id'] for like in user_likes if like['shared_post_id']}
+
+    return user_post_likes, user_shared_likes
+
+def get_user_tags_and_friends(user):
+
+    """
+    retrieves user interests and user friends ids
+    """
+
+    cache_key = f'user_tags_friends_{user.pk}'
+    data = cache.get(cache_key)
     
-    if not user_tags:
+    if not data:
         if hasattr(user, 'interests') and user.interests.tags.exists():
             user_tags = list(user.interests.tags.values_list('id', flat=True))
         else:
-            user_tags = [] 
-        cache.set(user_tags_cache_key, user_tags, timeout=604800)
-    
-    return user_tags
+            user_tags = []
 
-def get_friends_ids(user):
-    friends_ids_cache_key = f'friends_ids_{user.pk}'
-    friends_ids = cache.get(friends_ids_cache_key)
-
-    if not friends_ids:
         friends_ids = list(Friendship.objects.filter(Q(user=user) | Q(friend=user))
-                            .values_list('user__id', 'friend__id'))
+                           .values_list('user__id', 'friend__id'))
+        
+        # ვშლით ამ user__id, friend__id და ვაბრუნებთ ერთ ლისტად შემდეგ გადაგვაქ სეთში რათა დუპლიკატები არ გვქონდეს
         friends_ids = set(chain.from_iterable(friends_ids))
-        cache.set(friends_ids_cache_key, friends_ids, timeout=604800)
-    
-    return friends_ids
+        
+        data = {'user_tags': user_tags, 'friends_ids': friends_ids}
+        cache.set(cache_key, data, timeout=604800)
 
-def get_tag_posts(user_tags, fetched_post_ids, fetched_shared_post_ids, user_shared_likes, user_post_likes, limit):
-    if not user_tags:
-        return Post.objects.none(), SharedPost.objects.none()
+    return data['user_tags'], data['friends_ids']
+
+def get_combined_posts(user, user_tags, friends_ids, fetched_post_ids, fetched_shared_post_ids, user_post_likes, user_shared_likes, limit):
+
+    """
+    fetches friend-based, tag-based and popular posts and combine them.
+    """
 
     comments_prefetch = Prefetch(
         'comments',
         queryset=Comment.objects.select_related('user').order_by('-created_at')
     )
 
-    tag_posts = Post.objects.filter(tags__in=user_tags).exclude(pk__in=fetched_post_ids) \
-                            .select_related('user') \
-                            .prefetch_related('tags', comments_prefetch) \
-                            .annotate(
-                                num_likes=Count('likes', distinct=True),
-                                num_comments=Count('comments', distinct=True),
-                                user_liked=Case(
-                                    When(pk__in=user_post_likes, then=True),
-                                    default=False,
-                                    output_field=BooleanField()
-                                )
-                            ).order_by('-created_at')[0:limit]
+    # Base post query excluding already fetched posts
+    posts_query = Post.objects.exclude(pk__in=fetched_post_ids) \
+                              .select_related('user') \
+                              .prefetch_related('tags', comments_prefetch) \
+                              .annotate(
+                                  num_likes=Count('likes', distinct=True),
+                                  num_comments=Count('comments', distinct=True),
+                                  user_liked=Case(
+                                      When(pk__in=user_post_likes, then=True),
+                                      default=False,
+                                      output_field=BooleanField()
+                                  )
+                              ).order_by('-created_at')
 
-    shared_tag_posts = SharedPost.objects.filter(original_post__tags__in=user_tags).exclude(pk__in=fetched_shared_post_ids) \
-                                         .select_related('original_post__user', 'shared_by') \
-                                         .prefetch_related('original_post__tags', comments_prefetch) \
-                                         .annotate(
-                                            num_likes=Count('likes', distinct=True),
-                                            num_comments=Count('original_post__comments', distinct=True),
-                                            user_liked=Case(
-                                                When(pk__in=user_shared_likes, then=True),
-                                                default=False,
-                                                output_field=BooleanField()
-                                            )
-                                         ).order_by('-created_at')[0:limit]
-    
-    return tag_posts, shared_tag_posts
+    # Filter by user tags and friends if available
+    tag_posts = posts_query.filter(tags__in=user_tags) if user_tags else Post.objects.none()
+    friends_posts = posts_query.filter(user_id__in=friends_ids) if friends_ids else Post.objects.none()
 
-def get_friends_posts(friends_ids, fetched_post_ids, fetched_shared_post_ids, user_shared_likes, user_post_likes, limit):
-    comments_prefetch = Prefetch(
-        'comments',
-        queryset=Comment.objects.select_related('user').order_by('-created_at')
-    )
+    # Base shared post query excluding already fetched shared posts
+    shared_posts_query = SharedPost.objects.exclude(pk__in=fetched_shared_post_ids) \
+                                           .select_related('original_post__user', 'shared_by') \
+                                           .prefetch_related('original_post__tags', comments_prefetch) \
+                                           .annotate(
+                                               num_likes=Count('likes', distinct=True),
+                                               num_comments=Count('original_post__comments', distinct=True),
+                                               user_liked=Case(
+                                                   When(pk__in=user_shared_likes, then=True),
+                                                   default=False,
+                                                   output_field=BooleanField()
+                                               )
+                                           ).order_by('-created_at')
 
-    friends_posts = Post.objects.filter(user_id__in=friends_ids) \
-                                .exclude(pk__in=fetched_post_ids) \
-                                .select_related('user') \
-                                .prefetch_related('tags', comments_prefetch) \
-                                .annotate(
-                                    num_likes=Count('likes', distinct=True),
-                                    num_comments=Count('comments', distinct=True),
-                                    user_liked=Case(
-                                        When(pk__in=user_post_likes, then=True),
-                                        default=False,
-                                        output_field=BooleanField()
-                                    )
-                                ).order_by('-created_at')[0:limit]
-    
-    shared_friends_posts = SharedPost.objects.filter(shared_by_id__in=friends_ids) \
-                                             .exclude(pk__in=fetched_shared_post_ids) \
-                                             .select_related('original_post__user', 'shared_by') \
-                                             .prefetch_related('original_post__tags', comments_prefetch) \
-                                             .annotate(
-                                                num_likes=Count('likes', distinct=True),
-                                                num_comments=Count('original_post__comments', distinct=True),
-                                                user_liked=Case(
-                                                    When(pk__in=user_shared_likes, then=True),
-                                                    default=False,
-                                                    output_field=BooleanField()
-                                                )
-                                             ).order_by('-created_at')[0:limit]
-    
-    return friends_posts, shared_friends_posts
+    shared_tag_posts = shared_posts_query.filter(original_post__tags__in=user_tags) if user_tags else SharedPost.objects.none()
+    shared_friends_posts = shared_posts_query.filter(shared_by_id__in=friends_ids) if friends_ids else SharedPost.objects.none()
 
-def get_popular_posts(fetched_post_ids, user_post_likes, limit):
-    comments_prefetch = Prefetch(
-        'comments',
-        queryset=Comment.objects.select_related('user').order_by('-created_at')
-    )
+    # Popular posts, filtered by likes or comments
+    popular_posts = posts_query.filter(Q(num_likes__gt=1) | Q(num_comments__gt=1))
 
-    popular_posts = Post.objects.annotate(
-        num_likes=Count('likes', distinct=True),
-        num_comments=Count('comments', distinct=True),
-        user_liked=Case(
-            When(pk__in=user_post_likes, then=True),
-            default=False,
-            output_field=BooleanField()
-        )
-    ).filter(
-        Q(num_likes__gt=1) | Q(num_comments__gt=1)
-    ).exclude(pk__in=fetched_post_ids) \
-    .select_related('user') \
-    .prefetch_related('tags', comments_prefetch) \
-    .order_by('-created_at')[0:limit]
-    
-    return popular_posts
+    # Combine all post lists into one and eliminate duplicates by PK
+    all_posts = list(chain(tag_posts, shared_tag_posts, friends_posts, shared_friends_posts, popular_posts))
+    unique_posts = {post.pk: post for post in all_posts}.values()
 
+    # Apply limit after deduplication
+    posts_combined = list(unique_posts)[:limit]
 
+    # Update fetched IDs to avoid fetching them again
+    fetched_post_ids.update(post.pk for post in posts_combined if isinstance(post, Post))
+    fetched_shared_post_ids.update(post.pk for post in posts_combined if isinstance(post, SharedPost))
+
+    return posts_combined, fetched_post_ids, fetched_shared_post_ids
 
 def get_user_feed(request, user, offset=0, limit=7):
+
+    """
+    This is the main function that generates the user feed by calling the helper functions defined above and manages session data.
+    """
 
     is_ajax_request = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
@@ -218,28 +203,15 @@ def get_user_feed(request, user, offset=0, limit=7):
     fetched_post_ids = set(request.session['fetched_post_ids'])
     fetched_shared_post_ids = set(request.session['fetched_shared_post_ids'])
 
-    user_tags = get_user_tags(user)
-    friends_ids = get_friends_ids(user)
+    user_tags, friends_ids = get_user_tags_and_friends(user)
+    user_post_likes, user_shared_likes = get_user_likes(user)
 
-    # Step 1: Get likes for posts
-    user_post_likes = Like.objects.filter(user=user, post__isnull=False).select_related('user', 'post').values_list('post_id', flat=True)
-    user_shared_likes = Like.objects.filter(user=user, shared_post__isnull=False).select_related('user', 'shared_post').values_list('shared_post_id', flat=True)
+    # Fetch combined posts
+    posts_combined, fetched_post_ids, fetched_shared_post_ids = get_combined_posts(
+        user, user_tags, friends_ids, fetched_post_ids, fetched_shared_post_ids, user_post_likes, user_shared_likes, limit
+    )
 
-    # Step 2: Fetch posts from different categories
-    tag_posts, shared_tag_posts = get_tag_posts(user_tags, fetched_post_ids, fetched_shared_post_ids, user_shared_likes, user_post_likes, limit)
-    fetched_post_ids.update(tag_posts.values_list('pk', flat=True))
-    fetched_shared_post_ids.update(shared_tag_posts.values_list('pk', flat=True))
-
-    friends_posts, shared_friends_posts = get_friends_posts(friends_ids, fetched_post_ids, fetched_shared_post_ids, user_shared_likes, user_post_likes, limit)
-    fetched_post_ids.update(friends_posts.values_list('pk', flat=True))
-    fetched_shared_post_ids.update(shared_friends_posts.values_list('pk', flat=True))
-    
-    popular_posts = get_popular_posts(fetched_post_ids, user_post_likes, limit)
-    fetched_post_ids.update(popular_posts.values_list('pk', flat=True))
-
-    # Step 3: Combine posts
-    posts_combined = list(chain(tag_posts, shared_tag_posts, friends_posts, shared_friends_posts, popular_posts))
-
+    # Update session with fetched IDs
     request.session['fetched_post_ids'] = list(fetched_post_ids)
     request.session['fetched_shared_post_ids'] = list(fetched_shared_post_ids)
 

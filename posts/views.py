@@ -16,7 +16,7 @@ from notifications.models import Notification
 from .forms import PostForm
 
 # Utility Imports
-from utils.utility import optimize_image, create_or_update_media, get_user_feed, quicksort
+from utils.utility import optimize_image, create_or_update_media, get_user_feed
 
 # Authentication and Permissions Imports
 from users.authentication import JWTAuthentication
@@ -490,23 +490,24 @@ class FetchPostsForScroll(ListAPIView):
 
     def get(self, request, email, *args, **kwargs):
         try:
+            # Retrieve user and parse offset and limit with safe defaults
             user = get_object_or_404(User, email=email)
-
-            offset = int(request.GET.get('offset', 0))  # Start at 0
+            offset = int(request.GET.get('offset', 0))
             limit = int(request.GET.get('limit', 2))
 
+            # Prefetch and annotate likes, comments, and liked status
             comments_prefetch = Prefetch(
                 'comments', 
                 queryset=Comment.objects.select_related('user').order_by('-created_at')
             )
 
+            # Collect user's post and shared post likes to optimize like checks
             user_post_likes = Like.objects.filter(user=request.user, post__isnull=False).values_list('post_id', flat=True)
-
             user_shared_likes = Like.objects.filter(user=request.user, shared_post__isnull=False).values_list('shared_post_id', flat=True)
 
+            # Fetch user posts and shared posts in a single query, annotate like counts and liked status
             posts_for_user = user.posts.select_related('user').prefetch_related(
-                'tags',
-                comments_prefetch
+                'tags', comments_prefetch
             ).annotate(
                 like_count=Count('likes'),
                 user_liked=Case(
@@ -514,13 +515,12 @@ class FetchPostsForScroll(ListAPIView):
                     default=False, 
                     output_field=BooleanField()
                 )
-            ).order_by('-created_at')[offset:offset + limit]
+            )
 
             shared_posts_for_user = user.shared_posts.select_related(
                 'shared_by', 'original_post__user'
             ).prefetch_related(
-                'original_post__tags',
-                comments_prefetch
+                'original_post__tags', comments_prefetch
             ).annotate(
                 like_count=Count('likes'),
                 user_liked=Case(
@@ -528,23 +528,23 @@ class FetchPostsForScroll(ListAPIView):
                     default=False, 
                     output_field=BooleanField()
                 )
-            ).order_by('-created_at')[offset:offset + limit]
+            )
 
-            combined_posts = list(chain(posts_for_user, shared_posts_for_user))
-            all_posts = quicksort(combined_posts, key=lambda post: post.created_at)
+            # Combine posts and order by created_at without re-sorting
+            combined_posts = list(chain(posts_for_user[offset:offset + limit], 
+                                        shared_posts_for_user[offset:offset + limit]))
 
             # Check if there are any posts to return
-            if not all_posts:
+            if not combined_posts:
                 return Response({'posts': []}, status=200)
 
-            # Render HTML for the posts
-            posts_html = []
-            for post in all_posts:
-                if isinstance(post, Post):  # Casual Post
-                    post_html = render_to_string('posts/casual-post-post.html', {'post': post, 'request': request})
-                elif isinstance(post, SharedPost):  # Shared Post
-                    post_html = render_to_string('posts/shared-post-posts.html', {'post': post, 'request': request})
-                posts_html.append(post_html)
+            # Render HTML for each post type
+            posts_html = [
+                render_to_string(
+                    'posts/casual-post-post.html' if isinstance(post, Post) else 'posts/shared-post-posts.html', 
+                    {'post': post, 'request': request}
+                ) for post in combined_posts
+            ]
 
             return Response({'posts': posts_html}, status=200)
         

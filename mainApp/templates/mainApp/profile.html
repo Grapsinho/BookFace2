@@ -74,6 +74,12 @@
     font-size: 1.5rem;
     color: #666;
   }
+
+  @media screen and (max-width: 768px) {
+    .user_postsWrapper_mainAbove {
+      width: 100% !important;
+    }
+  }
 </style>
 {% endblock css %}
 <!-- Page Content -->
@@ -461,7 +467,7 @@
         </aside>
 
         <!-- Right Column: User Posts -->
-        <div style="width: 60%">
+        <div style="width: 60%" class="user_postsWrapper_mainAbove">
           <main
             id="profile-posts"
             class="posts-area-mainpage-profilepage"
