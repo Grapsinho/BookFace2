@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from users.exceptions import AuthenticationRedirectException
 from notifications.models import Notification
 from django.db.models import Q
+from .tasks import notify_user_on_friend_request, handle_friend_request_response
 
 class SendFriendRequestView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -24,8 +25,6 @@ class SendFriendRequestView(APIView):
         try:
             # Get the receiver user
             receiver = User.objects.get(id=receiver_id)
-
-            print(receiver)
             
             # Ensure sender isn't sending a request to themselves
             if sender == receiver:
@@ -41,6 +40,9 @@ class SendFriendRequestView(APIView):
 
             # Create the friend request
             friend_request = FriendRequest.objects.create(sender=sender, receiver=receiver)
+
+            notify_user_on_friend_request.delay(friend_request.pk)
+
             return Response({"message": "Friend request sent."}, status=status.HTTP_201_CREATED)
 
         except AuthenticationRedirectException as e:
@@ -74,6 +76,8 @@ class RejectFriendRequestView(APIView):
             friend_request.save()
 
             notification = Notification.objects.get(id=notification_id)
+
+            handle_friend_request_response.delay(friend_request.pk, accepted=False)
 
             notification.delete()
 
@@ -110,6 +114,8 @@ class AcceptFriendRequestView(APIView):
             Friendship.create_friendship(sender, receiver)
 
             notification = Notification.objects.get(id=notification_id)
+
+            handle_friend_request_response.delay(friend_request.pk, accepted=True)
 
             notification.delete()
 

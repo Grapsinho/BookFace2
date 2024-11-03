@@ -80,17 +80,7 @@ DONE eseigi shemdegi aris ro gavgzavnot ukve mesiji, da amis mere ucbad mivamate
 
 DONE notification meijebze
 
-///////////////////////////////////////////////////////////////////////////
-kide aklia is ro gaziarebul postze movides notificaciebi
-eseigi saits aklia celery da videos optimizacia
-mokled mere saits davumateb celery notificationebistvis!!!!!!!!!!!!!
-rodesac user shlis posts romelic sxvas aqvs gaziarebuli minda ro magaze notificatia miuvides!!
-roca user aziarebs posts magdrosac vgzavni notifications da egec unda gadavitano celerishi
-///////////////////////////////////////////////////////////////////////////
-
-
-
-
+DONE eseigi davamato celery saitze
 
 /////////////////////////////// DONE //////////////////////////////////////
 2. Profiles & Friendships

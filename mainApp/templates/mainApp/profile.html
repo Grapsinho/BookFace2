@@ -989,6 +989,8 @@
 
   <ul class="friend-list">
     {% for i in user_friends %}
+    <!--  -->
+    {% if i.user_email == user.email %}
     <li class="friend-item">
       <a
         href="{% url 'profile' i.friend_email %}"
@@ -1004,6 +1006,23 @@
         </p>
       </a>
     </li>
+    {% else %}
+    <li class="friend-item">
+      <a
+        href="{% url 'profile' i.user_email %}"
+        style="display: flex; gap: 0.5rem; align-items: center"
+      >
+        <img
+          src="/static/media/{{i.user_avatar}}"
+          loading="lazy"
+          alt="Friend Avatar"
+        />
+        <p class="friend-name">{{i.user_first_name}} {{i.user_last_name}}</p>
+      </a>
+    </li>
+    <!--  -->
+    {% endif %}
+    <!--  -->
     {% endfor %}
   </ul>
 </div>

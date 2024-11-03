@@ -17,6 +17,9 @@
 
       <ul style="padding-left: 0">
         {% for i in user_friends %}
+
+        <!--  -->
+        {% if i.user_email == request.user.email %}
         <li
           class="friend"
           style="cursor: pointer"
@@ -32,6 +35,25 @@
             {{i.friend_first_name}} {{i.friend_last_name}}
           </p>
         </li>
+        {% else %}
+        <li
+          class="friend"
+          style="cursor: pointer"
+          data-useremail="{{i.user_email}}"
+          data-userphoto="static/media/{{i.user_avatar}}"
+          data-requestuseremail="{{request.user.email}}"
+        >
+          <img src="static/media/{{i.user_avatar}}" alt="Friend Avatar" />
+          <p
+            class="friend_name"
+            data-name="{{i.user_first_name}} {{i.user_last_name}}"
+          >
+            {{i.user_first_name}} {{i.user_last_name}}
+          </p>
+        </li>
+        <!--  -->
+        {% endif %}
+        <!--  -->
         {% endfor %}
       </ul>
     </section>

@@ -15,74 +15,67 @@ from django.core.cache import cache
 
 @login_required(login_url='login')
 def home(request):
+    user = request.user
+    
+    # Cache and query notifications, only fetch necessary fields
+    notifications = Notification.objects.filter(recipient=user) \
+        .select_related('sender') \
+        .only('id', 'sender__email', 'sender__id', 'sender__avatar', 'sender__first_name', 
+              'sender__last_name', 'notification_type', 'message', 'post_Id') \
+        .order_by('-timestamp')[:7]
 
-    notifications = Notification.objects.filter(
-        recipient=request.user
-    ).select_related('sender').only('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
+    # Cache and retrieve tags
+    tags = cache.get_or_set('tags', Tag.objects.all, timeout=604800)
 
-    cache_key = f'tags'
-    tags = cache.get(cache_key)
-
-    if not tags:
-        tags = Tag.objects.all()
-        cache.set(cache_key, tags, timeout=604800)
-
-    cache_key = f'user_friends_{request.user.pk}'
+    # Cache and retrieve friends list
+    cache_key = f'user_friends_{user.pk}'
     user_friends = cache.get(cache_key)
-
+    
     if not user_friends:
-        # Fetch friends where the user is the 'user' in the Friendship model
-        user_is_user_friends = Friendship.objects.filter(user=request.user).select_related('friend').values(
-            friend_first_name=F('friend__first_name'),
-            friend_last_name=F('friend__last_name'),
-            friend_email=F('friend__email'),
-            friend_avatar=F('friend__avatar')
-        )[:10]
-
-        # Fetch friends where the user is the 'friend' in the Friendship model
-        user_is_friend_friends = Friendship.objects.filter(friend=request.user).select_related('user').values(
-            friend_first_name=F('user__first_name'),
-            friend_last_name=F('user__last_name'),
-            friend_email=F('user__email'),
-            friend_avatar=F('user__avatar')
-        )[:10]
-
-        # Combine both querysets using UNION
-        user_friends = list(user_is_user_friends.union(user_is_friend_friends))
-
-        # Cache the result for a week
+        # Combine both user-friend relationships in one query
+        user_friends = Friendship.objects.filter(Q(user=user) | Q(friend=user)) \
+            .select_related('user', 'friend') \
+            .values(
+                friend_first_name=F('friend__first_name'),
+                friend_last_name=F('friend__last_name'),
+                friend_email=F('friend__email'),
+                friend_avatar=F('friend__avatar'),
+                user_first_name=F('user__first_name'),
+                user_last_name=F('user__last_name'),
+                user_email=F('user__email'),
+                user_avatar=F('user__avatar')
+            )[:10]
+        
         cache.set(cache_key, user_friends, timeout=604800)
 
-    posts = get_user_feed(request, request.user)
-
-    last_message_subquery = Message.objects.filter(
-        chat=OuterRef('pk')
-    ).order_by('-timestamp')
-
+    # Fetch user posts for feed
+    posts = get_user_feed(request, user)
     
-    chats = Chat.objects.filter(
-        Q(con_starter=request.user) | Q(con_receiver=request.user)
-    ).annotate(
-        last_message_id=Subquery(last_message_subquery.values('id')[:1]),
-        last_message_content=Subquery(last_message_subquery.values('content')[:1]),
-        last_message_sender_id=Subquery(last_message_subquery.values('sender')[:1]),
-        last_message_receiver_id=Subquery(last_message_subquery.values('receiver')[:1]),
-        last_message_timestamp=Subquery(last_message_subquery.values('timestamp')[:1])
-    ).select_related(
-        'con_starter', 'con_receiver'
-    )
+    # Retrieve chat data with optimized last message annotations
+    last_message_subquery = Message.objects.filter(chat=OuterRef('pk')).order_by('-timestamp')
     
-    message_ids = [chat.last_message_id for chat in chats if chat.last_message_id]
-    last_messages = Message.objects.filter(id__in=message_ids).select_related('sender', 'receiver')
+    chats = Chat.objects.filter(Q(con_starter=user) | Q(con_receiver=user)) \
+        .annotate(
+            last_message_id=Subquery(last_message_subquery.values('id')[:1]),
+            last_message_content=Subquery(last_message_subquery.values('content')[:1]),
+            last_message_sender_id=Subquery(last_message_subquery.values('sender')[:1]),
+            last_message_receiver_id=Subquery(last_message_subquery.values('receiver')[:1]),
+            last_message_timestamp=Subquery(last_message_subquery.values('timestamp')[:1])
+        ) \
+        .select_related('con_starter', 'con_receiver')
 
+    # Fetch last messages in one query
+    last_messages = Message.objects.filter(id__in=[chat.last_message_id for chat in chats if chat.last_message_id]) \
+        .select_related('sender', 'receiver')
 
+    # Render context
     context = {
         'initial_notifications': notifications,
         'initial_notifications_length': len(notifications),
         'tags': tags,
         'user_friends': user_friends,
         'posts': posts,
-        'chats': last_messages
+        'chats': last_messages,
     }
 
     return render(request, 'mainApp/home.html', context)
@@ -95,30 +88,24 @@ class ProfileView(View):
 
         cache_key = f'user_friends_{user.pk}'
         user_friends = cache.get(cache_key)
-
+        
         if not user_friends:
-            # Fetch friends where the user is the 'user' in the Friendship model
-            user_is_user_friends = Friendship.objects.filter(user=user).select_related('friend').values(
-                friend_first_name=F('friend__first_name'),
-                friend_last_name=F('friend__last_name'),
-                friend_email=F('friend__email'),
-                friend_avatar=F('friend__avatar')
-            )[:10]
-
-            # Fetch friends where the user is the 'friend' in the Friendship model
-            user_is_friend_friends = Friendship.objects.filter(friend=user).select_related('user').values(
-                friend_first_name=F('user__first_name'),
-                friend_last_name=F('user__last_name'),
-                friend_email=F('user__email'),
-                friend_avatar=F('user__avatar')
-            )[:10]
-
-            # Combine both querysets using UNION
-            user_friends = list(user_is_user_friends.union(user_is_friend_friends))
-
-            # Cache the result for a week
+            # Combine both user-friend relationships in one query
+            user_friends = Friendship.objects.filter(Q(user=user) | Q(friend=user)) \
+                .select_related('user', 'friend') \
+                .values(
+                    friend_first_name=F('friend__first_name'),
+                    friend_last_name=F('friend__last_name'),
+                    friend_email=F('friend__email'),
+                    friend_avatar=F('friend__avatar'),
+                    user_first_name=F('user__first_name'),
+                    user_last_name=F('user__last_name'),
+                    user_email=F('user__email'),
+                    user_avatar=F('user__avatar')
+                )[:10]
+            
             cache.set(cache_key, user_friends, timeout=604800)
-
+            
         notifications = Notification.objects.filter(
             recipient=request.user
         ).select_related('sender').only('id', 'sender__email', 'sender__id', 'sender__avatar', "sender__first_name", "sender__last_name", 'notification_type', 'message', 'post_Id').order_by('-timestamp')[:7]
