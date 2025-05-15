@@ -86,123 +86,132 @@ def returnTimeString(timestamp):
 ########################## all these for user feed ##################################
 
 def get_user_likes(user):
-
     """
-    retrieves all shared and casual posts that the user has
-    liked to annotate these posts in the feed. 
+    Retrieves all shared and casual posts that the user has liked to annotate these posts in the feed.
     """
-
-    user_likes = Like.objects.filter(user=user).values('post_id', 'shared_post_id')
-
-    # storing these likes ids in set for fast lookups
-    user_post_likes = {like['post_id'] for like in user_likes if like['post_id']}
-    user_shared_likes = {like['shared_post_id'] for like in user_likes if like['shared_post_id']}
+    # Fetch likes in separate queries for efficiency
+    user_post_likes = set(
+        Like.objects.filter(user=user, post_id__isnull=False).values_list('post_id', flat=True)
+    )
+    user_shared_likes = set(
+        Like.objects.filter(user=user, shared_post_id__isnull=False).values_list('shared_post_id', flat=True)
+    )
 
     return user_post_likes, user_shared_likes
 
+
 def get_user_tags_and_friends(user):
-
     """
-    retrieves user interests and user friends ids
+    Retrieves user interests and user friends' IDs.
     """
-
     cache_key = f'user_tags_friends_{user.pk}'
     data = cache.get(cache_key)
     
     if not data:
-        if hasattr(user, 'interests') and user.interests.tags.exists():
-            user_tags = list(user.interests.tags.values_list('id', flat=True))
-        else:
-            user_tags = []
+        # Fetch user tags efficiently
+        user_tags = (
+            list(user.interests.tags.values_list('id', flat=True))
+            if hasattr(user, 'interests') and user.interests.tags.exists()
+            else []
+        )
 
-        friends_ids = list(Friendship.objects.filter(Q(user=user) | Q(friend=user))
-                           .values_list('user__id', 'friend__id'))
-        
-        # ვშლით ამ user__id, friend__id და ვაბრუნებთ ერთ ლისტად შემდეგ გადაგვაქ სეთში რათა დუპლიკატები არ გვქონდეს
-        friends_ids = set(chain.from_iterable(friends_ids))
+        # Retrieve friend IDs directly with distinct values
+        friends_ids = set(
+            Friendship.objects.filter(Q(user=user) | Q(friend=user))
+            .values_list('user_id', 'friend_id')
+            .distinct()
+            .values_list(flat=True)
+        )
         
         data = {'user_tags': user_tags, 'friends_ids': friends_ids}
         cache.set(cache_key, data, timeout=604800)
 
     return data['user_tags'], data['friends_ids']
 
+
 def get_combined_posts(user, user_tags, friends_ids, fetched_post_ids, fetched_shared_post_ids, user_post_likes, user_shared_likes, limit):
-
     """
-    fetches friend-based, tag-based and popular posts and combine them.
+    Fetches friend-based, tag-based, and popular posts and combines them.
     """
-
     comments_prefetch = Prefetch(
         'comments',
         queryset=Comment.objects.select_related('user').order_by('-created_at')
     )
 
     # Base post query excluding already fetched posts
-    posts_query = Post.objects.exclude(pk__in=fetched_post_ids) \
-                              .select_related('user') \
-                              .prefetch_related('tags', comments_prefetch) \
-                              .annotate(
-                                  num_likes=Count('likes', distinct=True),
-                                  num_comments=Count('comments', distinct=True),
-                                  user_liked=Case(
-                                      When(pk__in=user_post_likes, then=True),
-                                      default=False,
-                                      output_field=BooleanField()
-                                  )
-                              ).order_by('-created_at')
+    posts_query = (
+        Post.objects.exclude(pk__in=fetched_post_ids)
+        .select_related('user')
+        .prefetch_related('tags', comments_prefetch)
+        .annotate(
+            num_likes=Count('likes', distinct=True),
+            num_comments=Count('comments', distinct=True),
+            user_liked=Case(
+                When(pk__in=user_post_likes, then=True),
+                default=False,
+                output_field=BooleanField()
+            )
+        )
+        .order_by('-created_at')
+    )
 
-    # Filter by user tags and friends if available
+    # Filter posts by user tags and friends
     tag_posts = posts_query.filter(tags__in=user_tags) if user_tags else Post.objects.none()
     friends_posts = posts_query.filter(user_id__in=friends_ids) if friends_ids else Post.objects.none()
 
     # Base shared post query excluding already fetched shared posts
-    shared_posts_query = SharedPost.objects.exclude(pk__in=fetched_shared_post_ids) \
-                                           .select_related('original_post__user', 'shared_by') \
-                                           .prefetch_related('original_post__tags', comments_prefetch) \
-                                           .annotate(
-                                               num_likes=Count('likes', distinct=True),
-                                               num_comments=Count('original_post__comments', distinct=True),
-                                               user_liked=Case(
-                                                   When(pk__in=user_shared_likes, then=True),
-                                                   default=False,
-                                                   output_field=BooleanField()
-                                               )
-                                           ).order_by('-created_at')
+    shared_posts_query = (
+        SharedPost.objects.exclude(pk__in=fetched_shared_post_ids)
+        .select_related('original_post__user', 'shared_by')
+        .prefetch_related('original_post__tags', comments_prefetch)
+        .annotate(
+            num_likes=Count('likes', distinct=True),
+            num_comments=Count('original_post__comments', distinct=True),
+            user_liked=Case(
+                When(pk__in=user_shared_likes, then=True),
+                default=False,
+                output_field=BooleanField()
+            )
+        )
+        .order_by('-created_at')
+    )
 
     shared_tag_posts = shared_posts_query.filter(original_post__tags__in=user_tags) if user_tags else SharedPost.objects.none()
     shared_friends_posts = shared_posts_query.filter(shared_by_id__in=friends_ids) if friends_ids else SharedPost.objects.none()
 
-    # Popular posts, filtered by likes or comments
+    # Popular posts, included in the main query as an annotation
     popular_posts = posts_query.filter(Q(num_likes__gt=1) | Q(num_comments__gt=1))
 
-    # Combine all post lists into one and eliminate duplicates by PK
+    # Combine posts into one list, ensuring deduplication and order
     all_posts = list(chain(tag_posts, shared_tag_posts, friends_posts, shared_friends_posts, popular_posts))
     unique_posts = {post.pk: post for post in all_posts}.values()
 
-    # Apply limit after deduplication
+    # Limit posts after deduplication
     posts_combined = list(unique_posts)[:limit]
 
-    # Update fetched IDs to avoid fetching them again
+    # Update fetched IDs
     fetched_post_ids.update(post.pk for post in posts_combined if isinstance(post, Post))
     fetched_shared_post_ids.update(post.pk for post in posts_combined if isinstance(post, SharedPost))
 
     return posts_combined, fetched_post_ids, fetched_shared_post_ids
 
+
 def get_user_feed(request, user, offset=0, limit=7):
-
     """
-    This is the main function that generates the user feed by calling the helper functions defined above and manages session data.
+    Main function that generates the user feed by calling helper functions and manages session data.
     """
-
     is_ajax_request = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     if not is_ajax_request:
+        # Initialize fetched IDs in session
         request.session['fetched_post_ids'] = set()
         request.session['fetched_shared_post_ids'] = set()
 
+    # Retrieve fetched IDs from session
     fetched_post_ids = set(request.session['fetched_post_ids'])
     fetched_shared_post_ids = set(request.session['fetched_shared_post_ids'])
 
+    # Retrieve user-specific data
     user_tags, friends_ids = get_user_tags_and_friends(user)
     user_post_likes, user_shared_likes = get_user_likes(user)
 
@@ -211,7 +220,7 @@ def get_user_feed(request, user, offset=0, limit=7):
         user, user_tags, friends_ids, fetched_post_ids, fetched_shared_post_ids, user_post_likes, user_shared_likes, limit
     )
 
-    # Update session with fetched IDs
+    # Update session data
     request.session['fetched_post_ids'] = list(fetched_post_ids)
     request.session['fetched_shared_post_ids'] = list(fetched_shared_post_ids)
 
